@@ -1,9 +1,9 @@
-const http = require("http");
-const https = require("https");
-const { moderator } = require('./general');
+import * as http from "http";
+import * as https from "https";
+import { moderator } from './general.js';
 
 
-async function apiRequest(url, options = {}, jsonData = true, httpsConnection = false)   {
+export async function apiRequest(url, options = {}, jsonData = true, httpsConnection = false) {
 
     const httpAgent = new http.Agent({
         rejectUnauthorized: false
@@ -16,22 +16,21 @@ async function apiRequest(url, options = {}, jsonData = true, httpsConnection = 
     let selectedAgent = httpsConnection ? httpsAgent : httpAgent;
 
     let headers = {
-            "Content-Type" : "application/json",
+            "Content-Type": "application/json",
         };
 
-    if(options.headers) {
+    if (options.headers) {
         Object.assign(headers, options.headers);
     }
 
-    let requestOptions = jsonData ? {...options, headers, agent : selectedAgent} : options,
+    let requestOptions = jsonData ? { ...options, headers, agent: selectedAgent } : options,
         res = await fetch(url, requestOptions),
         data = await res.json();
 
     return data;
-
 }
 
-async function dynamicApiRequest(url, options = {}, jsonData = true, httpsConnection = false) {
+export async function dynamicApiRequest(url, options = {}, jsonData = true, httpsConnection = false) {
     const isHttps = url.startsWith("https:");
 
     const agent = isHttps
@@ -39,14 +38,14 @@ async function dynamicApiRequest(url, options = {}, jsonData = true, httpsConnec
         : new http.Agent({ rejectUnauthorized: false });
 
     let headers = {
-            "Content-Type" : "application/json",
+            "Content-Type": "application/json",
         };
 
-    if(options.headers) {
+    if (options.headers) {
         Object.assign(headers, options.headers);
     }
 
-    let requestOptions = jsonData ? {...options, headers, agent} : options,
+    let requestOptions = jsonData ? { ...options, headers, agent } : options,
         res = await fetch(url, requestOptions),
         contentType = res.headers.get('Content-Type');
 
@@ -61,20 +60,20 @@ async function dynamicApiRequest(url, options = {}, jsonData = true, httpsConnec
     }
 }
 
-async function postDataObjects(url, dataObjects, options = {}, limit = 5, callback = async() => {}, jsonData = true, httpsConnection = false)   {
-    
+export async function postDataObjects(url, dataObjects, options = {}, limit = 5, callback = async () => { }, jsonData = true, httpsConnection = false) {
+
     let allResults = [];
 
     await moderator(dataObjects, async (slicedArr) => {
 
         let requestPromises = slicedArr.map(item => {
-            return async function() {
+            return async function () {
                 try {
                     let postResult = await apiRequest(
-                        url, 
+                        url,
                         {
-                            method : "POST",
-                            body : JSON.stringify(item, null, 4),
+                            method: "POST",
+                            body: JSON.stringify(item, null, 4),
                             ...options
                         },
                         jsonData,
@@ -82,12 +81,12 @@ async function postDataObjects(url, dataObjects, options = {}, limit = 5, callba
                     );
                     console.log(postResult);
                     return postResult;
-                } catch(err)    {
+                } catch (err) {
                     return item;
                 }
             }
         });
-    
+
         let results = await Promise.all(requestPromises.map(item => item()));
 
         await callback(results);
@@ -100,7 +99,7 @@ async function postDataObjects(url, dataObjects, options = {}, limit = 5, callba
 
 }
 
-async function verifyUrl(newUrl, sameOriginUrl = null) {
+export async function verifyUrl(newUrl, sameOriginUrl = null) {
 
     try {
 
@@ -109,7 +108,7 @@ async function verifyUrl(newUrl, sameOriginUrl = null) {
 
         const agent = newUrl.startsWith("https:") ? httpsAgent : httpAgent;
 
-        const response = await fetch(newUrl, { 
+        const response = await fetch(newUrl, {
             agent,
             redirect: "follow"
         });
@@ -146,20 +145,11 @@ async function verifyUrl(newUrl, sameOriginUrl = null) {
 
 }
 
-function getRequestResult(result, status = 200, contentType = "application/json") {
+export function getRequestResult(result, status = 200, contentType = "application/json") {
     let obj = {
         contentType,
-        status : status,
-        data : contentType === "application/json" ? JSON.stringify(result, null, 4) : result,
+        status: status,
+        data: contentType === "application/json" ? JSON.stringify(result, null, 4) : result,
     };
     return obj;
-}
-
-module.exports = {
-
-    apiRequest,
-    postDataObjects,
-    verifyUrl,
-    dynamicApiRequest,
-    getRequestResult
 }

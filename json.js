@@ -1,13 +1,13 @@
-const path = require("path");
-const { writeFileSync, fileExists, writeFile, readFile, mkdirSync } = require("./file-system");
+import * as path from "path";
+import { writeFileSync, fileExists, writeFile, readFile, mkdirSync } from "./file-system.js";
 
-function parseValidatedJSON(inputValue)   {
+export function parseValidatedJSON(inputValue) {
 
     try {
 
         return JSON.parse(inputValue);
 
-    } catch(err)    {
+    } catch (err) {
 
         return inputValue;
 
@@ -15,7 +15,7 @@ function parseValidatedJSON(inputValue)   {
 
 }
 
-function createJsonFileObject(targetPath, fileName) {
+export function createJsonFileObject(targetPath, fileName) {
 
     class JsonFile {
 
@@ -23,10 +23,10 @@ function createJsonFileObject(targetPath, fileName) {
             this.targetPath = targetPath;
             this.fileName = fileName;
             this.filePath = path.join(this.targetPath, this.fileName);
-            if(!fileExists(this.targetPath))    {
+            if (!fileExists(this.targetPath)) {
                 mkdirSync(this.targetPath);
             }
-            if(!fileExists(this.filePath))    {
+            if (!fileExists(this.filePath)) {
                 let result = writeFileSync(this.filePath, `[]`);
                 console.log(result);
             }
@@ -37,7 +37,7 @@ function createJsonFileObject(targetPath, fileName) {
             return JSON.parse(readResult.data);
         }
 
-        async addData(data, newData = false)  {
+        async addData(data, newData = false) {
             let savedData = newData ? [] : await this.getSavedData();
 
             return await writeFile(this.filePath, JSON.stringify([...savedData, ...data], null, 4))
@@ -50,10 +50,4 @@ function createJsonFileObject(targetPath, fileName) {
     }
 
     return new JsonFile(targetPath, fileName);
-
-}
-
-module.exports = {
-    createJsonFileObject,
-    parseValidatedJSON,
 }

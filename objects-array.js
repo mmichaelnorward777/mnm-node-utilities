@@ -1,24 +1,24 @@
-const { toNormalString } = require("./string");
+import { toNormalString } from "./string.js";
 
-function getValidatedPropValues(obj, propNames = [], callback = (value) => {})    {
+export function getValidatedPropValues(obj, propNames = [], callback = (value) => { }) {
 
-    if(!obj)    {
+    if (!obj) {
         return null;
     }
-        
+
     let objValue = null;
     propNames.reduce((object, key) => {
-    
-        if(object[key]) {
+
+        if (object[key]) {
             object = object[key];
             objValue = object;
-        } else  {
+        } else {
             object = {};
             objValue = null;
         }
 
         callback(objValue);
-        
+
         return object;
 
     }, obj);
@@ -27,27 +27,27 @@ function getValidatedPropValues(obj, propNames = [], callback = (value) => {})  
 
 }
 
-function isObjectInArray(object, array = [], keysToBeChecked = []) {
+export function isObjectInArray(object, array = [], keysToBeChecked = []) {
     return array.some(item => {
         let results = [];
-        if(keysToBeChecked.length)  {
-            for(let key of keysToBeChecked)    {
+        if (keysToBeChecked.length) {
+            for (let key of keysToBeChecked) {
                 results.push(object[key] === item[key]);
             }
-        } else  {
-            for(let key in object)    {
+        } else {
+            for (let key in object) {
                 results.push(object[key] === item[key]);
             }
         }
-        
+
         return results.every(res => res);
     });
 }
 
-function getAllObjectKeys(objects) {
+export function getAllObjectKeys(objects) {
     return objects.reduce((a, b) => {
-        for(let key of Object.keys(b))  {
-            if(!a.includes(key))    {
+        for (let key of Object.keys(b)) {
+            if (!a.includes(key)) {
                 a.push(key);
             }
         }
@@ -55,62 +55,62 @@ function getAllObjectKeys(objects) {
     }, []);
 }
 
-function sortObjectsByDate(arr, datePropName = "dateCreated", asc = true)  {
+export function sortObjectsByDate(arr, datePropName = "dateCreated", asc = true) {
     arr.sort((a, b) => {
         let date1 = new Date(a[datePropName]).getTime(),
             date2 = new Date(b[datePropName]).getTime();
-        if(asc) {
-            return date1 < date2 ? -1 : date1 > date2 ? 1 : 0; 
-        } else  {
-            return date1 > date2 ? -1 : date1 < date2 ? 1 : 0; 
+        if (asc) {
+            return date1 < date2 ? -1 : date1 > date2 ? 1 : 0;
+        } else {
+            return date1 > date2 ? -1 : date1 < date2 ? 1 : 0;
         }
-        
+
     })
 }
 
-function sortObjectsByPropName(arr, propName, asc = true)   {
+export function sortObjectsByPropName(arr, propName, asc = true) {
     arr.sort((a, b) => {
-        if(asc) {
+        if (asc) {
             return a[propName] < b[propName] ? -1 : b[propName] > a[propName] ? 1 : 0;
-        } else  {
+        } else {
             return a[propName] > b[propName] ? -1 : b[propName] < a[propName] ? 1 : 0;
         }
 
     })
 }
 
-function objectToString(object, delimiter=", ") {
+export function objectToString(object, delimiter = ", ") {
     let output = [];
-    for(let key in object)  {
+    for (let key in object) {
         output.push(`${toNormalString(key)} : ${toNormalString(`${object[key]}`)}`);
     }
     return output.join(delimiter);
 }
 
-function isObjectUnique(obj, objectsArray, keys=[])   {   
-    let overAllResults = []; 
-    for(let object of objectsArray)  {
+export function isObjectUnique(obj, objectsArray, keys = []) {
+    let overAllResults = [];
+    for (let object of objectsArray) {
         let results = [];
-        if(keys.length) {
-            for(let key of keys)    {
+        if (keys.length) {
+            for (let key of keys) {
                 results.push(obj[key] !== object[key]);
             }
-        } else  {
-            for(let key in obj) {
+        } else {
+            for (let key in obj) {
                 results.push(obj[key] !== object[key]);
             }
         }
-        
+
         overAllResults.push(results.every(res => res));
     }
     return overAllResults.every(res => res);
 }
 
-function filterUnlistedObjects(localObjects, allObjects, keys=[])    {
+export function filterUnlistedObjects(localObjects, allObjects, keys = []) {
     return allObjects.filter(obj => isObjectUnique(obj, localObjects, keys));
 }
 
-function shuffleArr(arr = [])    {
+export function shuffleArr(arr = []) {
 
     for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -120,7 +120,7 @@ function shuffleArr(arr = [])    {
 
 }
 
-function objectCompare(target, src, arrayInclusion = true) {
+export function objectCompare(target, src, arrayInclusion = true) {
 
     let targetClone = objectToDotNotation(target),
         srcClone = objectToDotNotation(src),
@@ -131,15 +131,15 @@ function objectCompare(target, src, arrayInclusion = true) {
     }
 
 
-    for(let key in srcClone)    {
+    for (let key in srcClone) {
 
-        if(Array.isArray(srcClone[key]))    {
+        if (Array.isArray(srcClone[key])) {
             results.push(JSON.stringify(srcClone[key]) === JSON.stringify(targetClone[key]));
-        } else  {
+        } else {
 
-            if(Array.isArray(targetClone[key]) && arrayInclusion)   {
+            if (Array.isArray(targetClone[key]) && arrayInclusion) {
                 results.push(targetClone[key].includes(srcClone[key]));
-            } else  {
+            } else {
                 results.push(srcClone[key] === targetClone[key]);
             }
 
@@ -147,22 +147,22 @@ function objectCompare(target, src, arrayInclusion = true) {
     }
 
     return results.every(res => res);
-    
+
 }
 
-function assignProps(target, source)  {
+export function assignProps(target, source) {
 
-    for(let prop in source) {
+    for (let prop in source) {
 
-        if(typeof source[prop] === "object")    {
+        if (typeof source[prop] === "object") {
 
-            if(typeof target[prop] !== "object")    {
+            if (typeof target[prop] !== "object") {
                 target[prop] = {};
             }
-            
+
             target[prop] = assignProps(target[prop], source[prop]);
 
-        } else  {
+        } else {
 
             target[prop] = source[prop];
 
@@ -174,7 +174,7 @@ function assignProps(target, source)  {
 
 }
 
-function deepMerge(target, ...sources) {
+export function deepMerge(target, ...sources) {
     // Create a deep copy of the target to avoid mutating the original if you want
     // If you WANT to mutate target, you can skip the copy step, but be careful.
     const isObject = (obj) => obj && typeof obj === 'object' && !Array.isArray(obj);
@@ -198,19 +198,4 @@ function deepMerge(target, ...sources) {
     if (sources.length) return deepMerge(target, ...sources);
 
     return target;
-}
-
-module.exports = {
-    getValidatedPropValues,
-    isObjectInArray,
-    getAllObjectKeys,
-    sortObjectsByDate,
-    objectToString,
-    isObjectUnique,
-    filterUnlistedObjects,
-    shuffleArr,
-    sortObjectsByPropName,
-    objectCompare,
-    assignProps,
-    deepMerge
 }

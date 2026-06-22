@@ -1,28 +1,18 @@
-const nodeUtilities = require("./node");
-const generalUtilities = require("./general");
-const dateUtilities = require("./date");
-const objectsArrayUtilities = require("./objects-array");
-const stringUtilities = require("./string");
-const urlUtilities = require("./url");
-const webPageUtilities = require("./web-page");
-const webRequestsUtilities = require("./web-requests");
-const fileSystemUtilities = require("./file-system");
-const jsonUtilities = require("./json");
-const miscsUtilities = require("./miscs");
+// 1. Import specific functions from each module
+import * as miscsUtilities from './miscs.js';
+import * as nodeUtilities from './node.js';
+import * as generalUtilities from './general.js';
+import * as jsonUtilities from './json.js';
+import * as fileSystemUtilities from './file-system.js';
+import * as dateUtilities from './date.js';
+import * as objectsArrayUtilities from './objects-array.js';
+import * as stringUtilities from './string.js';
+import * as urlUtilities from './url.js';
+import * as webPageUtilities from './web-page.js';
+import * as webRequestsUtilities from './web-requests.js';
 
-// const ProcessClass = require("./classes/process/process");
-// const processClassFactory = require("./classes/process/index");
-// const EventClass = require("./classes/event/event");
-
-
-module.exports = {
-    // nodeProcess : {
-    //     classConstructor : ProcessClass,
-    //     classFactory : processClassFactory,
-    // },
-    // nodeEvent : {
-    //     classConstructor : EventClass
-    // },
+// 2. Export the combined object
+export default {
     ...miscsUtilities,
     ...nodeUtilities,
     ...generalUtilities,
@@ -34,4 +24,4 @@ module.exports = {
     ...urlUtilities,
     ...webPageUtilities,
     ...webRequestsUtilities,
-}
+};

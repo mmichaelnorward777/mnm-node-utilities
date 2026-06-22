@@ -1,0 +1,261 @@
+{
+  "date": {
+    "formattedDate": {
+      "description": "Returns a date string in MM-DD-YYYY format.",
+      "args": ["dateObject (Date, optional)"],
+      "returns": "string"
+    },
+    "getDateTimeObect": {
+      "description": "Converts a string or timestamp into a valid Date object.",
+      "args": ["dateTime (string or number)"],
+      "returns": "Date object"
+    },
+    "dateTimeObject": {
+      "description": "Returns a detailed object with formatted time/date and helpers.",
+      "args": ["dateInSeconds (number/string, optional)"],
+      "returns": "object"
+    },
+    "getTimeElapsed": {
+      "description": "Calculates time difference and returns human-readable string.",
+      "args": ["time1 (number), time2 (number)"],
+      "returns": "object"
+    },
+    "createZuluStartDate": {
+      "description": "Converts Date to strict ISO 8601 Zulu string with milliseconds.",
+      "args": ["dateObj (Date)"],
+      "returns": "Date object"
+    },
+    "getOffsetMinutesForTimezone": {
+      "description": "Calculates GMT offset in minutes for a timezone.",
+      "args": ["timeZone (string)"],
+      "returns": "number"
+    },
+    "toISOZeroOffset": {
+      "description": "Converts local time and timezone to UTC ISO string.",
+      "args": ["input (string/Date), tz (string)"],
+      "returns": "string"
+    },
+    "getHourlyDuration": {
+      "description": "Breaks down total minutes into hours and minutes.",
+      "args": ["numOfMinutes (number)"],
+      "returns": "object"
+    },
+    "getDurationInMinutes": {
+      "description": "Calculates duration in minutes between two dates.",
+      "args": ["dateObj1 (Date), dateObj2 (Date)"],
+      "returns": "number"
+    },
+    "localDateToSelectedTimeZone": {
+      "description": "Converts local Date to a target timezone.",
+      "args": ["dateObj (Date), selectedTimeZone (string)"],
+      "returns": "Date object"
+    },
+    "getFormattedTime": {
+      "description": "Formats date to HH:MM AM/PM.",
+      "args": ["dateObj (Date)"],
+      "returns": "string"
+    },
+    "getIsoFormattedTime": {
+      "description": "Formats time components to ISO time string.",
+      "args": ["hours, minutes, seconds (numbers)"],
+      "returns": "string"
+    },
+    "fixTimeStr": {
+      "description": "Standardizes time strings.",
+      "args": ["timeStr (string)"],
+      "returns": "string"
+    },
+    "getCurrentMonthByIndex": {
+      "description": "Returns month name from index.",
+      "args": ["monthIndex (number)"],
+      "returns": "string"
+    },
+    "getNextMonth": {
+      "description": "Returns Date for first day of next month.",
+      "args": ["dateObj (Date)"],
+      "returns": "Date object"
+    },
+    "getPrevMonth": {
+      "description": "Returns Date for first day of previous month.",
+      "args": ["dateObject (Date)"],
+      "returns": "Date object"
+    },
+    "getNumberOfDaysOfMonth": {
+      "description": "Returns days in the month of the given date.",
+      "args": ["dateObj (Date)"],
+      "returns": "number"
+    },
+    "getFormattedDateStr": {
+      "description": "Formats date as 'Month Day, Year'.",
+      "args": ["scheduledDateObj (Date)"],
+      "returns": "string"
+    },
+    "createTzScheduleObject": {
+      "description": "Creates detailed schedule object with timezone conversions.",
+      "args": ["scheduledDate (string/Date), timeOfDay (string), timeZone (string)"],
+      "returns": "object"
+    },
+    "getISOFormattedDate": {
+      "description": "Returns date in YYYY-MM-DD format.",
+      "args": ["dateObject (Date)"],
+      "returns": "string"
+    },
+    "createDateRangeObject": {
+      "description": "Creates object with formatted start/end dates.",
+      "args": ["dateObject (Date), lastDateObject (Date, optional)"],
+      "returns": "object"
+    },
+    "checkDateFlow": {
+      "description": "Determines if date range is forward or backward.",
+      "args": ["startDate, endDate (Date/string)"],
+      "returns": "string"
+    },
+    "getForwardDateRangeObjects": {
+      "description": "Generates array of monthly range objects.",
+      "args": ["startDate, endDate (Date/string)"],
+      "returns": "array"
+    },
+    "getBackwardDateRangeObjects": {
+      "description": "Generates array of monthly range objects (reversed).",
+      "args": ["startDate, endDate (Date/string)"],
+      "returns": "array"
+    },
+    "getDateRangeObjects": {
+      "description": "Wrapper for forward/backward range objects.",
+      "args": ["startDate, endDate (Date/string)"],
+      "returns": "array"
+    },
+    "getDateRangeObjectsWithIsoZeroOffset": {
+      "description": "Range objects with ISO zero-offset times.",
+      "args": ["startDate, endDate (Date/string), timeZone (string)"],
+      "returns": "array"
+    }
+  },
+  "file-system": {
+    "baseName": { "description": "Returns base name of file path.", "args": ["fileName, ...args"], "returns": "string" },
+    "fileExists": { "description": "Checks if file exists (sync).", "args": ["filePath"], "returns": "boolean" },
+    "isFile": { "description": "Checks if path is a file.", "args": ["path"], "returns": "boolean" },
+    "isDirectory": { "description": "Checks if path is a directory.", "args": ["path"], "returns": "boolean" },
+    "getFileExt": { "description": "Gets file extension.", "args": ["filePath"], "returns": "string" },
+    "getParentDir": { "description": "Gets parent directory.", "args": ["filePath"], "returns": "string" },
+    "readdir": { "description": "Reads directory contents (async).", "args": ["dirPath, options"], "returns": "object" },
+    "readdirSync": { "description": "Reads directory contents (sync).", "args": ["dirPath, options"], "returns": "object" },
+    "mkdir": { "description": "Creates directory (async).", "args": ["dirPath, options"], "returns": "object" },
+    "mkdirSync": { "description": "Creates directory (sync).", "args": ["dirPath, options"], "returns": "object" },
+    "deleteDir": { "description": "Deletes directory (async).", "args": ["dirPath, options"], "returns": "object" },
+    "deleteDirSync": { "description": "Deletes directory (sync).", "args": ["dirPath, options"], "returns": "object" },
+    "readFile": { "description": "Reads file content (async).", "args": ["filePath, options"], "returns": "object" },
+    "readFileSync": { "description": "Reads file content (sync).", "args": ["filePath, options"], "returns": "object" },
+    "writeFile": { "description": "Writes data to file (async).", "args": ["filePath, data, options"], "returns": "object" },
+    "writeFileSync": { "description": "Writes data to file (sync).", "args": ["filePath, data, options"], "returns": "object" },
+    "deleteFile": { "description": "Deletes file (async).", "args": ["filePath"], "returns": "object" },
+    "deleteFileSync": { "description": "Deletes file (sync).", "args": ["filePath"], "returns": "object" },
+    "getFileSize": { "description": "Gets file size in bytes.", "args": ["filePath"], "returns": "number" },
+    "isFileEmpty": { "description": "Checks if file is empty.", "args": ["dirPath, options"], "returns": "boolean" },
+    "isFileEmptySync": { "description": "Checks if file is empty (sync).", "args": ["dirPath, options"], "returns": "boolean" },
+    "isDirectoryEmpty": { "description": "Checks if directory is empty.", "args": ["dirPath, options"], "returns": "boolean" },
+    "isDirectoryEmptySync": { "description": "Checks if directory is empty (sync).", "args": ["dirPath, options"], "returns": "boolean" },
+    "getAllFilesFromDirectory": { "description": "Gets files in directory.", "args": ["dirPath, fileExt"], "returns": "array" },
+    "getAllFilesFromDirectorySync": { "description": "Gets files in directory (sync).", "args": ["dirPath, fileExt"], "returns": "array" },
+    "getAllDirsFromDirectory": { "description": "Gets subdirectories.", "args": ["dirPath"], "returns": "array" },
+    "getAllDirsFromDirectorySync": { "description": "Gets subdirectories (sync).", "args": ["dirPath"], "returns": "array" },
+    "getFileObject": { "description": "Returns object describing file/directory.", "args": ["filePath"], "returns": "object" },
+    "getAllFilesRecursively": { "description": "Recursively gets all files.", "args": ["dirPath, excludedFolders"], "returns": "array" },
+    "getAllFilesRecursivelySync": { "description": "Recursively gets all files (sync).", "args": ["dirPath, excludedFolders"], "returns": "array" },
+    "deleteAllFilesInDirPath": { "description": "Deletes all files in directory.", "args": ["dirPath, recursive"], "returns": "object" },
+    "deleteAllDirsInDirPath": { "description": "Deletes all subdirectories.", "args": ["dirPath, options"], "returns": "object" },
+    "deleteAllInDirPath": { "description": "Deletes all files and dirs inside path.", "args": ["dirPath"], "returns": "object" },
+    "deleteAllEmptyFilesInDirectory": { "description": "Deletes only empty files.", "args": ["dirPath, recursive"], "returns": "object" },
+    "deleteAllEmptyDirsInDirectory": { "description": "Deletes only empty directories.", "args": ["dirPath, recursive"], "returns": "object" },
+    "getMimeType": { "description": "Gets MIME type by extension.", "args": ["file"], "returns": "string" },
+    "getFileExtensionsByMimeType": { "description": "Gets extensions for MIME type.", "args": ["mimeType"], "returns": "array" },
+    "getSpecifiedExt": { "description": "Finds matching extension in URL.", "args": ["url, fileExtensions"], "returns": "string" },
+    "createDirPath": { "description": "Creates directory path if not exists.", "args": ["...args"], "returns": "string" },
+    "createSvgFile": { "description": "Writes an SVG file.", "args": ["filePath, svgName, svgData"], "returns": "object" },
+    "getAppDataDirPath": { "description": "Gets OS app data directory.", "args": [], "returns": "string" }
+  },
+  "general": {
+    "generateUuid": { "description": "Generates UUID-like string.", "args": ["num"], "returns": "string" },
+    "waitForCondition": { "description": "Waits until condition is true.", "args": ["conditionCallback, onTrueCallback, messageCallback"], "returns": "Promise" },
+    "moderator": { "description": "Processes array in chunks.", "args": ["arr, callback, bulkCount"], "returns": "Promise" },
+    "slowDown": { "description": "Pauses execution.", "args": ["timeDelay"], "returns": "Promise" },
+    "enumerate": { "description": "Joins array items grammatically.", "args": ["arr, and"], "returns": "string" },
+    "getRandomNumber": { "description": "Generates random integer.", "args": ["initialIndex, limit"], "returns": "number" },
+    "replaceWithForwardSlash": { "description": "Replaces backslashes with slashes.", "args": ["str"], "returns": "string" },
+    "debounce": { "description": "Creates debounced function.", "args": ["fn, delay"], "returns": "function" },
+    "getNumericValue": { "description": "Extracts number from string.", "args": ["str"], "returns": "number" },
+    "getValidatedStringValue": { "description": "Converts input to string or null.", "args": ["input"], "returns": "string/null" }
+  },
+  "json": {
+    "parseValidatedJSON": { "description": "Parses JSON, returns original if invalid.", "args": ["inputValue"], "returns": "any" },
+    "createJsonFileObject": { "description": "Returns instance to manage JSON file.", "args": ["targetPath, fileName"], "returns": "object" }
+  },
+  "node.js": {
+    "registerWindowEvent": { "description": "Registers global event listener.", "args": ["windowId, object, eventName, callback"], "returns": "void" },
+    "spawnOnChildProcess": { "description": "Forks child process.", "args": ["filePath"], "returns": "ChildProcess" },
+    "createNodeModule": { "description": "Creates a new JS file.", "args": ["targetPath, fileName, textData"], "returns": "object" },
+    "getRequestResult": { "description": "Formats HTTP response object.", "args": ["result, status, contentType"], "returns": "object" },
+    "sendDataToMainProcess": { "description": "Emits data to main process.", "args": ["channel, data"], "returns": "void" },
+    "getAppDataDirPath": { "description": "Gets OS app data directory.", "args": [], "returns": "string" },
+    "runSystemCommand": { "description": "Executes system command.", "args": ["command, cwd"], "returns": "Promise<string>" }
+  },
+  "objects-array": {
+    "getValidatedPropValues": { "description": "Safely navigates nested props.", "args": ["obj, propNames, callback"], "returns": "any" },
+    "isObjectInArray": { "description": "Checks if object exists in array.", "args": ["object, array, keysToBeChecked"], "returns": "boolean" },
+    "getAllObjectKeys": { "description": "Gets unique keys from array of objects.", "args": ["objects"], "returns": "array" },
+    "sortObjectsByDate": { "description": "Sorts objects by date prop.", "args": ["arr, datePropName, asc"], "returns": "array" },
+    "sortObjectsByPropName": { "description": "Sorts objects by prop name.", "args": ["arr, propName, asc"], "returns": "array" },
+    "objectToString": { "description": "Converts object to string.", "args": ["object, delimiter"], "returns": "string" },
+    "isObjectUnique": { "description": "Checks if object is unique in array.", "args": ["obj, objectsArray, keys"], "returns": "boolean" },
+    "filterUnlistedObjects": { "description": "Filters out listed objects.", "args": ["localObjects, allObjects, keys"], "returns": "array" },
+    "shuffleArr": { "description": "Shuffles array in place.", "args": ["arr"], "returns": "array" },
+    "objectCompare": { "description": "Compares two objects.", "args": ["target, src, arrayInclusion"], "returns": "boolean" },
+    "assignProps": { "description": "Deeply assigns props from source to target.", "args": ["target, source"], "returns": "object" },
+    "deepMerge": { "description": "Deeply merges sources into target.", "args": ["target, ...sources"], "returns": "object" }
+  },
+  "string": {
+    "toUrl": { "description": "Converts string to URL slug.", "args": ["str"], "returns": "string" },
+    "toCapitalize": { "description": "Capitalizes first letter.", "args": ["str"], "returns": "string" },
+    "toCapitalizeAll": { "description": "Capitalizes each word.", "args": ["str"], "returns": "string" },
+    "toNormalString": { "description": "Converts camel/kebab to normal title case.", "args": ["str, previousFormat"], "returns": "string" },
+    "getInitials": { "description": "Gets initials from name.", "args": ["str"], "returns": "string" },
+    "toCamelCase": { "description": "Converts to camelCase.", "args": ["str, url, initialCap"], "returns": "string" }
+  },
+  "url": {
+    "urlConstructor": { "description": "Reconstructs URL with protocol/domain.", "args": ["urlString"], "returns": "string" },
+    "objectToQueryString": { "description": "Converts object to query string.", "args": ["obj, prefix"], "returns": "string" },
+    "queryStringToObject": { "description": "Parses query string to object.", "args": ["queryString"], "returns": "object" },
+    "urlToQueryStringObject": { "description": "Parses URL into components.", "args": ["urlString, trailingSlash"], "returns": "object" },
+    "objectToDotNotation": { "description": "Converts object to dot notation keys.", "args": ["obj, prefix, res"], "returns": "object" },
+    "dotNotationToObject": { "description": "Converts dot notation to nested object.", "args": ["dotObj"], "returns": "object" },
+    "getDomain": { "description": "Removes protocol/www from URL.", "args": ["url"], "returns": "string" },
+    "checkSubDomain": { "description": "Checks if subUrl is subdomain of mainUrl.", "args": ["mainUrl, subUrl"], "returns": "boolean" },
+    "cleanApiUrl": { "description": "Cleans and constructs API URL.", "args": ["apiEndpoint, baseUrl, categorizedSetId, page, limit, pathFilter"], "returns": "string" }
+  },
+  "web-page": {
+    "scrollToBottom": { "description": "Scrolls to bottom of page.", "args": ["num, containingEl"], "returns": "Promise" },
+    "scrollToBottomByCondition": { "description": "Scrolls until condition met.", "args": ["conditionObject, propName"], "returns": "Promise" },
+    "scrollToElement": { "description": "Scrolls to element.", "args": ["el"], "returns": "Promise" },
+    "toggleScroll": { "description": "Toggles scroll top/bottom.", "args": [], "returns": "Promise" },
+    "scrollToTop": { "description": "Scrolls to top of page.", "args": [], "returns": "Promise" },
+    "waitForSelector": { "description": "Waits for element to appear.", "args": ["callback, numberOfWaits"], "returns": "Promise" },
+    "typeIt": { "description": "Types string into input.", "args": ["{el, string, elPropKey, newText, duration}"], "returns": "Promise" },
+    "createJSONBlob": { "description": "Creates JSON Blob.", "args": ["productObjects, excludedProps"], "returns": "object" },
+    "downloadJsonFile": { "description": "Triggers JSON download.", "args": ["productObjects, productProps"], "returns": "Promise" },
+    "downloadAllJsonFiles": { "description": "Downloads JSON for multiple instances.", "args": ["dbInstances, dataRowProps"], "returns": "Promise" },
+    "downloadCsvData": { "description": "Triggers CSV download.", "args": ["productObjects, fileName"], "returns": "void" },
+    "readBlobData": { "description": "Reads blob as base64.", "args": ["blob"], "returns": "Promise" },
+    "timedReload": { "description": "Reloads page on condition/time.", "args": ["condition, timeLimit"], "returns": "Promise" },
+    "removeAttributes": { "description": "Removes attributes from elements.", "args": ["containerEl, excludedAttributes"], "returns": "void" },
+    "extractTableData": { "description": "Extracts data from HTML table.", "args": ["table"], "returns": "array" },
+    "detectDOMChanges": { "description": "Returns function to observe DOM.", "args": ["fnCallback, logOnConsole"], "returns": "function" },
+    "xhrDetector": { "description": "Intercepts XHR/Fetch requests.", "args": ["callback"], "returns": "void" }
+  },
+  "web-requests": {
+    "apiRequest": { "description": "Makes JSON API request.", "args": ["url, options, jsonData, httpsConnection"], "returns": "Promise" },
+    "dynamicApiRequest": { "description": "Makes API request with dynamic content type.", "args": ["url, options, jsonData, httpsConnection"], "returns": "Promise" },
+    "postDataObjects": { "description": "Posts array of objects in batches.", "args": ["url, dataObjects, options, limit, callback, jsonData, httpsConnection"], "returns": "Promise" },
+    "verifyUrl": { "description": "Verifies URL and origin.", "args": ["newUrl, sameOriginUrl"], "returns": "Promise" },
+    "getRequestResult": { "description": "Formats HTTP response object.", "args": ["result, status, contentType"], "returns": "object" }
+  }
+}

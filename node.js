@@ -1,19 +1,19 @@
-const { fork, exec } = require('child_process');
-const path = require("path");
-const { writeFile, createDirPath } = require('./file-system');
-const { EventEmitter } = require("events");
+import { fork, exec } from 'child_process';
+import * as path from "path";
+import { writeFile, createDirPath } from './file-system.js';
+import { EventEmitter } from "events";
 const globalEvent = new EventEmitter();
-const os = require('os');
+import * as os from 'os';
 
-function registerWindowEvent(windowId, object, eventName, callback)  {
+export function registerWindowEvent(windowId, object, eventName, callback) {
 
-    if(!Array.isArray(global.eventListenersObject))  {
+    if (!Array.isArray(global.eventListenersObject)) {
         global.eventListenersObject = [];
     }
 
     let foundRegisteredListener = global.eventListenersObject.find(item => item.windowId === windowId && item.eventName === eventName && item.object === object);
 
-    if(!foundRegisteredListener) {
+    if (!foundRegisteredListener) {
         object.on(eventName, callback);
         global.eventListenersObject.push({
             windowId,
@@ -21,37 +21,37 @@ function registerWindowEvent(windowId, object, eventName, callback)  {
             object,
             callback,
         });
-    } 
-    
+    }
+
 }
 
-function spawnOnChildProcess(filePath) {
+export function spawnOnChildProcess(filePath) {
     const childProcess = fork(filePath);
-  
+
     childProcess.on('message', (data) => {
         console.log({
-            message : "received message",
+            message: "received message",
             data,
         });
     });
-  
+
     childProcess.on('error', (error) => {
         console.error({
-            message : `error occured`,
+            message: `error occured`,
             error,
         });
     });
-  
+
     childProcess.on('close', (code) => {
         console.log({
-            message : `child process exited with code : ${code}`
+            message: `child process exited with code : ${code}`
         });
     });
 
     return childProcess;
 }
 
-async function createNodeModule(targetPath, fileName, textData) {
+export async function createNodeModule(targetPath, fileName, textData) {
     let dirPath = await createDirPath(targetPath),
         filePath = path.join(dirPath, fileName),
         writeResult = await writeFile(filePath, textData);
@@ -59,22 +59,22 @@ async function createNodeModule(targetPath, fileName, textData) {
     return writeResult;
 }
 
-function getRequestResult(result, status = 200, contentType = "application/json") {
+export function getRequestResult(result, status = 200, contentType = "application/json") {
     let obj = {
         contentType,
-        status : status,
-        data : contentType === "application/json" ? JSON.stringify(result, null, 4) : result,
+        status: status,
+        data: contentType === "application/json" ? JSON.stringify(result, null, 4) : result,
     };
     return obj;
 }
 
-function sendDataToMainProcess(channel, data)   {
+export function sendDataToMainProcess(channel, data) {
 
     globalEvent.emit(channel, data);
 
 }
 
-function getAppDataDirPath() {
+export function getAppDataDirPath() {
     const platform = os.platform();
 
     if (platform === 'win32') {
@@ -88,7 +88,7 @@ function getAppDataDirPath() {
     }
 }
 
-function runSystemCommand(command, cwd) {
+export function runSystemCommand(command, cwd) {
     return new Promise((resolve, reject) => {
         const platform = os.platform();
         let fullCommand;
@@ -111,12 +111,4 @@ function runSystemCommand(command, cwd) {
     });
 }
 
-module.exports = {
-    globalEvent,
-    registerWindowEvent,
-    spawnOnChildProcess,
-    getRequestResult,
-    createNodeModule,
-    sendDataToMainProcess,
-    getAppDataDirPath
-}
+export { globalEvent };

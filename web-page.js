@@ -1,8 +1,8 @@
-const {saveAs} = require("file-saver");
-const { moderator, slowDown, waitForCondition } = require("./general");
-const { getAllObjectKeys } = require("./objects-array");
+import { moderator, slowDown, waitForCondition } from "./general.js";
+import { getAllObjectKeys } from "./objects-array.js";
+import { toUrl } from "./string.js";
 
-async function scrollToBottom(num = 75, containingEl = null)  {
+export async function scrollToBottom(num = 75, containingEl = null) {
 
     let scrollableHeight = Math.max(
             document.documentElement.scrollHeight,
@@ -10,7 +10,7 @@ async function scrollToBottom(num = 75, containingEl = null)  {
         ) - window.innerHeight,
         currentScroll = window.scrollY;
 
-    function scroll()   {
+    function scroll() {
         currentScroll = window.scrollY;
     }
 
@@ -20,24 +20,24 @@ async function scrollToBottom(num = 75, containingEl = null)  {
         let interval = setInterval(() => {
                 window.scrollTo(0, currentScroll + 10);
 
-                if(currentScroll >= scrollableHeight - num) {
+                if (currentScroll >= scrollableHeight - num) {
                     clearInterval(interval);
                     window.removeEventListener("scroll", scroll);
                     resolve();
                 }
             }, 1);
     });
-    
+
 }
 
-async function scrollToBottomByCondition(conditionObject, propName)  {
+export async function scrollToBottomByCondition(conditionObject, propName) {
     let totalHeight = window.innerHeight,
         currentScroll = window.scrollY;
 
-    function scroll()   {
+    function scroll() {
         currentScroll = window.scrollY;
     }
-    
+
     window.addEventListener("scroll", scroll);
 
     await new Promise(resolve => {
@@ -48,11 +48,11 @@ async function scrollToBottomByCondition(conditionObject, propName)  {
 
             totalHeight = window.innerHeight;
 
-            if(conditionObject[propName])    {
+            if (conditionObject[propName]) {
 
                 console.log({
-                    condition : conditionObject[propName],
-                    message : conditionObject[propName] ? "condition is met" : "condition is not met",
+                    condition: conditionObject[propName],
+                    message: conditionObject[propName] ? "condition is met" : "condition is not met",
                 });
 
                 clearInterval(interval);
@@ -62,17 +62,17 @@ async function scrollToBottomByCondition(conditionObject, propName)  {
             }
         }, 25);
     });
-    
+
 }
 
-async function scrollToElement(el)  {
+export async function scrollToElement(el) {
     let scrollableHeight = Math.max(
             document.documentElement.scrollHeight,
             document.body.scrollHeight
         ) - window.innerHeight,
         currentScroll = window.scrollY;
 
-    function scroll()   {
+    function scroll() {
         currentScroll = window.scrollY;
     }
 
@@ -83,7 +83,7 @@ async function scrollToElement(el)  {
                 window.scrollTo(0, currentScroll + 10);
                 parallaxOffsetTop = el.offsetTop + el.offsetHeight;
 
-                if(currentScroll >= parallaxOffsetTop) {
+                if (currentScroll >= parallaxOffsetTop) {
 
                     clearInterval(interval);
                     window.removeEventListener("scroll", scroll);
@@ -94,7 +94,7 @@ async function scrollToElement(el)  {
 
 }
 
-async function toggleScroll()   {
+export async function toggleScroll() {
 
     let scrollableHeight = Math.max(
             document.documentElement.scrollHeight,
@@ -103,30 +103,30 @@ async function toggleScroll()   {
         currentScroll = window.scrollY,
         halfPageScroll = scrollableHeight / 2;
 
-    if(halfPageScroll > currentScroll)  {
+    if (halfPageScroll > currentScroll) {
         await scrollToBottom();
-    } else  {
+    } else {
         await scrollToTop();
     }
 
     await toggleScroll();
 }
 
-async function scrollToTop()   {
+export async function scrollToTop() {
     let totalHeight = document.body.offsetHeight - window.innerHeight,
         currentScroll = window.scrollY;
 
-    function scroll()   {
+    function scroll() {
         currentScroll = window.scrollY;
     }
-    
+
     window.addEventListener("scroll", scroll);
 
     await new Promise(resolve => {
         let interval = setInterval(() => {
             window.scrollTo(0, currentScroll - 10);
-            
-            if(currentScroll <= 0) {
+
+            if (currentScroll <= 0) {
 
                 clearInterval(interval);
                 window.removeEventListener("scroll", scroll);
@@ -136,16 +136,16 @@ async function scrollToTop()   {
     });
 }
 
-async function waitForSelector(callback, numberOfWaits = 300)  {
+export async function waitForSelector(callback, numberOfWaits = 300) {
     let node = callback();
     await new Promise(resolve => {
-        if(node)    {
+        if (node) {
             resolve();
         }
         let i = 0,
             interval = setInterval(() => {
                 node = callback();
-                if(node || i >= numberOfWaits)    {
+                if (node || i >= numberOfWaits) {
                     clearInterval(interval);
                     resolve();
                 }
@@ -156,7 +156,7 @@ async function waitForSelector(callback, numberOfWaits = 300)  {
     return node;
 }
 
-async function typeIt({el, string, elPropKey, newText, duration}) {
+export async function typeIt({ el, string, elPropKey, newText, duration }) {
 
     elPropKey = elPropKey ? elPropKey : "value";
     newText = typeof newText !== "undefined" ? newText : true;
@@ -166,12 +166,12 @@ async function typeIt({el, string, elPropKey, newText, duration}) {
     let charsArr = string.split(""),
         condition = el[elPropKey] === string;
 
-    if(newText) {
+    if (newText) {
         el[elPropKey] = "";
     }
 
     await moderator(charsArr, async (slicedArr) => {
-        
+
         let [char] = slicedArr;
 
         await slowDown(duration);
@@ -181,14 +181,14 @@ async function typeIt({el, string, elPropKey, newText, duration}) {
     }, 1);
 
     await waitForCondition({
-        conditionCallback : () => condition,
+        conditionCallback: () => condition,
     });
 
     return condition;
 
 }
 
-function createJSONBlob(productObjects, excludedProps = [])    {
+export function createJSONBlob(productObjects, excludedProps = []) {
     let allKeys = getAllObjectKeys(productObjects).filter(item => !excludedProps.includes(item)),
         data = productObjects.map(item => {
             return allKeys.reduce((a, b) => {
@@ -196,13 +196,13 @@ function createJSONBlob(productObjects, excludedProps = [])    {
                 return a;
             }, {});
         }),
-        jsonBlob = new Blob([JSON.stringify(data, null, 4)], {type: 'application/json'});
+        jsonBlob = new Blob([JSON.stringify(data, null, 4)], { type: 'application/json' });
 
-    return {jsonBlob, data : JSON.stringify(data, null, 4)};
+    return { jsonBlob, data: JSON.stringify(data, null, 4) };
 }
 
-async function downloadJsonFile(productObjects, productProps = {})  {
-    let {jsonBlob} = createJSONBlob(productObjects),
+export async function downloadJsonFile(productObjects, productProps = {}) {
+    let { jsonBlob } = createJSONBlob(productObjects),
         blobURL = URL.createObjectURL(jsonBlob),
         a = document.createElement('a'),
         fileName = `${toUrl(Object.keys(productProps).reduce((a, b) => {
@@ -212,21 +212,21 @@ async function downloadJsonFile(productObjects, productProps = {})  {
 
     a.setAttribute('href', blobURL);
     a.setAttribute('download', `${fileName}.json`);
-    
+
     a.style.display = 'none';
     document.body.appendChild(a);
-    
+
     a.click();
-    
+
     document.body.removeChild(a);
-    URL.revokeObjectURL(blobURL);    
+    URL.revokeObjectURL(blobURL);
 }
 
-async function downloadAllJsonFiles(dbInstances = [], dataRowProps = {})   {
+export async function downloadAllJsonFiles(dbInstances = [], dataRowProps = {}) {
 
     await moderator(dbInstances, async (slicedArr) => {
 
-        let [dbInstance] = slicedArr, 
+        let [dbInstance] = slicedArr,
             dataRows = await dbInstance.getAll();
 
         await downloadJsonFile(dataRows, dataRowProps);
@@ -235,36 +235,36 @@ async function downloadAllJsonFiles(dbInstances = [], dataRowProps = {})   {
 
 }
 
-function downloadCsvData(productObjects, fileName)   {
+export function downloadCsvData(productObjects, fileName) {
 
-    let {csvBlob} = createCsvBlob(productObjects),
+    let { csvBlob } = createCsvBlob(productObjects),
         blobURL = URL.createObjectURL(csvBlob),
         a = document.createElement('a');
 
     a.setAttribute('href', blobURL);
     a.setAttribute('download', `${fileName}.csv`);
-    
+
     a.style.display = 'none';
     document.body.appendChild(a);
-    
+
     a.click();
-    
+
     document.body.removeChild(a);
-    URL.revokeObjectURL(blobURL);    
+    URL.revokeObjectURL(blobURL);
 
 }
 
-async function readBlobData(blob)   {
+export async function readBlobData(blob) {
     let reader = new FileReader(),
         base64data = null;
-    reader.readAsDataURL(blob); 
-    reader.onloadend = function() {
-        base64data = reader.result;                
+    reader.readAsDataURL(blob);
+    reader.onloadend = function () {
+        base64data = reader.result;
     }
 
     await new Promise(resolve => {
         let interval = setInterval(() => {
-            if(base64data)  {
+            if (base64data) {
                 clearInterval(interval);
                 resolve();
             }
@@ -277,14 +277,14 @@ async function readBlobData(blob)   {
 
 
 
-async function timedReload(condition = () => {}, timeLimit = 30)   {
+export async function timedReload(condition = () => {}, timeLimit = 30) {
 
     await new Promise((resolve) => {
 
         let timer = 0,
             interval = setInterval(() => {
 
-            if(condition() || timer >= timeLimit) {
+            if (condition() || timer >= timeLimit) {
                 clearInterval(interval);
                 resolve();
             }
@@ -299,15 +299,15 @@ async function timedReload(condition = () => {}, timeLimit = 30)   {
 
 }
 
-function removeAttributes(containerEl, excludedAttributes = [])  {
-    let elements = Array.from(containerEll.querySelectorAll(`*`));
+export function removeAttributes(containerEl, excludedAttributes = []) {
+    let elements = Array.from(containerEl.querySelectorAll(`*`));
 
     elements.forEach(item => {
         let attrs = item.getAttributeNames();
 
-        for(let attr of attrs) {
+        for (let attr of attrs) {
 
-            if(!excludedAttributes.includes(attr))  {
+            if (!excludedAttributes.includes(attr)) {
                 item.removeAttribute(attr);
             }
 
@@ -315,7 +315,7 @@ function removeAttributes(containerEl, excludedAttributes = [])  {
     })
 }
 
-function extractTableData(table) {
+export function extractTableData(table) {
     const tableData = [];
     const thead = table.querySelector('thead');
     const thElements = Array.from(thead.querySelectorAll('th'));
@@ -339,48 +339,48 @@ function extractTableData(table) {
     return tableData;
 }
 
-function detectDOMChanges(fnCallback, logOnConsole = false) {
+export function detectDOMChanges(fnCallback, logOnConsole = false) {
 
     let observer = null;
 
     const observeDOMChanges = (callback) => {
         // Select the target node
         const targetNode = document.body; // You can change this to observe a specific element or the entire document
-      
+
         // Options for the observer (all possible options)
         const config = { attributes: true, childList: true, subtree: true, characterData: true };
-      
+
         // Create an observer instance linked to the callback function
         observer = new MutationObserver(callback);
-      
+
         // Start observing the target node for configured mutations
         observer.observe(targetNode, config);
-      
+
         // Later, you can disconnect the observer to stop observing
         // observer.disconnect();
 
         return observer;
 
     };
-      
+
     // Example callback function to be called when a change is detected
     const handleDOMChanges = (mutationsList, observer) => {
         mutationsList.forEach((mutation) => {
             fnCallback("Change detected:", mutation);
-            if(logOnConsole)    {
+            if (logOnConsole) {
                 console.log("Change detected:", mutation);
-            }   
+            }
         });
     };
-      
+
     // returns a callback function, that returns the observer
-    
+
 
     return () => observeDOMChanges(handleDOMChanges);
 
 }
 
-function xhrDetector(callback = () => {}) {
+export function xhrDetector(callback = () => {}) {
     function debounce(fn, delay = 2500) {
         let timer;
         return function (...args) {
@@ -457,23 +457,4 @@ function xhrDetector(callback = () => {}) {
             return response;
         };
     })();
-}
-
-
-module.exports = {
-    xhrDetector,
-    scrollToBottom,
-    scrollToBottomByCondition,
-    scrollToElement,
-    scrollToTop,
-    toggleScroll,
-    waitForSelector,
-    typeIt,
-    createJSONBlob,
-    downloadJsonFile,
-    downloadAllJsonFiles,
-    downloadCsvData,
-    readBlobData,
-    timedReload,
-    detectDOMChanges
 }

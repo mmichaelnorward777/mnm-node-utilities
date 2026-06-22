@@ -1,4 +1,4 @@
-function urlConstructor(urlString) {
+export function urlConstructor(urlString) {
     // Step 1: Identify the parts of the URL
     let protocol = "";
     let domain = "";
@@ -21,7 +21,7 @@ function urlConstructor(urlString) {
         domain = urlString.split("/")[0];
         urlString = urlString.slice(domain.length);
     } else {
-    
+
         domain = urlString;
 
         urlString = "";
@@ -42,25 +42,25 @@ function urlConstructor(urlString) {
 
     // Step 6: Assemble the URL
     let url = protocol + domain + path;
-        if (queryParams) {
+    if (queryParams) {
         url += "?" + queryParams;
     }
 
     return url;
 }
 
-function objectToQueryString(obj, prefix = '') {
+export function objectToQueryString(obj, prefix = '') {
     const queryParts = [];
 
     for (const key in obj) {
-        if (!obj.hasOwnProperty(key)) continue;
+        if (!Object.hasOwn(obj, key)) continue;
 
         const value = obj[key];
         const prefixedKey = prefix
-        ? Array.isArray(obj)
-            ? `${prefix}[]`
-            : `${prefix}[${key}]`
-        : key;
+            ? Array.isArray(obj)
+                ? `${prefix}[]`
+                : `${prefix}[${key}]`
+            : key;
 
         if (value === null || value === undefined) continue;
 
@@ -76,7 +76,7 @@ function objectToQueryString(obj, prefix = '') {
     return queryParts.join('&');
 }
 
-function queryStringToObject(queryString) {
+export function queryStringToObject(queryString) {
     const result = {};
 
     const pairs = queryString.replace(/^\?/, '').split('&');
@@ -134,7 +134,7 @@ function queryStringToObject(queryString) {
     return result;
 }
 
-function urlToQueryStringObject(urlString, trailingSlash = false)   {
+export function urlToQueryStringObject(urlString, trailingSlash = false) {
     try {
         let url = new URL(urlString),
             queryString = url.search.length ? url.search.slice(1) : "",
@@ -143,24 +143,24 @@ function urlToQueryStringObject(urlString, trailingSlash = false)   {
 
         urlPath = urlPath.replace(origin, "").trim();
         urlPath = url.pathname.split("/").filter(item => item.length > 0).join("/");
-        
+
         let pathname = trailingSlash ? `${urlPath}/` : urlPath,
             queryObject = queryStringToObject(queryString);
 
         return {
             queryObject,
-            originalUrl : urlString,
+            originalUrl: urlString,
             origin,
-            pathName : pathname,
-            queryString : objectToQueryString(queryObject),
-            urlWithoutQueryString : [origin, pathname].join("/"),
+            pathName: pathname,
+            queryString: objectToQueryString(queryObject),
+            urlWithoutQueryString: [origin, pathname].join("/"),
         };
-    } catch(err)    {
+    } catch (err) {
         return null;
     }
 }
 
-function objectToDotNotation(obj, prefix = '', res = {}) {
+export function objectToDotNotation(obj, prefix = '', res = {}) {
     for (const key in obj) {
         if (!Object.hasOwn(obj, key)) continue;
 
@@ -176,7 +176,7 @@ function objectToDotNotation(obj, prefix = '', res = {}) {
     return res;
 }
 
-function dotNotationToObject(dotObj) {
+export function dotNotationToObject(dotObj) {
     const result = {};
 
     for (const key in dotObj) {
@@ -198,40 +198,40 @@ function dotNotationToObject(dotObj) {
         }
     }
 
-  return result;
+    return result;
 
 }
 
 
-function getDomain(url) {
+export function getDomain(url) {
     // Remove "https://" or "http://"
     url = url.replace(/^(https?:\/\/)?/, '');
-  
+
     // Remove "www."
     url = url.replace(/^(www\.)?/, '');
-  
+
     return url;
 }
 
-function checkSubDomain(mainUrl, subUrl)    {
+export function checkSubDomain(mainUrl, subUrl) {
 
     return subUrl.toLowerCase().includes(getDomain(mainUrl.toLowerCase()));
 
 }
 
-function cleanApiUrl(apiEndpoint, baseUrl, categorizedSetId, page=1, limit=10, pathFilter="paginated", ) {
+export function cleanApiUrl(apiEndpoint, baseUrl, categorizedSetId, page = 1, limit = 10, pathFilter = "paginated") {
 
     try {
         let urlObject = queryStringToObject(apiEndpoint, false);
         // console.log(urlObject);
-        if(!urlObject) {
+        if (!urlObject) {
             apiEndpoint = `${baseUrl}/${apiEndpoint.split("/").filter(item => item.trim() !== "").join("/")}`;
             urlObject = queryStringToObject(apiEndpoint);
         }
 
-        let {queryObject, origin, pathName : pathname} = urlObject;
+        let { queryObject, origin, pathName: pathname } = urlObject;
 
-        if(pathname.includes(baseUrl))  {
+        if (pathname.includes(baseUrl)) {
 
             pathname.replace(`${baseUrl}/`, "");
 
@@ -239,43 +239,31 @@ function cleanApiUrl(apiEndpoint, baseUrl, categorizedSetId, page=1, limit=10, p
 
         pathname = pathname.trim().split("/").filter(item => item !== "");
 
-        
 
-        if(!pathname.includes("api") && pathname[0] !== "api") {
+
+        if (!pathname.includes("api") && pathname[0] !== "api") {
             pathname.unshift("api");
         }
 
-        if((pathname[pathname.length - 1] === "single" || pathname[pathname.length - 1] === "all" || pathname[pathname.length - 1] === "paginated") && pathFilter)   {
+        if ((pathname[pathname.length - 1] === "single" || pathname[pathname.length - 1] === "all" || pathname[pathname.length - 1] === "paginated") && pathFilter) {
             pathname[pathname.length - 1] = pathFilter;
         }
 
-        
-        if(pathFilter && (!pathname.includes(pathFilter) && pathname[pathname.length - 1] !== pathFilter)) {
+
+        if (pathFilter && (!pathname.includes(pathFilter) && pathname[pathname.length - 1] !== pathFilter)) {
             pathname.push(pathFilter);
         }
 
         queryObject.categorizedSetId = categorizedSetId;
         queryObject.page = page;
         queryObject.limit = limit;
-        
+
+
 
 
         return `${[origin, ...pathname].join("/")}?${objectToQueryString(queryObject)}`;
-    }catch(err) {
+    } catch (err) {
         console.log(err);
     }
 
 }
-
-
-module.exports = {
-    urlConstructor,
-    objectToQueryString,
-    urlToQueryStringObject,
-    objectToDotNotation,
-    dotNotationToObject,
-    queryStringToObject,
-    getDomain,
-    cleanApiUrl,
-    checkSubDomain
-};
