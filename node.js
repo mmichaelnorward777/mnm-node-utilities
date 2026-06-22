@@ -1,4 +1,4 @@
-const { fork } = require('child_process');
+const { fork, exec } = require('child_process');
 const path = require("path");
 const { writeFile, createDirPath } = require('./file-system');
 const { EventEmitter } = require("events");
@@ -86,6 +86,29 @@ function getAppDataDirPath() {
     } else {
         throw new Error(`Unsupported platform: ${platform}`);
     }
+}
+
+function runSystemCommand(command, cwd) {
+    return new Promise((resolve, reject) => {
+        const platform = os.platform();
+        let fullCommand;
+
+        if (platform === 'win32') {
+            // Windows example: list directory
+            fullCommand = `cmd /c ${command}`;
+        } else {
+            // Linux and macOS example: list directory
+            fullCommand = `sh -c "${command}"`;
+        }
+
+        exec(fullCommand, { cwd: cwd }, (error, stdout, stderr) => {
+            if (error) {
+                reject(error);
+                return;
+            }
+            resolve(stdout);
+        });
+    });
 }
 
 module.exports = {

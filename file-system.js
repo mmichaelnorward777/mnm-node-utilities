@@ -760,7 +760,6 @@ module.exports = {
 
     writeFileSync,
 
-    
     deleteFile,
 
     deleteFileSync,

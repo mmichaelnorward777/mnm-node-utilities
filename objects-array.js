@@ -174,20 +174,30 @@ function assignProps(target, source)  {
 
 }
 
-function deepObjectAssignment(target, ...sourceArgs)  {
+function deepMerge(target, ...sources) {
+    // Create a deep copy of the target to avoid mutating the original if you want
+    // If you WANT to mutate target, you can skip the copy step, but be careful.
+    const isObject = (obj) => obj && typeof obj === 'object' && !Array.isArray(obj);
 
-    let newObj = {};
+    if (!sources.length) return target;
 
-    Object.assign(newObj, target);
+    const source = sources.shift();
 
-    for(let source of sourceArgs)   {
-        
-        assignProps(newObj, source);
-
+    if (isObject(target) && isObject(source)) {
+        for (const key in source) {
+            if (isObject(source[key])) {
+                if (!target[key]) Object.assign(target, { [key]: {} });
+                deepMerge(target[key], source[key]);
+            } else {
+                Object.assign(target, { [key]: source[key] });
+            }
+        }
     }
 
-    Object.assign(target, newObj);
+    // If there are more sources, merge the next one into the result
+    if (sources.length) return deepMerge(target, ...sources);
 
+    return target;
 }
 
 module.exports = {
@@ -202,5 +212,5 @@ module.exports = {
     sortObjectsByPropName,
     objectCompare,
     assignProps,
-    deepObjectAssignment
+    deepMerge
 }
