@@ -1,31 +1,5 @@
 # MNM-NODE-UTILITIES
 
-**MNM-NODE-UTILITIES** is a modular, lightweight, and practical Node.js
-utilities library that provides a wide range of helper functions for:
-
--   Date & time handling\
--   File system operations\
--   JSON processing\
--   Node process utilities\
--   Object & array manipulation\
--   String manipulation\
--   URL/query-string utilities\
--   Web-page scripting helpers\
--   Web-request utilities\
--   Geo & timezone lookup\ requires playwright
--   Miscellaneous helpers\
--   Factory constructors for Node processes and EventEmitters
-
-This library is designed to be a powerful toolbox for Node.js
-applications, automation scripts, web scraping projects, CLI tools, and
-backend services. 
-
-Here is the documentation for your utility library in both Markdown and JSON formats.
-
---- File: README.md ---
-
-# Utility Library Documentation
-
 This library provides a set of utility functions for date manipulation, file system operations, general logic, object/array handling, string manipulation, URL handling, web page automation, and API requests. All modules are now ES Modules.
 
 ## Table of Contents
