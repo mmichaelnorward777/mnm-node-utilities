@@ -5,13 +5,9 @@ import { moderator } from './general.js';
 
 export async function apiRequest(url, options = {}, jsonData = true, httpsConnection = false) {
 
-    const httpAgent = new http.Agent({
-        rejectUnauthorized: false
-    });
+    const httpAgent = new http.Agent();
 
-    const httpsAgent = new https.Agent({
-        rejectUnauthorized: false
-    });
+    const httpsAgent = new https.Agent();
 
     let selectedAgent = httpsConnection ? httpsAgent : httpAgent;
 
@@ -34,8 +30,8 @@ export async function dynamicApiRequest(url, options = {}, jsonData = true, http
     const isHttps = url.startsWith("https:");
 
     const agent = isHttps
-        ? new https.Agent({ rejectUnauthorized: false })
-        : new http.Agent({ rejectUnauthorized: false });
+        ? new https.Agent()
+        : new http.Agent();
 
     let headers = {
             "Content-Type": "application/json",
@@ -104,7 +100,7 @@ export async function verifyUrl(newUrl, sameOriginUrl = null) {
     try {
 
         const httpAgent = new http.Agent();
-        const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+        const httpsAgent = new https.Agent();
 
         const agent = newUrl.startsWith("https:") ? httpsAgent : httpAgent;
 

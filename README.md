@@ -465,11 +465,6 @@ JSON file manipulation.
 
 Node-specific utilities.
 
-### `registerWindowEvent(windowId, object, eventName, callback)`
-- **Purpose**: Registers an event listener globally to prevent duplicates.
-- **Arguments**: `windowId` (string), `object` (event emitter), `eventName` (string), `callback` (function).
-- **Returns**: `void`.
-
 ### `spawnOnChildProcess(filePath)`
 - **Purpose**: Forks a child process and logs messages/errors.
 - **Arguments**: `filePath` (string).
@@ -485,20 +480,31 @@ Node-specific utilities.
 - **Arguments**: `result` (any), `status` (number, default 200), `contentType` (string, default "application/json").
 - **Returns**: `object`.
 
-### `sendDataToMainProcess(channel, data)`
-- **Purpose**: Emits data to the main process via a global event emitter.
-- **Arguments**: `channel` (string), `data` (any).
-- **Returns**: `void`.
-
 ### `getAppDataDirPath()`
 - **Purpose**: Gets the OS-specific application data directory.
 - **Arguments**: None.
 - **Returns**: `string`.
 
-### `runSystemCommand(command, cwd)`
-- **Purpose**: Executes a system command in a specific working directory.
-- **Arguments**: `command` (string), `cwd` (string, working directory).
-- **Returns**: `Promise<string>` (stdout).
+### `getSystemCommandRunner(config)`
+- **Purpose**: A secure factory function that creates a restricted system command executor. It ensures commands are only run in user-approved directories (whitelist) to prevent path traversal attacks.
+- **Arguments**:
+  - `config` (object): Configuration object containing:
+    - `userAllowedPaths` (array of strings): List of absolute or relative directory paths that are permitted for command execution.
+- **Returns**: `Function`
+  - The returned function accepts:
+    - `command` (string): The shell command to execute.
+    - `cwd` (string): The current working directory where the command will run.
+  - The returned function returns a `Promise` that resolves to an object:
+    ```javascript
+    {
+        statusOk: boolean, // true if allowed and executed, false if denied or failed
+        message: string,   // Human-readable status message
+        stdout?: string,   // Standard output (if successful)
+        stderr?: string,   // Standard error (if failed)
+        command: string    // The command that was run
+    }
+    ```
+- **Security Note**: This function uses a whitelist approach. If the resolved `cwd` does not strictly start with any path in `userAllowedPaths`, it returns a rejected Promise with an error status. It prevents command injection by validating the execution context.
 
 ---
 

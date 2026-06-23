@@ -197,7 +197,11 @@
     "getRequestResult": { "description": "Formats HTTP response object.", "args": ["result, status, contentType"], "returns": "object" },
     "sendDataToMainProcess": { "description": "Emits data to main process.", "args": ["channel, data"], "returns": "void" },
     "getAppDataDirPath": { "description": "Gets OS app data directory.", "args": [], "returns": "string" },
-    "runSystemCommand": { "description": "Executes system command.", "args": ["command, cwd"], "returns": "Promise<string>" }
+    "getSystemCommandRunner": {
+      "description": "Factory function that creates a secure system command executor with path whitelisting.",
+      "args": ["config (object): { userAllowedPaths: array<string> }"],
+      "returns": "Function(command, cwd) => Promise<object>"
+    }
   },
   "objects-array": {
     "getValidatedPropValues": { "description": "Safely navigates nested props.", "args": ["obj, propNames, callback"], "returns": "any" },

@@ -1,29 +1,8 @@
 import { fork, exec } from 'child_process';
 import * as path from "path";
 import { writeFile, createDirPath } from './file-system.js';
-import { EventEmitter } from "events";
-const globalEvent = new EventEmitter();
 import * as os from 'os';
 
-export function registerWindowEvent(windowId, object, eventName, callback) {
-
-    if (!Array.isArray(global.eventListenersObject)) {
-        global.eventListenersObject = [];
-    }
-
-    let foundRegisteredListener = global.eventListenersObject.find(item => item.windowId === windowId && item.eventName === eventName && item.object === object);
-
-    if (!foundRegisteredListener) {
-        object.on(eventName, callback);
-        global.eventListenersObject.push({
-            windowId,
-            eventName,
-            object,
-            callback,
-        });
-    }
-
-}
 
 export function spawnOnChildProcess(filePath) {
     const childProcess = fork(filePath);
@@ -68,12 +47,6 @@ export function getRequestResult(result, status = 200, contentType = "applicatio
     return obj;
 }
 
-export function sendDataToMainProcess(channel, data) {
-
-    globalEvent.emit(channel, data);
-
-}
-
 export function getAppDataDirPath() {
     const platform = os.platform();
 
@@ -88,27 +61,60 @@ export function getAppDataDirPath() {
     }
 }
 
-export function runSystemCommand(command, cwd) {
-    return new Promise((resolve, reject) => {
-        const platform = os.platform();
-        let fullCommand;
+export function getSystemCommandRunner(config) {
+    // Validate config on creation to fail fast if something is missing
+    if (!config || !Array.isArray(config.userAllowedPaths)) {
+        throw new Error("Invalid configuration: 'config.userAllowedPaths' must be an array.");
+    }
 
-        if (platform === 'win32') {
-            // Windows example: list directory
-            fullCommand = `cmd /c ${command}`;
-        } else {
-            // Linux and macOS example: list directory
-            fullCommand = `sh -c "${command}"`;
+    return function runSystemCommand(command, cwd) {
+        // 1. Resolve to absolute path to prevent "../" attacks
+        const absoluteCwd = path.resolve(cwd);
+
+        // 2. Secure Path Validation
+        // We check if the absolute cwd starts with any allowed path + separator
+        // OR if it is exactly equal to the allowed path
+        const isUserAllowedPath = config.userAllowedPaths.some(allowedPath => {
+            const resolvedAllowed = path.resolve(allowedPath);
+            // Ensure we check for directory containment strictly
+            const isContained = absoluteCwd.startsWith(resolvedAllowed + path.sep) || 
+                                absoluteCwd === resolvedAllowed;
+            return isContained;
+        });
+
+        if (!isUserAllowedPath) {
+            // Return a resolved Promise with an error object so the caller can handle it synchronously or asynchronously
+            return Promise.resolve({
+                statusOk: false,
+                message: `Command Execution Failed: This path we're trying to execute the command line on, is not allowed by the user. Please add the current working directory on the app's configuration file.`,
+                path: absoluteCwd,
+                allowedPaths: config.userAllowedPaths
+            });
         }
 
-        exec(fullCommand, { cwd: cwd }, (error, stdout, stderr) => {
-            if (error) {
-                reject(error);
-                return;
-            }
-            resolve(stdout);
-        });
-    });
-}
+        // 3. Execute Command
+        return new Promise((resolve, reject) => {
+            const platform = os.platform();
+            // Note: For better security, consider using execFile with an array of args instead of string interpolation
+            let fullCommand = platform === 'win32' ? `cmd /c ${command}` : `sh -c "${command}"`;
 
-export { globalEvent };
+            exec(fullCommand, { cwd: absoluteCwd }, (error, stdout, stderr) => {
+                if (error) {
+                    reject({
+                        statusOk: false,
+                        message: `Command Execution Failed: ${error.message}`,
+                        stderr: stderr,
+                        command: command
+                    });
+                } else {
+                    resolve({
+                        statusOk: true,
+                        message: `Command Execution Successful: We have successfully executed the command ${command} on ${absoluteCwd}`,
+                        stdout: stdout,
+                        command: command
+                    });
+                }
+            });
+        });
+    };
+}
