@@ -1,0 +1,66 @@
+{
+  "className": "Event",
+  "description": "A wrapper around Node.js EventEmitter with built-in logging and registry management.",
+  "constructor": {
+    "name": "Event",
+    "params": [
+      {
+        "name": "eventName",
+        "type": "string",
+        "description": "The name/identifier for this event type."
+      },
+      {
+        "name": "options",
+        "type": "object",
+        "optional": true,
+        "properties": {
+          "callback": {
+            "type": "function",
+            "description": "A callback function triggered whenever a log entry is added."
+          },
+          "logging": {
+            "type": "boolean",
+            "default": true,
+            "description": "Enable or disable logging."
+          }
+        }
+      }
+    ],
+    "returns": "Event Instance"
+  },
+  "methods": {
+    "emit": {
+      "params": [
+        { "name": "eventType", "type": "string" },
+        { "name": "payload", "type": "any" }
+      ],
+      "returns": "undefined",
+      "description": "Emits an event and logs the action."
+    },
+    "addListener": {
+      "params": [
+        { "name": "eventType", "type": "string" },
+        { "name": "callback", "type": "function" }
+      ],
+      "returns": "undefined",
+      "description": "Adds a listener for a specific event type."
+    },
+    "destroy": {
+      "params": [],
+      "returns": "undefined",
+      "description": "Stops the emitter, removes listeners, and clears from registry."
+    }
+  },
+  "staticMethods": {
+    "getAllEvents": {
+      "params": [],
+      "returns": "array",
+      "description": "Returns an array of all active Event instances."
+    },
+    "clearAllEvents": {
+      "params": [],
+      "returns": "undefined",
+      "description": "Terminates and removes all active Event instances."
+    }
+  }
+}

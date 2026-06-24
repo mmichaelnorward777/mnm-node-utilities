@@ -2,218 +2,209 @@ const { fork } = require("child_process");
 const { DateTime } = require("luxon");
 const { createJsonFileObject } = require("mnm-node-utilities");
 
-
 class Process {
+    // Static Registry
+    static childProcesses = [];
+    static maxAllowedChildProcesses = 10; // Define this in config
 
-    constructor({filePath, processName, rootDirectory, config})   {
-
-        if(Array.isArray(global.AuraCrmProcesses) && global.AuraCrmProcesses.length >= config.maxAllowedChildProcesses) {
-            return false;
-        }
-
-        this.setGlobalProcessVariable();
-
-        this.process = null;
-        this.processId = null;
+    constructor({ filePath, processName, rootDirectory, config }) {
         this.filePath = filePath;
         this.processName = processName;
-        this.status = null;
+        this.rootDirectory = rootDirectory;
+        this.config = config;
+        
+        this.process = null;
+        this.processId = null;
+        this.status = "stopped"; // stopped, alive, killed
         this.respawnOnExit = false;
+        
         this.messageLogs = [];
         this.messageListeners = [];
-        this.messageHandlersCallback = (data) => {};
-
-        this.currentDate = function(){
-            let dt = DateTime.fromJSDate(new Date()).toObject(),
-                {day, month, year} = dt;
-
-            return `${month}-${day}-${year}`;
-        }();
+        this.messageHandlersCallback = () => {};
         
-
-        this.taskFinished = false;
-
+        this.currentDate = DateTime.now().toFormat("M-d-yyyy"); // Use Luxon directly
         this.messageLoggingEnabled = false;
-
         this.messageLogsDirPath = `${rootDirectory}/logs/process/`;
-
         this.logFile = null;
-
+        
+        this._isStopping = false; // Flag to prevent respawn during manual terminate
     }
 
-    setGlobalProcessVariable()  {
+    setGlobalProcessVariable() {
         if (typeof global.AuraCrmProcesses === "undefined") {
             global.AuraCrmProcesses = Process;
         }
-
-        // Only assign once
         if (!Array.isArray(Process.childProcesses)) {
             Process.childProcesses = [];
         }
     }
 
-    setRespawnOnExit(booleanValue){
-        this.respawnOnExit = booleanValue;
+    static getActiveCount() {
+        return Process.childProcesses.length;
     }
 
-    static addToChildProcesses(childProcessObj)    {
-
-        Process.childProcesses.push({
-            processId : childProcessObj.processId,
-            filePath : childProcessObj.filePath,
-            processName : childProcessObj.processName,
-            process : childProcessObj.process,
-        });
-
+    static canSpawn() {
+        return Process.getActiveCount() < (Process.maxAllowedChildProcesses || 10);
     }
 
-    static removeFromChildProcesses(childProcess, onExit = false)   {
+    async initialize() {
+        this.setGlobalProcessVariable();
+        
+        if (!Process.canSpawn()) {
+            throw new Error("Max child processes reached");
+        }
 
+        // Initialize log file asynchronously
+        if (this.messageLoggingEnabled) {
+            this.logFile = await createJsonFileObject(this.messageLogsDirPath, `${this.processName}-${this.currentDate}.json`);
+        }
+    }
+
+    async start() {
+        if (this.status === "alive") return; // Already running
+
+        try {
+            this.process = fork(this.filePath);
+            this.status = "alive";
+            this.processId = this.process.pid;
+            
+            Process.addToChildProcesses(this);
+            this.getInitialListeners();
+            this.setLiveMessageListner();
+            
+            await this.addToMessageLogs({ message: `Child started: PID ${this.processId}` });
+        } catch (error) {
+            await this.addToMessageLogs({ message: "Failed to start child process", error });
+            this.status = "error";
+            throw error;
+        }
+    }
+
+    static addToChildProcesses(processInstance) {
+        if (!Process.childProcesses.find(p => p.processId === processInstance.processId)) {
+            Process.childProcesses.push({
+                processId: processInstance.processId,
+                filePath: processInstance.filePath,
+                processName: processInstance.processName,
+                process: processInstance, // Store the instance, not the child object
+            });
+        }
+    }
+
+    static removeFromChildProcesses(processInstance) {
         Process.childProcesses = Process.childProcesses.filter(
-            item => item.processId !== childProcess.processId
+            item => item.processId !== processInstance.processId
         );
-
-        if (!onExit && childProcess.process) {
-            childProcess.taskFinished = true;
-            childProcess.process.kill("SIGTERM");
-            childProcess.status = "killed";
-        }
-
     }
 
-    static terminateAllProcesses()   {
-
-        Process.childProcesses.forEach(childProcess => {
-            Process.removeFromChildProcesses(childProcess, true);
-        })
-
-    }
-
-    start()    {
-
-        this.process = fork(this.filePath);
-        this.status = "alive";
-        this.processId = this.process.pid;
-        Process.addToChildProcesses(this);
-        this.getInitialListeners();
-        
-    }
-
-    async messageLogger(data)   {
-        if(this.messageLoggingEnabled) {
-
-            if(!this.logFile)    {
-                this.logFile = createJsonFileObject(this.messageLogsDirPath, `${this.processName}-${this.currentDate}.json`);
+    static terminateAllProcesses() {
+        // Create a copy to iterate safely
+        [...Process.childProcesses].forEach(item => {
+            // item.process is the Process instance
+            if (item.process) {
+                item.process.terminate(true); // Force terminate
             }
+        });
+        Process.childProcesses = [];
+    }
 
-            await this.logFile.addData([data]);
+    async addToMessageLogs(data) {
+        const logEntry = {
+            processId: this.processId,
+            processName: this.processName,
+            filePath: this.filePath,
+            timestamp: new Date().toISOString(),
+            ...data
+        };
+
+        this.messageLogs.push(logEntry);
+
+        if (this.messageLoggingEnabled && this.logFile) {
+            try {
+                await this.logFile.addData([logEntry]);
+            } catch (e) {
+                console.error("Logging error:", e);
+            }
         }
-        
     }
 
-    async addToMessageLogs(data)  {
-
-        this.messageLogs.push({
-            processId : this.processId,
-            processName : this.processName,
-            filePath : this.filePath,
-            ...data
-        });
-        await this.messageLogger({
-            processId : this.processId,
-            processName : this.processName,
-            filePath : this.filePath,
-            ...data
-        });
-
-    }
-
-    getInitialListeners()   {
-
+    getInitialListeners() {
         this.process.on('exit', async (code) => {
-
-            await this.addToMessageLogs({
-                message : `Child exited: ${code}`
-            });           
+            this.status = "exited";
+            await this.addToMessageLogs({ message: `Child exited: ${code}` });
             
             Process.removeFromChildProcesses(this);
-
-            if(this.respawnOnExit)  {
-                this.start();
+            
+            // Only respawn if not manually stopped and flag is set
+            if (!this._isStopping && this.respawnOnExit) {
+                await this.addToMessageLogs({ message: "Respawning process..." });
+                // Small delay to prevent crash loops
+                setTimeout(() => this.start(), 1000); 
             }
         });
 
         this.process.on('error', async (error) => {
-
-            await this.addToMessageLogs({
-                message : `Child process error`,
-                error
-            });  
-
-            Process.removeFromChildProcesses(this);
-
-            if(this.respawnOnExit)  {
-                this.start();
-            }
-
+            await this.addToMessageLogs({ message: "Child process error", error });
+            // Error doesn't always mean exit, but we should handle it
         });
-
     }
 
     sendToChild(data) {
-        this.process.send(data)
+        if (this.status !== "alive" || !this.process) {
+            throw new Error("Process is not running");
+        }
+        this.process.send(data);
     }
 
-    addChildMessageListeners({type, callback}) {
-
-        let foundListenerObj = this.messageListeners.find(item => item.type === type);
-
-        if(foundListenerObj)   {
-            foundListenerObj.callback = callback;
-        } else  {
-            this.messageListeners.push({type, callback});
+    addChildMessageListeners({ type, callback }) {
+        const existing = this.messageListeners.find(item => item.type === type);
+        if (existing) {
+            existing.callback = callback;
+        } else {
+            this.messageListeners.push({ type, callback });
         }
-
     }
 
     createMessageHandlersCallback() {
-
         this.messageHandlersCallback = (data) => {
-
             this.messageListeners.forEach(item => {
-                if(data.type === item.type) {
+                if (data.type === item.type) {
                     item.callback(data);
                 }
-            })
-
-        }
-        
+            });
+        };
     }
 
-    setLiveMessageListner()    {
-
+    setLiveMessageListner() {
         this.removeLiveMessageListner();
-
         this.createMessageHandlersCallback();
-
         this.process.on("message", this.messageHandlersCallback);
-
-    } 
+    }
 
     removeLiveMessageListner() {
-
-        this.process.removeListener("message", this.messageHandlersCallback);
-
+        if (this.process && this.messageHandlersCallback) {
+            this.process.removeListener("message", this.messageHandlersCallback);
+        }
     }
 
-    terminate()  {
-        Process.removeFromChildProcesses(this.process, false)
+    terminate(force = false) {
+        this._isStopping = true;
+        this.status = "killing";
+        
+        Process.removeFromChildProcesses(this);
+        this.removeLiveMessageListner();
+        
+        if (this.process) {
+            try {
+                this.process.kill("SIGTERM");
+            } catch (e) {
+                console.error("Kill error:", e);
+            }
+        }
+        
         this.status = "dead";
-        this.process.kill("SIGTERM");
-        this.process.taskFinished = true;
+        this.addToMessageLogs({ message: "Terminated" }).catch(() => {}); // Ignore logging errors on destroy
     }
-
 }
 
 module.exports = Process;
-

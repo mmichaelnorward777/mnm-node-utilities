@@ -1,0 +1,87 @@
+{
+  "className": "Process",
+  "description": "Manages Node.js child processes with logging, respawn capabilities, and message passing.",
+  "constructor": {
+    "name": "Process",
+    "params": [
+      {
+        "name": "config",
+        "type": "object",
+        "properties": {
+          "filePath": { "type": "string", "description": "Path to the child script." },
+          "processName": { "type": "string", "description": "Name for logging." },
+          "rootDirectory": { "type": "string", "description": "Directory for log files." },
+          "maxAllowedChildProcesses": { "type": "number", "description": "Global limit for child processes." }
+        }
+      }
+    ],
+    "returns": "Process Instance"
+  },
+  "methods": {
+    "initialize": {
+      "isAsync": true,
+      "params": [],
+      "returns": "Promise<void>",
+      "description": "Initializes the process instance and logging."
+    },
+    "start": {
+      "isAsync": true,
+      "params": [],
+      "returns": "Promise<void>",
+      "description": "Forks the child process and starts listening."
+    },
+    "setRespawnOnExit": {
+      "params": [
+        { "name": "booleanValue", "type": "boolean" }
+      ],
+      "returns": "undefined",
+      "description": "Sets whether to auto-restart on exit."
+    },
+    "sendToChild": {
+      "params": [
+        { "name": "data", "type": "any" }
+      ],
+      "returns": "undefined",
+      "throws": "Error if process not running",
+      "description": "Sends a message to the child process."
+    },
+    "addChildMessageListeners": {
+      "params": [
+        {
+          "name": "config",
+          "type": "object",
+          "properties": {
+            "type": { "type": "string" },
+            "callback": { "type": "function" }
+          }
+        }
+      ],
+      "returns": "undefined",
+      "description": "Adds a listener for specific message types."
+    },
+    "setLiveMessageListner": {
+      "params": [],
+      "returns": "undefined",
+      "description": "Activates the message listeners on the child process."
+    },
+    "terminate": {
+      "params": [
+        { "name": "force", "type": "boolean", "optional": true }
+      ],
+      "returns": "undefined",
+      "description": "Stops and removes the process."
+    }
+  },
+  "staticMethods": {
+    "canSpawn": {
+      "params": [],
+      "returns": "boolean",
+      "description": "Checks if new processes can be created."
+    },
+    "terminateAllProcesses": {
+      "params": [],
+      "returns": "undefined",
+      "description": "Terminates all managed child processes."
+    }
+  }
+}
