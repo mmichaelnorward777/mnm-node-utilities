@@ -1,5 +1,5 @@
-const { EventEmitter } = require("events");
-const { generateUuid } = require("mnm-node-utilities");
+import { EventEmitter } from "events";
+import { generateUuid } from "mnm-node-utilities";
 
 class Event {
     // Static Registry
@@ -99,4 +99,4 @@ class Event {
     }
 }
 
-module.exports = Event;
+export default Event;

@@ -1,4 +1,4 @@
-const Process = require("./process");
+import * as Process from "./process";
 let exitHandlerInitialized = false;
 
 module.exports = function() {

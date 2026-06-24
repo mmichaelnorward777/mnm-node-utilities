@@ -1,6 +1,6 @@
-const { fork } = require("child_process");
-const { DateTime } = require("luxon");
-const { createJsonFileObject } = require("mnm-node-utilities");
+import { fork } from "child_process";
+import { DateTime } from "luxon";
+import { createJsonFileObject } from "../../json";
 
 class Process {
     // Static Registry
