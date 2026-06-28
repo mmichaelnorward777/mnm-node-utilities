@@ -1,5 +1,5 @@
 // 1. Import specific functions from each module
-import * as miscsUtilities from './miscs.js';
+import * as miscsUtilities from './miscs/index.js';
 import * as nodeUtilities from './node.js';
 import * as generalUtilities from './general.js';
 import * as jsonUtilities from './json.js';
