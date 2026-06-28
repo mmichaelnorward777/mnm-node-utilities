@@ -1,6 +1,6 @@
 {
   "name": "mnm-node-utilities",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "My personalize node utilities for creating node applications",
   "main": "index.js",
   "scripts": {
