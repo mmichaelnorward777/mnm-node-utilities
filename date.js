@@ -181,7 +181,7 @@ export function toISOZeroOffset(input, tz) {
 
 export function getHourlyDuration(numOfMinutes) {
 
-    let hours = numOfMinutes / 60,
+    let hours = Math.floor(numOfMinutes / 60),
         minutes = numOfMinutes % 60;
 
     return {

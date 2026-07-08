@@ -2,138 +2,97 @@ import { moderator, slowDown, waitForCondition } from "./general.js";
 import { getAllObjectKeys } from "./objects-array.js";
 import { toUrl } from "./string.js";
 
-export async function scrollToBottom(num = 75, containingEl = null) {
+export async function scrollToBottom(targetDistanceFromBottom = 200, targetEl = document.documentElement, maxTimeout = 10) {
 
-    let scrollableHeight = Math.max(
-            document.documentElement.scrollHeight,
-            document.body.scrollHeight
-        ) - window.innerHeight,
-        currentScroll = window.scrollY;
+    try {
 
-    function scroll() {
-        currentScroll = window.scrollY;
-    }
+        let scrollableHeight = targetEl !== window && targetEl !== document.documentElement ? targetEl.scrollHeight : document.documentElement.scrollHeight,
+            currentTimeout = 0,
+            error = false,
+            targetDistance = function(){
+                targetDistanceFromBottom = targetDistanceFromBottom > 0 ? targetDistanceFromBottom * -1 : targetDistanceFromBottom;
+                return scrollableHeight + targetDistanceFromBottom < 0 ? scrollableHeight * -1 : targetDistanceFromBottom;
+            }();
+        
+        maxTimeout = maxTimeout * 10;      
+        targetEl.scrollTo({
+            top: scrollableHeight + targetDistance,
+            behavior: 'smooth'
+        });
 
-    window.addEventListener("scroll", scroll);
-
-    await new Promise(resolve => {
-        let interval = setInterval(() => {
-                window.scrollTo(0, currentScroll + 10);
-
-                if (currentScroll >= scrollableHeight - num) {
-                    clearInterval(interval);
-                    window.removeEventListener("scroll", scroll);
-                    resolve();
+        await waitForCondition({
+            conditionCallback : () => {
+                if(currentTimeout >= maxTimeout)    {
+                    console.log({message : "checking condition", currentTimeout, maxTimeout});
+                    error = true;
+                    return error;
                 }
-            }, 1);
-    });
+                
+                currentTimeout += 1;
+                let currentScroll = targetEl !== window ? targetEl.scrollTop : targetEl.scrollY;
 
+                return currentScroll >= scrollableHeight + targetDistance || (currentScroll / scrollableHeight) * 100 > 85;
+            },
+            messageCallback : () => console.log({message : "still scrolling", currentTimeout, maxTimeout}),
+            onTrueCallback : () => console.log("scrolling done"),
+        });
+
+        if(error)   {
+            throw Error("Reached Maximum timeout for scroll, target distance may not have been reached.")
+        }
+
+        return true;
+
+    } catch(err)    {
+        return false;
+    }
+    
 }
 
-export async function scrollToBottomByCondition(conditionObject, propName) {
-    let totalHeight = window.innerHeight,
-        currentScroll = window.scrollY;
 
-    function scroll() {
-        currentScroll = window.scrollY;
-    }
+export async function scrollToTop(targetDistanceFromTop = 0, targetEl = document.documentElement, maxTimeout = 10) {
 
-    window.addEventListener("scroll", scroll);
+    try {
+        let scrollableHeight = targetEl !== window && targetEl !== document.documentElement ? targetEl.scrollHeight : document.documentElement.scrollHeight, 
+            currentTimeout = 0,
+            error = false,
+            targetDistance = function(){
+                targetDistanceFromTop = targetDistanceFromTop > 0 ? targetDistanceFromTop : targetDistanceFromTop * -1;
 
-    await new Promise(resolve => {
+                return targetDistanceFromTop >= scrollableHeight ? scrollableHeight : targetDistanceFromTop;
+            }();
+        
+        maxTimeout = maxTimeout * 10;
+        targetEl.scrollTo({
+            top: targetDistance,
+            behavior: 'smooth' 
+        });
 
-        let interval = setInterval(async () => {
-
-            window.scrollTo(0, currentScroll + 1000);
-
-            totalHeight = window.innerHeight;
-
-            if (conditionObject[propName]) {
-
-                console.log({
-                    condition: conditionObject[propName],
-                    message: conditionObject[propName] ? "condition is met" : "condition is not met",
-                });
-
-                clearInterval(interval);
-                window.removeEventListener("scroll", scroll);
-                resolve();
-
-            }
-        }, 25);
-    });
-
-}
-
-export async function scrollToElement(el) {
-    let scrollableHeight = Math.max(
-            document.documentElement.scrollHeight,
-            document.body.scrollHeight
-        ) - window.innerHeight,
-        currentScroll = window.scrollY;
-
-    function scroll() {
-        currentScroll = window.scrollY;
-    }
-
-    window.addEventListener("scroll", scroll);
-
-    await new Promise(resolve => {
-        let interval = setInterval(() => {
-                window.scrollTo(0, currentScroll + 10);
-                parallaxOffsetTop = el.offsetTop + el.offsetHeight;
-
-                if (currentScroll >= parallaxOffsetTop) {
-
-                    clearInterval(interval);
-                    window.removeEventListener("scroll", scroll);
-                    resolve();
+        await waitForCondition({
+            conditionCallback : () => {
+                if(currentTimeout >= maxTimeout)    {
+                    console.log({message : "checking condition", currentTimeout, maxTimeout});
+                    error = true;
+                    return error;
                 }
-            }, 1);
-    });
+                let currentScroll = targetEl !== window ? targetEl.scrollTop : targetEl.scrollY;
+                currentTimeout += 1;
+                return currentScroll <= targetDistance;
+            },
+            messageCallback : () => console.log({message : "still scrolling", currentTimeout, maxTimeout}),
+            onTrueCallback : () => console.log("scrolling done"),
+        });
 
-}
+        if(error)   {
+            throw Error("Reached Maximum timeout for scroll, target distance may not have been reached.")
+        }
 
-export async function toggleScroll() {
-
-    let scrollableHeight = Math.max(
-            document.documentElement.scrollHeight,
-            document.body.scrollHeight
-        ) - window.innerHeight,
-        currentScroll = window.scrollY,
-        halfPageScroll = scrollableHeight / 2;
-
-    if (halfPageScroll > currentScroll) {
-        await scrollToBottom();
-    } else {
-        await scrollToTop();
+        return true;
+    } catch(err)    {
+        console.log(err)
+        return false;
     }
-
-    await toggleScroll();
-}
-
-export async function scrollToTop() {
-    let totalHeight = document.body.offsetHeight - window.innerHeight,
-        currentScroll = window.scrollY;
-
-    function scroll() {
-        currentScroll = window.scrollY;
-    }
-
-    window.addEventListener("scroll", scroll);
-
-    await new Promise(resolve => {
-        let interval = setInterval(() => {
-            window.scrollTo(0, currentScroll - 10);
-
-            if (currentScroll <= 0) {
-
-                clearInterval(interval);
-                window.removeEventListener("scroll", scroll);
-                resolve();
-            }
-        }, 1);
-    });
+    
 }
 
 export async function waitForSelector(callback, numberOfWaits = 300) {
@@ -457,4 +416,18 @@ export function xhrDetector(callback = () => {}) {
             return response;
         };
     })();
+}
+
+
+export function getMouseCoordsOnElement(event, element) {
+    const rect = element.getBoundingClientRect();
+    
+    // Check for standard touches, changedTouches (for touchend), or fallback to mouse clientX/Y
+    const clientX = event.touches?.[0]?.clientX ?? event.changedTouches?.[0]?.clientX ?? event.clientX;
+    const clientY = event.touches?.[0]?.clientY ?? event.changedTouches?.[0]?.clientY ?? event.clientY;
+
+    return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+    };
 }

@@ -1,5 +1,5 @@
-// 1. Import specific functions from each module
-import * as miscsUtilities from './miscs/index.js';
+// src/utils/index.js
+
 import * as nodeUtilities from './node.js';
 import * as generalUtilities from './general.js';
 import * as jsonUtilities from './json.js';
@@ -11,9 +11,8 @@ import * as urlUtilities from './url.js';
 import * as webPageUtilities from './web-page.js';
 import * as webRequestsUtilities from './web-requests.js';
 
-// 2. Export the combined object
-export default {
-    ...miscsUtilities,
+// Merge all named exports into a single utilities object
+export const utilities = {
     ...nodeUtilities,
     ...generalUtilities,
     ...jsonUtilities,
@@ -25,3 +24,6 @@ export default {
     ...webPageUtilities,
     ...webRequestsUtilities,
 };
+
+// Export the combined object as default for easy importing
+export default utilities;

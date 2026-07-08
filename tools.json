@@ -238,9 +238,6 @@
   },
   "web-page": {
     "scrollToBottom": { "description": "Scrolls to bottom of page.", "args": ["num, containingEl"], "returns": "Promise" },
-    "scrollToBottomByCondition": { "description": "Scrolls until condition met.", "args": ["conditionObject, propName"], "returns": "Promise" },
-    "scrollToElement": { "description": "Scrolls to element.", "args": ["el"], "returns": "Promise" },
-    "toggleScroll": { "description": "Toggles scroll top/bottom.", "args": [], "returns": "Promise" },
     "scrollToTop": { "description": "Scrolls to top of page.", "args": [], "returns": "Promise" },
     "waitForSelector": { "description": "Waits for element to appear.", "args": ["callback, numberOfWaits"], "returns": "Promise" },
     "typeIt": { "description": "Types string into input.", "args": ["{el, string, elPropKey, newText, duration}"], "returns": "Promise" },

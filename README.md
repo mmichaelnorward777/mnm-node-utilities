@@ -644,21 +644,6 @@ Browser-side automation utilities.
 - **Arguments**: `num` (number, buffer), `containingEl` (element, optional).
 - **Returns**: `Promise<void>`.
 
-### `scrollToBottomByCondition(conditionObject, propName)`
-- **Purpose**: Scrolls until a condition object property is true.
-- **Arguments**: `conditionObject` (object), `propName` (string).
-- **Returns**: `Promise<void>`.
-
-### `scrollToElement(el)`
-- **Purpose**: Scrolls to a specific element.
-- **Arguments**: `el` (element).
-- **Returns**: `Promise<void>`.
-
-### `toggleScroll()`
-- **Purpose**: Toggles between scroll to top and bottom.
-- **Arguments**: None.
-- **Returns**: `Promise<void>`.
-
 ### `scrollToTop()`
 - **Purpose**: Scrolls to the top of the page.
 - **Arguments**: None.

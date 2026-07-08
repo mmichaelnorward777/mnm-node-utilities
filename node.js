@@ -47,6 +47,8 @@ export function getRequestResult(result, status = 200, contentType = "applicatio
     return obj;
 }
 
+
+
 export function getAppDataDirPath() {
     const platform = os.platform();
 
@@ -60,6 +62,7 @@ export function getAppDataDirPath() {
         throw new Error(`Unsupported platform: ${platform}`);
     }
 }
+
 
 export function getSystemCommandRunner(config) {
     // Validate config on creation to fail fast if something is missing
@@ -118,3 +121,4 @@ export function getSystemCommandRunner(config) {
         });
     };
 }
+
