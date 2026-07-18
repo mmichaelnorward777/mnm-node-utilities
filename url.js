@@ -1,4 +1,4 @@
-export function urlConstructor(urlString) {
+function urlConstructor(urlString) {
     // Step 1: Identify the parts of the URL
     let protocol = "";
     let domain = "";
@@ -49,7 +49,7 @@ export function urlConstructor(urlString) {
     return url;
 }
 
-export function objectToQueryString(obj, prefix = '') {
+function objectToQueryString(obj, prefix = '') {
     const queryParts = [];
 
     for (const key in obj) {
@@ -76,7 +76,7 @@ export function objectToQueryString(obj, prefix = '') {
     return queryParts.join('&');
 }
 
-export function queryStringToObject(queryString) {
+function queryStringToObject(queryString) {
     const result = {};
 
     const pairs = queryString.replace(/^\?/, '').split('&');
@@ -134,7 +134,7 @@ export function queryStringToObject(queryString) {
     return result;
 }
 
-export function urlToQueryStringObject(urlString, trailingSlash = false) {
+function urlToQueryStringObject(urlString, trailingSlash = false) {
     try {
         let url = new URL(urlString),
             queryString = url.search.length ? url.search.slice(1) : "",
@@ -160,7 +160,7 @@ export function urlToQueryStringObject(urlString, trailingSlash = false) {
     }
 }
 
-export function objectToDotNotation(obj, prefix = '', res = {}) {
+function objectToDotNotation(obj, prefix = '', res = {}) {
     for (const key in obj) {
         if (!Object.hasOwn(obj, key)) continue;
 
@@ -176,7 +176,7 @@ export function objectToDotNotation(obj, prefix = '', res = {}) {
     return res;
 }
 
-export function dotNotationToObject(dotObj) {
+function dotNotationToObject(dotObj) {
     const result = {};
 
     for (const key in dotObj) {
@@ -203,7 +203,7 @@ export function dotNotationToObject(dotObj) {
 }
 
 
-export function getDomain(url) {
+function getDomain(url) {
     // Remove "https://" or "http://"
     url = url.replace(/^(https?:\/\/)?/, '');
 
@@ -213,13 +213,13 @@ export function getDomain(url) {
     return url;
 }
 
-export function checkSubDomain(mainUrl, subUrl) {
+function checkSubDomain(mainUrl, subUrl) {
 
     return subUrl.toLowerCase().includes(getDomain(mainUrl.toLowerCase()));
 
 }
 
-export function cleanApiUrl(apiEndpoint, baseUrl, categorizedSetId, page = 1, limit = 10, pathFilter = "paginated") {
+function cleanApiUrl(apiEndpoint, baseUrl, categorizedSetId, page = 1, limit = 10, pathFilter = "paginated") {
 
     try {
         let urlObject = queryStringToObject(apiEndpoint, false);
