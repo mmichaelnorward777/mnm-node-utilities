@@ -2,17 +2,126 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from 'os';
 
-export default function getFileSystemUtilities(fileSystemPermissionsConfig = [])    {
+
+
+function setUserFsPermissions(fsPermisionsConfig = []) {
+
+    /* 
+        if string of dirPaths, defaults to read only in the userFileSystemPermissions;
+        fsPermissionsConfig = [...dirPaths]
+        fsPermissionsConfig = [
+            {
+                path : string of dirPath
+                permissions : string // "rwdx" read/write/delete/execute
+            },
+        ]
+    
+    */
+
+    const userFileSystemPermissions = new Map();
+
+    function isDirectory(p) {
+        try {
+            const stats = fs.statSync(p);
+            return stats.isDirectory();
+        } catch (err) {
+            return false;
+        }
+    }
+
+    for(let pathItem of fsPermissionsConfig)   {
+        let obj = {};
+            readPermission = false,
+            writePermission = false,
+            deletePermission = false,
+            executePermission = false,
+            dirPath = null;
+
+        if(typeof pathItem === "string")    {
+            let absolutePath = path.resolve(pathItem);
+            if(isDirectory(absolutePath))   {
+                dirPath = pathItem;
+                readPermission = true;
+            } else  {
+                obj = false;
+            }
+        } else if(typeof pathItem === "object") {
+            let absolutePath = path.resolve(pathItem.path);
+            if(isDirectory(absolutePath))   {
+                dirPath = pathItem.path;
+                readPermission = pathItem.permissions.includes("r");
+                writePermission = pathItem.permissions.includes("w");
+                deletePermission = pathItem.permissions.includes("d");
+                executePermission = pathItem.permissions.includes("x");
+            } else  {
+                obj = false;
+            }
+            
+        } else  {
+            obj = false;
+        }
+
+        if(obj)    {
+            Object.defineProperties(obj, {
+                "path" : {
+                    value : dirPath,
+                    enumerable : true, 
+                    writable : false,
+                    configurable : false,
+                },
+                "read" : {
+                    value : readPermission,
+                    enumerable : true, 
+                    writable : false,
+                    configurable : false,
+                },
+                "write" : {
+                    value : writePermission,
+                    enumerable : true, 
+                    writable : false,
+                    configurable : false,
+                },
+                "delete" : {
+                    value : deletePermission,
+                    enumerable : true, 
+                    writable : false,
+                    configurable : false,
+                },
+                "execute" : {
+                    value : executePermission,
+                    enumerable : true, 
+                    writable : false,
+                    configurable : false,
+                }
+            });
+
+            userFileSystemPermissions.set(dirPath, obj)
+        }
+        
+    }
+
+}
+
+export default function getFileSystemUtils(fsPermisionsConfig = [])    {
 
     /* 
 
         fileSystemPermissionsConfig array of strings or array of objects,
 
     */
+    const userFileSystemPermissions = setUserFsPermissions(fsPermisionsConfig); // returns a map of the user file permissions
 
     function checkFsPermissions()   {
 
     }
+
+    function getUserAllowedPaths()   {
+
+    }
+
+    
+
+    
         
     const mimeTypes = {
         "aac": "audio/aac",
@@ -779,6 +888,7 @@ export default function getFileSystemUtilities(fileSystemPermissionsConfig = [])
         createDirPath,
         createSvgFile,
         getAppDataDirPath,
+        getUserAllowedPaths,
     }
 
 }

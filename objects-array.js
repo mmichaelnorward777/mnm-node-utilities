@@ -1,4 +1,4 @@
-export default function ({toNormalString, objectToDotNotation})  {
+export default function getObjectArrayUtils({toNormalString, objectToDotNotation})  {
 
     function getValidatedPropValues(obj, propNames = [], callback = (value) => { }) {
 
@@ -209,6 +209,7 @@ export default function ({toNormalString, objectToDotNotation})  {
         objectToString,
         isObjectUnique,
         filterUnlistedObjects,
+        shuffleArr,
         objectCompare,
         assignProps,
         deepMerge

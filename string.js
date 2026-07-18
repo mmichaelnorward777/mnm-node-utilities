@@ -1,4 +1,4 @@
-export default function()   {
+export default function getStringUtils()   {
 
     function toUrl(str) {
         return Array.from(str.toLowerCase().trim().replace(/[^a-zA-Z0-9]/g, " ").split(" ")).reduce((a, b) => {

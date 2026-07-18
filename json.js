@@ -1,6 +1,6 @@
 import * as path from "path";
 
-export default function({ writeFileSync, fileExists, writeFile, readFile, mkdirSync })  {
+export default function getJsonUtils({ writeFileSync, fileExists, writeFile, readFile, mkdirSync })  {
 
     function parseValidatedJSON(inputValue) {
 

@@ -1,4 +1,4 @@
-export default function getDateUtilities()  {
+export default function getDateUtils()  {
 
     function formattedDate(dateObject) {
         let dt = dateObject ? dateObject : new Date(),
