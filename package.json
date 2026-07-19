@@ -5,15 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test-date" : "node ./test/date.js"
+    "test-all": "node ./test/run-all-tests.js",
+    "test-date" : "node ./test/date-utils-test.js",
+    "test-file-system" : "node ./test/file-system-utils-test.js"
   },
   "keywords": [
     "mnm-node-utilities"
   ],
+  "type": "module",
   "author": "Michael Norward Miranda",
-  "license": "ISC",
-  "dependencies": {
-    "geo-tz": "^8.1.4",
-    "luxon": "^3.7.2"
-  }
+  "license": "ISC"
 }

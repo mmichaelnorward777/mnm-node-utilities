@@ -30,7 +30,7 @@ export default function getUtilities(config)  {
     const urlUtils = getUrlUtils();
     const generalUtils = getGeneralUtils();
 
-    const { writeFileSync, fileExists, writeFile, readFile, mkdirSync, writeFile, createDirPath, checkDirPathPermissions } = fileSystemUtils;
+    const { writeFileSync, fileExists, writeFile, readFile, mkdirSync, createDirPath, checkDirPathPermissions } = fileSystemUtils;
     const { toUrl, toNormalString } = stringUtils;
     const { objectToDotNotation } = urlUtils;
     const { moderator, slowDown, waitForCondition } = generalUtils;
@@ -41,7 +41,7 @@ export default function getUtilities(config)  {
     
     const { getAllObjectKeys } = objectArrayUtils;
 
-    const webPageUtils = getWebPageUtils({moderator, slowDown, waitForCondition, getAllObjectKeys, toUrl});
+    const webPageUtils = getWebPageUtils({ moderator, slowDown, waitForCondition, getAllObjectKeys, toUrl });
     const webRequestUtils = getWebRequestUtils({ moderator });
 
 

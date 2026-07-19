@@ -47,8 +47,6 @@ export default function getNodeUtils({writeFile, createDirPath, checkDirPathPerm
         return obj;
     }
 
-
-
     function getAppDataDirPath() {
         const platform = os.platform();
 
@@ -62,7 +60,6 @@ export default function getNodeUtils({writeFile, createDirPath, checkDirPathPerm
             throw new Error(`Unsupported platform: ${platform}`);
         }
     }
-
 
     function runSystemCommand(command, cwd) {
 

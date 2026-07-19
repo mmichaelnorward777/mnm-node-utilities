@@ -30,8 +30,8 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
         const userFileSystemPermissions = new Map();
 
 
-        for(let pathItem of fsPermissionsConfig)   {
-            let obj = {};
+        for(let pathItem of fsPermisionsConfig)   {
+            let obj = {},
                 readPermission = false,
                 writePermission = false,
                 deletePermission = false,
@@ -854,19 +854,6 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
         return { imageName: `${path.basename(fileName)}`, imagePath: filePath };
     }
 
-    function getAppDataDirPath() {
-        const platform = os.platform();
-
-        if (platform === 'win32') {
-            return process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
-        } else if (platform === 'linux') {
-            return process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config');
-        } else if (platform === 'darwin') {
-            return path.join(os.homedir(), 'Library', 'Application Support');
-        } else {
-            throw new Error(`Unsupported platform: ${platform}`);
-        }
-    }
 
     return {
         getUserAllowedPathsByPermissionType,
@@ -913,7 +900,6 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
         getSpecifiedExt,
         createDirPath,
         createSvgFile,
-        getAppDataDirPath,
     }
 
 }

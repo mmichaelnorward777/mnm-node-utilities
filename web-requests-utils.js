@@ -1,7 +1,3 @@
-import * as http from "http";
-import * as https from "https";
-import { moderator } from './general-utils.js';
-
 export default function getWebRequestUtils({ moderator })    {
 
     async function apiRequest(url, options = {}, jsonData = true) {
@@ -134,7 +130,7 @@ export default function getWebRequestUtils({ moderator })    {
     }
 
     return  {
-
+        apiRequest,
         getWebRequestUtils,
         dynamicApiRequest,
         postDataObjects,

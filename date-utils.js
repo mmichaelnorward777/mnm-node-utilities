@@ -18,8 +18,11 @@ export default function getDateUtils()  {
 
         try {
             let dtObj;
-
-            if (dateTime && dateTime.includes("-")) {
+            if(dateTime instanceof Date)    {
+                dtObj = dateTime;
+            }  else if(typeof dateTime === "number")    {
+                dtObj = new Date(dateTime);
+            } else if (dateTime && dateTime.includes("-")) {
                 dtObj = new Date(`${dateTime}`);
             } else if (dateTime && typeof dateTime === "number") {
                 dtObj = new Date(dateTime);
@@ -37,8 +40,9 @@ export default function getDateUtils()  {
 
     }
 
-    function dateTimeObject(dateInSeconds = null) {
-        let dateTime = getDateTimeObect(dateInSeconds),
+    function dateTimeObject(dateObj) {
+
+        let dateTime = getDateTimeObect(dateObj),
             months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
             days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
             month = months[dateTime.getMonth()],
@@ -264,21 +268,27 @@ export default function getDateUtils()  {
     function getPrevMonth(dateObject) {
         let monthsArray = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
             monthIndex = dateObject.getMonth(),
+            currentMonth = monthsArray[monthIndex],
+            currentDate = dateObject.getDate(),
             year = dateObject.getFullYear(),
-            prevMonth = null;
+            prevMonth = monthsArray[monthIndex - 1],
+            date = 1;
 
-        if (dateObject.getDate() > 1) {
-            prevMonth = monthsArray[dateObject.getMonth()];
-        } else {
-            prevMonth = monthIndex - 1 >= 0 ? monthsArray[monthIndex - 1] : monthsArray[monthsArray.length - 1];
+        if(monthIndex === 0)    {
+            prevMonth = monthsArray[11];
+            year = year - 1;
         }
 
-        if (prevMonth === "January") {
-            year -= 1;
+        if(currentDate > 28) {
+            let prevMonthDays = getNumberOfDaysOfMonth(new Date(`${prevMonth} ${year}`));
+            if(prevMonthDays >= currentDate) {
+                date = currentDate;
+            } else  {
+                date = prevMonthDays;
+            }
         }
 
-
-        return new Date(`${prevMonth} 1, ${year}`);
+        return new Date(`${prevMonth} ${date}, ${year}`);
     }
 
     function getNumberOfDaysOfMonth(dateObj) {
@@ -293,6 +303,15 @@ export default function getDateUtils()  {
         return `${getCurrentMonthByIndex(scheduledDateObj.getMonth())} ${scheduledDateObj.getDate()}, ${scheduledDateObj.getFullYear()}`;
     }
 
+    function toLocalBusinessTimeZone(dateObj, businessTimeZone)  {
+        let localTimezone =  Intl.DateTimeFormat().resolvedOptions().timeZone,
+            localTzOffset = getOffsetMinutesForTimezone(localTimezone),
+            businessTzOffset = getOffsetMinutesForTimezone(businessTimeZone),
+            totalTimeDiffMS = (businessTzOffset - localTzOffset) * 60 * 1000;
+
+        return new Date(dateObj.getTime() + totalTimeDiffMS);
+    }
+
     function createTzScheduleObject(scheduledDate, timeOfDay, timeZone) {
 
         try {
@@ -303,8 +322,6 @@ export default function getDateUtils()  {
                 timeInputString = `${scheduledDateObj.toISOString().split("T").shift()}T${timeOfDay}`,
                 isoZeroOffset = toISOZeroOffset(timeInputString, timeZone),
                 zeroOffsetDateObj;
-
-
 
             if (!isoZeroOffset) {
                 timeInputString = `${getFormattedDateStr(scheduledDateObj)} ${timeOfDay}`;
@@ -345,7 +362,7 @@ export default function getDateUtils()  {
 
 
         } catch (err) {
-
+            
             return {
                 statusOk: false,
                 message: err.message,
@@ -363,7 +380,7 @@ export default function getDateUtils()  {
 
     function getISOFormattedDate(dateObject) {
         let date = dateObject.getDate() < 10 ? `0${dateObject.getDate()}` : dateObject.getDate(),
-            monthIndex = dateObject.getMonth()
+            monthIndex = dateObject.getMonth(),
             month = monthIndex + 1 < 10 ? `0${monthIndex + 1}` : monthIndex + 1;
         return `${dateObject.getFullYear()}-${month}-${date}`;
     }
@@ -456,6 +473,7 @@ export default function getDateUtils()  {
         formattedDate,
         getDateTimeObect,
         dateTimeObject,
+        getTimeElapsed,
         createZuluStartDate,
         getOffsetMinutesForTimezone,
         toISOZeroOffset,
@@ -470,6 +488,7 @@ export default function getDateUtils()  {
         getPrevMonth,
         getNumberOfDaysOfMonth,
         getFormattedDateStr,
+        toLocalBusinessTimeZone,
         createTzScheduleObject,
         getISOFormattedDate,
         createDateRangeObject,
