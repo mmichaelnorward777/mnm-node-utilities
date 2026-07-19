@@ -137,7 +137,7 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
 
     }
 
-    function checkUserFsPermission(dirPath, permissionType = "read")   {
+    function checkDirPathPermissions(dirPath, permissionType = "read")   {
 
         if(!permissionType) {
             return false
@@ -872,7 +872,7 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
         getUserAllowedPathsByPermissionType,
         getUserAllowedPaths,
         getUserFsPermission,
-        checkUserFsPermission,
+        checkDirPathPermissions,
         mimeTypes,
         baseName,
         fileExists,

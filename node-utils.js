@@ -2,7 +2,7 @@ import { fork, exec } from 'child_process';
 import * as path from "path";
 import * as os from 'os';
 
-export default function getNodeUtils({writeFile, createDirPath, checkUserFsPermission}) {
+export default function getNodeUtils({writeFile, createDirPath, checkDirPathPermissions}) {
 
     function spawnOnChildProcess(filePath) {
         const childProcess = fork(filePath);
@@ -67,7 +67,7 @@ export default function getNodeUtils({writeFile, createDirPath, checkUserFsPermi
     function runSystemCommand(command, cwd) {
 
         // 1. Check if user has the correct and matching fs permission for the directory, the user wants to execute system command on.
-        let isUserAllowed = checkUserFsPermission(cwd, "execute")
+        let isUserAllowed = checkDirPathPermissions(cwd, "execute")
 
         if (!isUserAllowedPath) {
             // Return a resolved Promise with an error object so the caller can handle it synchronously or asynchronously

@@ -4,7 +4,8 @@
   "description": "My personalize node utilities for creating node applications",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test-date" : "node ./test/date.js"
   },
   "keywords": [
     "mnm-node-utilities"
