@@ -2,7 +2,7 @@ import { fork, exec } from 'child_process';
 import * as path from "path";
 import * as os from 'os';
 
-export default function getNodeUtils({writeFile, createDirPath, getUserAllowedPaths}) {
+export default function getNodeUtils({writeFile, createDirPath, checkUserFsPermission}) {
 
     function spawnOnChildProcess(filePath) {
         const childProcess = fork(filePath);
@@ -66,27 +66,8 @@ export default function getNodeUtils({writeFile, createDirPath, getUserAllowedPa
 
     function runSystemCommand(command, cwd) {
 
-        const userAllowedPaths = getUserAllowedPaths();
-
-        if(!Array.isArray(userAllowedPaths) && userAllowedPaths.length < 1) {
-            return {
-                statusOk : false, 
-                message : "The user has to specify a whitelist of directory paths that this function can execute from"
-            }
-        }
-        // 1. Resolve to absolute path to prevent "../" attacks
-        const absoluteCwd = path.resolve(cwd);
-
-        // 2. Secure Path Validation
-        // We check if the absolute cwd starts with any allowed path + separator
-        // OR if it is exactly equal to the allowed path
-        const isUserAllowedPath = userAllowedPaths.some(allowedPath => {
-            const resolvedAllowed = path.resolve(allowedPath);
-            // Ensure we check for directory containment strictly
-            const isContained = absoluteCwd.startsWith(resolvedAllowed + path.sep) || 
-                                absoluteCwd === resolvedAllowed;
-            return isContained;
-        });
+        // 1. Check if user has the correct and matching fs permission for the directory, the user wants to execute system command on.
+        let isUserAllowed = checkUserFsPermission(cwd, "execute")
 
         if (!isUserAllowedPath) {
             // Return a resolved Promise with an error object so the caller can handle it synchronously or asynchronously
@@ -98,7 +79,7 @@ export default function getNodeUtils({writeFile, createDirPath, getUserAllowedPa
             });
         }
 
-        // 3. Execute Command
+        // 2. Execute Command
         return new Promise((resolve, reject) => {
             const platform = os.platform();
             // Note: For better security, consider using execFile with an array of args instead of string interpolation

@@ -2,23 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from 'os';
 
-
-
-function setUserFsPermissions(fsPermisionsConfig = []) {
-
-    /* 
-        if string of dirPaths, defaults to read only in the userFileSystemPermissions;
-        fsPermissionsConfig = [...dirPaths]
-        fsPermissionsConfig = [
-            {
-                path : string of dirPath
-                permissions : string // "rwdx" read/write/delete/execute
-            },
-        ]
-    
-    */
-
-    const userFileSystemPermissions = new Map();
+export default function getFileSystemUtils(fsPermisionsConfig = [])    {
 
     function isDirectory(p) {
         try {
@@ -29,80 +13,97 @@ function setUserFsPermissions(fsPermisionsConfig = []) {
         }
     }
 
-    for(let pathItem of fsPermissionsConfig)   {
-        let obj = {};
-            readPermission = false,
-            writePermission = false,
-            deletePermission = false,
-            executePermission = false,
-            dirPath = null;
+    function setUserFsPermissions(fsPermisionsConfig = []) {
 
-        if(typeof pathItem === "string")    {
-            let absolutePath = path.resolve(pathItem);
-            if(isDirectory(absolutePath))   {
-                dirPath = pathItem;
-                readPermission = true;
+        /* 
+            if string of dirPaths, defaults to read only in the userFileSystemPermissions;
+            fsPermissionsConfig = [...dirPaths]
+            fsPermissionsConfig = [
+                {
+                    path : string of dirPath
+                    permissions : string // "rwdx" read/write/delete/execute
+                },
+            ]
+        
+        */
+
+        const userFileSystemPermissions = new Map();
+
+
+        for(let pathItem of fsPermissionsConfig)   {
+            let obj = {};
+                readPermission = false,
+                writePermission = false,
+                deletePermission = false,
+                executePermission = false,
+                dirPath = null;
+
+            if(typeof pathItem === "string")    {
+                let absolutePath = path.resolve(pathItem);
+                if(isDirectory(absolutePath))   {
+                    dirPath = pathItem;
+                    readPermission = true;
+                } else  {
+                    obj = false;
+                }
+            } else if(typeof pathItem === "object") {
+                let absolutePath = path.resolve(pathItem.path);
+                if(isDirectory(absolutePath))   {
+                    dirPath = pathItem.path;
+                    readPermission = pathItem.permissions.includes("r");
+                    writePermission = pathItem.permissions.includes("w");
+                    deletePermission = pathItem.permissions.includes("d");
+                    executePermission = pathItem.permissions.includes("x");
+                } else  {
+                    obj = false;
+                }
+                
             } else  {
                 obj = false;
             }
-        } else if(typeof pathItem === "object") {
-            let absolutePath = path.resolve(pathItem.path);
-            if(isDirectory(absolutePath))   {
-                dirPath = pathItem.path;
-                readPermission = pathItem.permissions.includes("r");
-                writePermission = pathItem.permissions.includes("w");
-                deletePermission = pathItem.permissions.includes("d");
-                executePermission = pathItem.permissions.includes("x");
-            } else  {
-                obj = false;
+
+            if(obj)    {
+                Object.defineProperties(obj, {
+                    "path" : {
+                        value : dirPath,
+                        enumerable : true, 
+                        writable : false,
+                        configurable : false,
+                    },
+                    "read" : {
+                        value : readPermission,
+                        enumerable : true, 
+                        writable : false,
+                        configurable : false,
+                    },
+                    "write" : {
+                        value : writePermission,
+                        enumerable : true, 
+                        writable : false,
+                        configurable : false,
+                    },
+                    "delete" : {
+                        value : deletePermission,
+                        enumerable : true, 
+                        writable : false,
+                        configurable : false,
+                    },
+                    "execute" : {
+                        value : executePermission,
+                        enumerable : true, 
+                        writable : false,
+                        configurable : false,
+                    }
+                });
+
+                userFileSystemPermissions.set(dirPath, obj)
             }
             
-        } else  {
-            obj = false;
         }
 
-        if(obj)    {
-            Object.defineProperties(obj, {
-                "path" : {
-                    value : dirPath,
-                    enumerable : true, 
-                    writable : false,
-                    configurable : false,
-                },
-                "read" : {
-                    value : readPermission,
-                    enumerable : true, 
-                    writable : false,
-                    configurable : false,
-                },
-                "write" : {
-                    value : writePermission,
-                    enumerable : true, 
-                    writable : false,
-                    configurable : false,
-                },
-                "delete" : {
-                    value : deletePermission,
-                    enumerable : true, 
-                    writable : false,
-                    configurable : false,
-                },
-                "execute" : {
-                    value : executePermission,
-                    enumerable : true, 
-                    writable : false,
-                    configurable : false,
-                }
-            });
+        return userFileSystemPermissions;
 
-            userFileSystemPermissions.set(dirPath, obj)
-        }
-        
     }
-
-}
-
-export default function getFileSystemUtils(fsPermisionsConfig = [])    {
 
     /* 
 
@@ -111,16 +112,46 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     */
     const userFileSystemPermissions = setUserFsPermissions(fsPermisionsConfig); // returns a map of the user file permissions
 
-    function checkFsPermissions()   {
+    function getUserAllowedPathsByPermissionType(permissionType = "read")   {
+        
+        return typeof permissionType !== "undefined" ? Array.from(userFileSystemPermissions.values()).filter(item => item[permissionType]) : [];
 
     }
 
-    function getUserAllowedPaths()   {
+    function getUserAllowedPaths()  {
+        return Array.from(userFileSystemPermissions.values());
+    }
+
+    function getUserFsPermission(dirPath)   {
+
+        let absoluteCwd = path.resolve(dirPath),
+            userAllowedPaths = getUserAllowedPaths();
+        
+        return userAllowedPaths.find(allowedPath => {
+            const resolvedAllowed = path.resolve(allowedPath);
+            // Ensure we check for directory containment strictly
+            const isContained = absoluteCwd.startsWith(resolvedAllowed + path.sep) || 
+                                absoluteCwd === resolvedAllowed;
+            return isContained;
+        });
 
     }
 
-    
+    function checkUserFsPermission(dirPath, permissionType = "read")   {
 
+        if(!permissionType) {
+            return false
+        }
+        
+        let foundUserFsPermission = getUserFsPermission(dirPath);
+
+        if(!foundPermission)    {
+            return false;
+        }
+
+        return foundUserFsPermission[permissionType] === permissionType;
+
+    }
     
         
     const mimeTypes = {
@@ -219,15 +250,6 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
         try {
             const stats = fs.statSync(p);
             return stats.isFile();
-        } catch (err) {
-            return false;
-        }
-    }
-
-    function isDirectory(p) {
-        try {
-            const stats = fs.statSync(p);
-            return stats.isDirectory();
         } catch (err) {
             return false;
         }
@@ -847,6 +869,10 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     return {
+        getUserAllowedPathsByPermissionType,
+        getUserAllowedPaths,
+        getUserFsPermission,
+        checkUserFsPermission,
         mimeTypes,
         baseName,
         fileExists,
@@ -888,7 +914,6 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
         createDirPath,
         createSvgFile,
         getAppDataDirPath,
-        getUserAllowedPaths,
     }
 
 }
