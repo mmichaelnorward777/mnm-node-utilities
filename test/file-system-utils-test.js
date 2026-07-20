@@ -4,18 +4,23 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 const runner = new TestRunner();
-
+const dirname = import.meta.dirname;
 // Configuration
-const TEST_BASE_DIR = "E:/apps/npm-packages/mnm-node-utilities/test/sample-directory";
-const TEST_PERMISSIONS = [{ path: TEST_BASE_DIR, permissions: "rwdx" }];
+const TEST_BASE_DIR = path.join(dirname, "sample-directory").replace(/\\/g, "/");
 
-// Ensure test base directory exists and is clean for this suite
-if (fs.existsSync(path.dirname(TEST_BASE_DIR))) {
-    fs.rmSync(path.dirname(TEST_BASE_DIR), { recursive: true, force: true });
+// Ensure base directory exists before starting tests
+if (!fs.existsSync(TEST_BASE_DIR)) {
+    fs.mkdirSync(TEST_BASE_DIR, { recursive: true });
 }
-fs.mkdirSync(path.dirname(TEST_BASE_DIR), { recursive: true });
 
-const utils = getUtilities({ userAllowedPaths: TEST_PERMISSIONS });
+const utils = getUtilities({ 
+    userAllowedPaths: [
+        { 
+            path: TEST_BASE_DIR, 
+            permissions: "rwdx" 
+        }
+    ] 
+});
 
 // Destructure all returned methods
 const {
@@ -65,16 +70,30 @@ const {
     createSvgFile
 } = utils;
 
-// Helper to create a unique test subdirectory to avoid conflicts
-const getTestDir = (name) => path.join(TEST_BASE_DIR, name);
+// Helper to create a unique test subdirectory
+const getTestDir = (name) => path.join(TEST_BASE_DIR, `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${name}`);
+
+// Helper to clean up a specific directory
+const cleanupDir = (dirPath) => {
+    if (fs.existsSync(dirPath)) {
+        try {
+            deleteDirSync(dirPath);
+        } catch (e) {
+            // Ignore cleanup errors in tests if dir is already gone or locked
+        }
+    }
+};
 
 runner.describe('File System Utils', () => {
 
     // --- Permission Helpers ---
     runner.it('getUserAllowedPaths: returns array of permissions', () => {
         const paths = getUserAllowedPaths();
+
         assertTrue(Array.isArray(paths));
         assertTrue(paths.length > 0);
+        // Verify the base dir is in the list
+        assertTrue(paths.some(p => p.path === TEST_BASE_DIR || p.path === path.resolve(TEST_BASE_DIR)));
     });
 
     runner.it('getUserAllowedPathsByPermissionType: filters by read', () => {
@@ -107,331 +126,413 @@ runner.describe('File System Utils', () => {
     });
 
     runner.it('fileExists: returns false for non-existing file', () => {
-        assertFalse(fileExists(path.join(TEST_BASE_DIR, "nonexistent.txt")));
+        const nonExistent = path.join(TEST_BASE_DIR, "nonexistent_file_12345.txt");
+        assertFalse(fileExists(nonExistent));
     });
 
     runner.it('isDirectory: returns true for dir', () => {
+        isDirectory(TEST_BASE_DIR);
         assertTrue(isDirectory(TEST_BASE_DIR));
     });
 
     runner.it('isFile: returns true for file', async () => {
-        const f = path.join(TEST_BASE_DIR, "test.txt");
+        const testDir = getTestDir("isFile");
+        mkdirSync(testDir);
+        const f = path.join(testDir, "test.txt");
         writeFileSync(f, "content");
         assertTrue(isFile(f));
-        deleteFileSync(f);
+        cleanupDir(testDir);
+    });
+
+    runner.it('isFile: returns false for directory', async () => {
+        const testDir = getTestDir("isFileDir");
+        mkdirSync(testDir);
+        assertFalse(isFile(testDir));
+        cleanupDir(testDir);
     });
 
     runner.it('getFileExt: extracts extension', () => {
         assertEqual(getFileExt("file.txt"), ".txt");
+        assertEqual(getFileExt("file.tar.gz"), ".gz");
     });
 
-    runner.it('getParentDir: extracts parent dir', () => {
-        assertEqual(getParentDir("/path/to/file.txt"), "/path/to");
+    runner.it('getParentDir: extracts parent dir', async () => {
+
+        const testDir = getTestDir("getParentDir");
+        mkdirSync(testDir);
+        await writeFile(path.join(testDir, "a.txt"), "");
+
+        console.log({
+            firstTest : getParentDir(path.join(TEST_BASE_DIR, "../test")),
+            secondTest : getParentDir(path.join(testDir, "a.txt"))
+        })
+
+        assertEqual(getParentDir(path.join(dirname, "../test")), undefined);
+        assertEqual(getParentDir(path.join(testDir, "a.txt")), path.resolve(TEST_BASE_DIR));
+
+        cleanupDir(testDir);
     });
 
     // --- Read/Write/Sync Methods ---
-    runner.it('mkdirSync: creates directory', async () => {
-        const d = getTestDir("mkdirSync-test");
-        const res = mkdirSync(d);
+    runner.it('mkdirSync: creates directory', () => {
+        const testDir = getTestDir("mkdirSync");
+        const res = mkdirSync(testDir);
         assertEqual(res.status, "success");
-        assertTrue(isDirectory(d));
-        deleteDirSync(d);
+        assertTrue(isDirectory(testDir));
+        cleanupDir(testDir);
     });
 
     runner.it('mkdir: creates directory async', async () => {
-        const d = getTestDir("mkdir-async-test");
-        const res = await mkdir(d);
+        const testDir = getTestDir("mkdirAsync");
+        const res = await mkdir(testDir);
         assertEqual(res.status, "success");
-        assertTrue(isDirectory(d));
-        deleteDirSync(d);
+        assertTrue(isDirectory(testDir));
+        cleanupDir(testDir);
     });
 
-    runner.it('writeFileSync: writes content', async () => {
-        const f = getTestDir("writeSync.txt");
+    runner.it('writeFileSync: writes content', () => {
+        const testDir = getTestDir("writeSync");
+        mkdirSync(testDir);
+        const f = path.join(testDir, "file.txt");
         const res = writeFileSync(f, "Hello Sync");
         assertEqual(res.status, "success");
         const content = readFileSync(f).data;
         assertEqual(content, "Hello Sync");
-        deleteFileSync(f);
+        cleanupDir(testDir);
     });
 
     runner.it('writeFile: writes content async', async () => {
-        const f = getTestDir("writeAsync.txt");
-        const res = await writeFile(f, "Hello Async");
+        const testDir = getTestDir("writeFile");
+        mkdirSync(testDir);
+        const f = path.join(testDir, "file.txt");
+        const res = await writeFile(f, "Hello Async");        
+        const content = await readFile(f);
         assertEqual(res.status, "success");
-        const content = await readFile(f).data;
-        assertEqual(content, "Hello Async");
-        deleteFileSync(f);
+        assertEqual(content.data, "Hello Async");
+        cleanupDir(testDir);
     });
 
-    runner.it('readFileSync: reads content', async () => {
-        const f = getTestDir("readSync.txt");
+    runner.it('readFileSync: reads content', () => {
+        const testDir = getTestDir("readSync");
+        mkdirSync(testDir);
+        const f = path.join(testDir, "file.txt");
         writeFileSync(f, "Read Me");
         const res = readFileSync(f);
         assertEqual(res.status, "success");
         assertEqual(res.data, "Read Me");
-        deleteFileSync(f);
+        cleanupDir(testDir);
     });
 
     runner.it('readFile: reads content async', async () => {
-        const f = getTestDir("readAsync.txt");
+        const testDir = getTestDir("readAsync");
+        mkdirSync(testDir);
+        const f = path.join(testDir, "file.txt");
         writeFileSync(f, "Read Me Async");
         const res = await readFile(f);
         assertEqual(res.status, "success");
         assertEqual(res.data, "Read Me Async");
-        deleteFileSync(f);
+        cleanupDir(testDir);
     });
 
-    runner.it('deleteFileSync: deletes file', async () => {
-        const f = getTestDir("deleteSync.txt");
+    runner.it('deleteFileSync: deletes file', () => {
+        const testDir = getTestDir("deleteFileSync");
+        mkdirSync(testDir);
+        const f = path.join(testDir, "file.txt");
         writeFileSync(f, "Delete Me");
         const res = deleteFileSync(f);
         assertEqual(res.status, "success");
         assertFalse(fileExists(f));
+        cleanupDir(testDir);
     });
 
     runner.it('deleteFile: deletes file async', async () => {
-        const f = getTestDir("deleteAsync.txt");
+        const testDir = getTestDir("deleteFileAsync");
+        mkdirSync(testDir);
+        const f = path.join(testDir, "file.txt");
         writeFileSync(f, "Delete Me Async");
         const res = await deleteFile(f);
         assertEqual(res.status, "successful");
         assertFalse(fileExists(f));
+        cleanupDir(testDir);
     });
 
-    runner.it('deleteDirSync: deletes directory', async () => {
-        const d = getTestDir("deleteDirSync");
-        mkdirSync(d);
-        const res = deleteDirSync(d);
+    runner.it('deleteDirSync: deletes directory', () => {
+        const testDir = getTestDir("deleteDirSync");
+        mkdirSync(testDir);
+        const res = deleteDirSync(testDir, {recursive : true});
         assertEqual(res.status, "success");
-        assertFalse(isDirectory(d));
+        assertFalse(isDirectory(testDir));
     });
 
     runner.it('deleteDir: deletes directory async', async () => {
-        const d = getTestDir("deleteDirAsync");
-        mkdirSync(d);
-        const res = await deleteDir(d);
+        const testDir = getTestDir("deleteDirAsync");
+        mkdirSync(testDir);
+        const res = await deleteDir(testDir, {recursive : true});
         assertEqual(res.status, "success");
-        assertFalse(isDirectory(d));
+        assertFalse(isDirectory(testDir));
     });
 
     runner.it('getFileSize: returns size in bytes', async () => {
-        const f = getTestDir("size.txt");
+        const testDir = getTestDir("getFileSize");
+        mkdirSync(testDir);
+        const f = path.join(testDir, "size.txt");
         writeFileSync(f, "12345"); // 5 bytes
         const size = await getFileSize(f);
         assertEqual(size, 5);
-        deleteFileSync(f);
+        cleanupDir(testDir);
     });
 
     // --- Read Directory Sync/Async ---
     runner.it('readdirSync: lists files', async () => {
-        const d = getTestDir("readdirSync");
-        mkdirSync(d);
-        writeFile(path.join(d, "a.txt"), "");
-        writeFile(path.join(d, "b.txt"), "");
+        const testDir = getTestDir("readdirSync");
+        mkdirSync(testDir);
+        await writeFile(path.join(testDir, "a.txt"), "");
+        await writeFile(path.join(testDir, "b.txt"), "");
         
-        const res = readdirSync(d);
+        const res = readdirSync(testDir);
         assertEqual(res.status, "success");
+        assertTrue(Array.isArray(res.data));
         assertTrue(res.data.length >= 2);
         
-        deleteDirSync(d);
+        cleanupDir(testDir);
     });
 
     runner.it('readdir: lists files async', async () => {
-        const d = getTestDir("readdirAsync");
-        mkdirSync(d);
-        writeFile(path.join(d, "a.txt"), "");
+        const testDir = getTestDir("readdirAsync");
+        mkdirSync(testDir);
+        await writeFile(path.join(testDir, "a.txt"), "");
         
-        const res = await readdir(d);
+        const res = await readdir(testDir);
         assertEqual(res.status, "success");
+        assertTrue(Array.isArray(res.data));
         assertTrue(res.data.length >= 1);
         
-        deleteDirSync(d);
+        cleanupDir(testDir);
     });
 
     // --- Empty Checks ---
     runner.it('isFileEmptySync: returns true for empty', async () => {
-        const f = getTestDir("emptySync.txt");
+        const testDir = getTestDir("isFileEmptySync");
+        mkdirSync(testDir);
+        const f = path.join(testDir, "empty.txt");
         writeFileSync(f, "");
         assertTrue(isFileEmptySync(f));
-        deleteFileSync(f);
+        cleanupDir(testDir);
+    });
+
+    runner.it('isFileEmptySync: returns false for non-empty', async () => {
+        const testDir = getTestDir("isFileEmptySyncNonEmpty");
+        mkdirSync(testDir);
+        const f = path.join(testDir, "nonempty.txt");
+        writeFileSync(f, "data");
+        assertFalse(isFileEmptySync(f));
+        cleanupDir(testDir);
     });
 
     runner.it('isFileEmpty: returns true for empty async', async () => {
-        const f = getTestDir("emptyAsync.txt");
+        const testDir = getTestDir("isFileEmptyAsync");
+        mkdirSync(testDir);
+        const f = path.join(testDir, "empty.txt");
         writeFileSync(f, "");
         const empty = await isFileEmpty(f);
         assertTrue(empty);
-        deleteFileSync(f);
+        cleanupDir(testDir);
     });
 
-    runner.it('isDirectoryEmptySync: returns true for empty', async () => {
-        const d = getTestDir("emptyDirSync");
-        mkdirSync(d);
-        assertTrue(isDirectoryEmptySync(d));
-        deleteDirSync(d);
+    runner.it('isDirectoryEmpty: returns true for empty', () => {
+        const testDir = getTestDir("isDirEmptySync");
+        mkdirSync(testDir);
+        const result = isDirectoryEmptySync(testDir);
+        assertTrue(result);
+        cleanupDir(testDir);
+    });
+
+    runner.it('isDirectoryEmptySync: returns false for non-empty', async () => {
+        const testDir = getTestDir("isDirEmptySyncNonEmpty");
+        mkdirSync(testDir);
+        await writeFile(path.join(testDir, "file.txt"), "");
+        const result = isDirectoryEmptySync(testDir);
+        assertFalse(result);
+        cleanupDir(testDir);
     });
 
     runner.it('isDirectoryEmpty: returns true for empty async', async () => {
-        const d = getTestDir("emptyDirAsync");
-        mkdirSync(d);
-        const empty = await isDirectoryEmpty(d);
+        const testDir = getTestDir("isDirEmptyAsync");
+        mkdirSync(testDir);
+        const empty = await isDirectoryEmpty(testDir);
         assertTrue(empty);
-        deleteDirSync(d);
+        cleanupDir(testDir);
     });
 
     // --- List Files/Dirs ---
     runner.it('getAllFilesFromDirectorySync: filters by ext', async () => {
-        const d = getTestDir("listSync");
-        mkdirSync(d);
-        writeFile(path.join(d, "a.txt"), "");
-        writeFile(path.join(d, "b.json"), "");
+        const testDir = getTestDir("listSync");
+        mkdirSync(testDir);
+        await writeFile(path.join(testDir, "a.txt"), "");
+        await writeFile(path.join(testDir, "b.json"), "");
         
-        const files = getAllFilesFromDirectorySync(d, ".txt");
+        const files = getAllFilesFromDirectorySync(testDir, ".txt");
         assertTrue(Array.isArray(files));
         assertEqual(files.length, 1);
         assertEqual(files[0], "a.txt");
         
-        deleteDirSync(d);
+        cleanupDir(testDir);
     });
 
     runner.it('getAllFilesFromDirectory: filters by ext async', async () => {
-        const d = getTestDir("listAsync");
-        mkdirSync(d);
-        writeFile(path.join(d, "a.txt"), "");
-        writeFile(path.join(d, "b.json"), "");
+        const testDir = getTestDir("listAsync");
+        mkdirSync(testDir);
+        await writeFile(path.join(testDir, "a.txt"), "");
+        await writeFile(path.join(testDir, "b.json"), "");
         
-        const files = await getAllFilesFromDirectory(d, ".txt");
+        const files = await getAllFilesFromDirectory(testDir, ".txt");
         assertTrue(Array.isArray(files));
         assertEqual(files.length, 1);
         
-        deleteDirSync(d);
+        cleanupDir(testDir);
     });
 
     runner.it('getAllDirsFromDirectorySync: lists subdirs', async () => {
-        const d = getTestDir("dirsSync");
-        mkdirSync(d);
-        mkdirSync(path.join(d, "subdir1"));
-        writeFile(path.join(d, "file.txt"), "");
+        const testDir = getTestDir("dirsSync");
+        mkdirSync(testDir);
+        mkdirSync(path.join(testDir, "subdir1"));
+        await writeFile(path.join(testDir, "file.txt"), "");
         
-        const dirs = getAllDirsFromDirectorySync(d);
+        const dirs = getAllDirsFromDirectorySync(testDir);
         assertTrue(Array.isArray(dirs));
         assertEqual(dirs.length, 1);
         assertEqual(dirs[0], "subdir1");
         
-        deleteDirSync(d);
+        cleanupDir(testDir);
     });
 
     runner.it('getAllDirsFromDirectory: lists subdirs async', async () => {
-        const d = getTestDir("dirsAsync");
-        mkdirSync(d);
-        mkdirSync(path.join(d, "subdir2"));
+        const testDir = getTestDir("dirsAsync");
+        mkdirSync(testDir);
+        mkdirSync(path.join(testDir, "subdir2"));
         
-        const dirs = await getAllDirsFromDirectory(d);
+        const dirs = await getAllDirsFromDirectory(testDir);
         assertTrue(Array.isArray(dirs));
         assertEqual(dirs.length, 1);
         
-        deleteDirSync(d);
+        cleanupDir(testDir);
     });
 
     // --- Recursive Operations ---
     runner.it('getAllFilesRecursivelySync: gets all files', async () => {
-        const d = getTestDir("recSync");
-        mkdirSync(path.join(d, "sub"));
-        writeFile(path.join(d, "top.txt"), "");
-        writeFile(path.join(d, "sub", "nested.txt"), "");
+        const testDir = getTestDir("recSync");
+        mkdirSync(path.join(testDir, "sub"));
+        await writeFile(path.join(testDir, "top.txt"), "");
+        await writeFile(path.join(testDir, "sub", "nested.txt"), "");
         
-        const files = getAllFilesRecursivelySync(d);
+        const files = getAllFilesRecursivelySync(testDir);
         assertTrue(Array.isArray(files));
-        // Should have at least 2 files
+        // Should find both files
         assertTrue(files.length >= 2);
         
-        deleteDirSync(d);
+        cleanupDir(testDir);
     });
 
     runner.it('getAllFilesRecursively: gets all files async', async () => {
-        const d = getTestDir("recAsync");
-        mkdirSync(path.join(d, "sub"));
-        writeFile(path.join(d, "top.txt"), "");
-        writeFile(path.join(d, "sub", "nested.txt"), "");
+        const testDir = getTestDir("recAsync");
+        mkdirSync(path.join(testDir, "sub"));
+        await writeFile(path.join(testDir, "top.txt"), "");
+        await writeFile(path.join(testDir, "sub", "nested.txt"), "");
         
-        const files = await getAllFilesRecursively(d);
+        const files = await getAllFilesRecursively(testDir);
         assertTrue(Array.isArray(files));
         assertTrue(files.length >= 2);
         
-        deleteDirSync(d);
+        cleanupDir(testDir);
     });
 
     // --- Bulk Deletion ---
     runner.it('deleteAllFilesInDirPath: deletes files only', async () => {
-        const d = getTestDir("delFiles");
-        mkdirSync(d);
-        writeFile(path.join(d, "a.txt"), "");
-        writeFile(path.join(d, "b.txt"), "");
+        const testDir = getTestDir("delFiles");
+        mkdirSync(testDir);
+        await writeFile(path.join(testDir, "a.txt"), "");
+        await writeFile(path.join(testDir, "b.txt"), "");
         
-        const res = await deleteAllFilesInDirPath(d);
+        const res = await deleteAllFilesInDirPath(testDir);
         assertEqual(res.status, "success");
-        assertTrue(isDirectoryEmptySync(d)); // Dir should still exist but be empty
-        deleteDirSync(d);
+        // Dir should still exist but be empty
+        assertTrue(isDirectory(testDir));
+        assertTrue(isDirectoryEmptySync(testDir));
+        
+        cleanupDir(testDir);
     });
 
     runner.it('deleteAllDirsInDirPath: deletes subdirs', async () => {
-        const d = getTestDir("delDirs");
-        mkdirSync(d);
-        mkdirSync(path.join(d, "sub1"));
-        mkdirSync(path.join(d, "sub2"));
+        const testDir = getTestDir("delDirs");
+        mkdirSync(testDir);
+        mkdirSync(path.join(testDir, "sub1"));
+        mkdirSync(path.join(testDir, "sub2"));
+        await writeFile(path.join(testDir, "file.txt"), ""); // Keep a file
         
-        const res = await deleteAllDirsInDirPath(d);
+        const res = await deleteAllDirsInDirPath(testDir);
         assertEqual(res.status, "success");
         // Check if subdirs are gone
-        assertFalse(isDirectory(path.join(d, "sub1")));
+        assertFalse(isDirectory(path.join(testDir, "sub1")));
+        assertFalse(isDirectory(path.join(testDir, "sub2")));
+        // File should remain
+        assertTrue(fileExists(path.join(testDir, "file.txt")));
         
-        deleteDirSync(d);
+        cleanupDir(testDir);
     });
 
     runner.it('deleteAllInDirPath: deletes everything', async () => {
-        const d = getTestDir("delAll");
-        mkdirSync(d);
-        writeFile(path.join(d, "a.txt"), "");
-        mkdirSync(path.join(d, "sub"));
+        const testDir = getTestDir("delAll");
+        mkdirSync(testDir);
+        await writeFile(path.join(testDir, "a.txt"), "");
+        mkdirSync(path.join(testDir, "sub"));
         
-        const res = await deleteAllInDirPath(d);
-        // Note: deleteAllInDirPath tries to delete files and dirs.
-        // If successful, the directory content is empty.
-        assertTrue(isDirectoryEmptySync(d));
+        const res = await deleteAllInDirPath(testDir);
+        // Note: deleteAllInDirPath deletes files and dirs inside, but usually not the root dir itself unless specified.
+        // However, our implementation deletes content. Let's verify content is empty.
+        assertTrue(isDirectory(testDir));
+        assertTrue(isDirectoryEmptySync(testDir));
         
-        deleteDirSync(d);
+        cleanupDir(testDir);
     });
 
     runner.it('deleteAllEmptyFilesInDirectory: deletes empty files', async () => {
-        const d = getTestDir("delEmptyFiles");
-        mkdirSync(d);
-        writeFile(path.join(d, "empty.txt"), "");
-        writeFile(path.join(d, "nonempty.txt"), "data");
+        const testDir = getTestDir("delEmptyFiles");
+        mkdirSync(testDir);
+        await writeFile(path.join(testDir, "empty.txt"), "");
+        await writeFile(path.join(testDir, "nonempty.txt"), "data");
         
-        const res = await deleteAllEmptyFilesInDirectory(d);
+        const res = await deleteAllEmptyFilesInDirectory(testDir);
         assertEqual(res.status, "success");
-        assertTrue(fileExists(path.join(d, "nonempty.txt")));
-        assertFalse(fileExists(path.join(d, "empty.txt")));
+        assertTrue(fileExists(path.join(testDir, "nonempty.txt")));
+        assertFalse(fileExists(path.join(testDir, "empty.txt")));
         
-        deleteDirSync(d);
+        cleanupDir(testDir);
     });
 
     runner.it('deleteAllEmptyDirsInDirectory: deletes empty dirs', async () => {
-        const d = getTestDir("delEmptyDirs");
-        mkdirSync(d);
-        mkdirSync(path.join(d, "emptySub"));
-        writeFile(path.join(d, "file.txt"), "");
+        const testDir = getTestDir("delEmptyDirs");
+        mkdirSync(testDir);
+        mkdirSync(path.join(testDir, "emptySub"));
+        await writeFile(path.join(testDir, "file.txt"), "");
         
-        const res = await deleteAllEmptyDirsInDirectory(d);
+        const res = await deleteAllEmptyDirsInDirectory(testDir);
         assertEqual(res.status, "success");
-        assertFalse(isDirectory(path.join(d, "emptySub")));
+        assertFalse(isDirectory(path.join(testDir, "emptySub")));
         
-        deleteDirSync(d);
+        cleanupDir(testDir);
     });
 
     // --- MIME Types & Helpers ---
     runner.it('getMimeType: returns correct mime', () => {
         assertEqual(getMimeType("file.png"), "image/png");
+        assertEqual(getMimeType("file.txt"), "text/plain");
+    });
+
+    runner.it('getMimeType: returns undefined for directory', () => {
+        const testDir = getTestDir("mimeTypeDir");
+        mkdirSync(testDir);
+        assertTrue(getMimeType(testDir) === undefined);
+        cleanupDir(testDir);
     });
 
     runner.it('getFileExtensionsByMimeType: returns array of exts', () => {
@@ -445,22 +546,22 @@ runner.describe('File System Utils', () => {
     });
 
     runner.it('createDirPath: creates dir if not exists', async () => {
-        const d = getTestDir("createDirPath");
-        const res = await createDirPath(d);
-        assertEqual(res, d);
-        assertTrue(isDirectory(d));
-        deleteDirSync(d);
+        const testDir = getTestDir("createDirPath");
+        const res = await createDirPath(testDir);
+        assertEqual(res, testDir);
+        assertTrue(isDirectory(testDir));
+        cleanupDir(testDir);
     });
 
     runner.it('createSvgFile: creates svg file', async () => {
-        const d = getTestDir("createSvg");
-        mkdirSync(d);
+        const testDir = getTestDir("createSvg");
+        mkdirSync(testDir);
         const svgData = "<svg></svg>";
-        const res = await createSvgFile(d, "test", svgData);
+        const res = await createSvgFile(testDir, "test", svgData);
         assertEqual(res.imageName, "test.svg");
-        assertTrue(fileExists(path.join(d, "test.svg")));
+        assertTrue(fileExists(path.join(testDir, "test.svg")));
         
-        deleteDirSync(d);
+        cleanupDir(testDir);
     });
 });
 

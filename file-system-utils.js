@@ -4,13 +4,26 @@ import * as os from 'os';
 
 export default function getFileSystemUtils(fsPermisionsConfig = [])    {
 
-    function isDirectory(p) {
+    function isFileNonSecured(p) {
+        try {
+            const stats = fs.statSync(p);
+            return stats.isFile();
+        } catch (err) {
+            return false;
+        }
+    }
+
+    function isDirectoryNonSecured(p) {
         try {
             const stats = fs.statSync(p);
             return stats.isDirectory();
         } catch (err) {
             return false;
         }
+    }
+
+    function getParentDirNonSecured(filePath) {
+        return path.dirname(filePath);
     }
 
     function setUserFsPermissions(fsPermisionsConfig = []) {
@@ -39,17 +52,17 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
                 dirPath = null;
 
             if(typeof pathItem === "string")    {
-                let absolutePath = path.resolve(pathItem);
-                if(isDirectory(absolutePath))   {
-                    dirPath = pathItem;
+                let absolutePath = path.resolve(pathItem).replace(/\\/g, "/");
+                if(isDirectoryNonSecured(absolutePath))   {
+                    dirPath = absolutePath;
                     readPermission = true;
                 } else  {
                     obj = false;
                 }
             } else if(typeof pathItem === "object") {
-                let absolutePath = path.resolve(pathItem.path);
-                if(isDirectory(absolutePath))   {
-                    dirPath = pathItem.path;
+                let absolutePath = path.resolve(pathItem.path).replace(/\\/g, "/");
+                if(isDirectoryNonSecured(absolutePath))   {
+                    dirPath = absolutePath;
                     readPermission = pathItem.permissions.includes("r");
                     writePermission = pathItem.permissions.includes("w");
                     deletePermission = pathItem.permissions.includes("d");
@@ -124,13 +137,17 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
 
     function getUserFsPermission(dirPath)   {
 
-        let absoluteCwd = path.resolve(dirPath),
+        if(isFileNonSecured(dirPath)) {
+            dirPath = getParentDirNonSecured(dirPath);
+        }
+
+        let absoluteCwd = path.resolve(dirPath).replace(/\\/g, "/"),
             userAllowedPaths = getUserAllowedPaths();
-        
+
         return userAllowedPaths.find(allowedPath => {
-            const resolvedAllowed = path.resolve(allowedPath);
+            const resolvedAllowed = path.resolve(allowedPath.path).replace(/\\/g, "/");
             // Ensure we check for directory containment strictly
-            const isContained = absoluteCwd.startsWith(resolvedAllowed + path.sep) || 
+            const isContained = absoluteCwd.startsWith(resolvedAllowed) || 
                                 absoluteCwd === resolvedAllowed;
             return isContained;
         });
@@ -145,11 +162,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
         
         let foundUserFsPermission = getUserFsPermission(dirPath);
 
-        if(!foundPermission)    {
+        if(!foundUserFsPermission)    {
             return false;
         }
 
-        return foundUserFsPermission[permissionType] === permissionType;
+        return foundUserFsPermission[permissionType];
 
     }
     
@@ -243,10 +260,17 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     function fileExists(filePath) {
+        if(!checkDirPathPermissions(filePath, "read")) {
+            return;
+        }
         return fs.existsSync(filePath);
     }
 
     function isFile(p) {
+        if(!checkDirPathPermissions(p, "read")) {
+            return;
+        }
+
         try {
             const stats = fs.statSync(p);
             return stats.isFile();
@@ -255,15 +279,36 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
         }
     }
 
+    function isDirectory(dirPath) {
+        if(!checkDirPathPermissions(dirPath, "read")) {
+            console.log({isAllowed: checkDirPathPermissions(dirPath, "read")})
+            return;
+        }
+        try {
+            const stats = fs.statSync(dirPath);
+            return stats.isDirectory();
+        } catch (err) {
+            return false;
+        }
+    }
+
+    function getParentDir(filePath) {
+        if(!checkDirPathPermissions(filePath, "read")) {
+            return;
+        }
+        return path.dirname(filePath) || null;
+    }
+
     function getFileExt(filePath) {
         return path.extname(filePath);
     }
 
-    function getParentDir(filePath) {
-        return path.dirname(filePath);
-    }
-
     async function readdir(dirPath, options = { encoding: "utf8" }) {
+
+        if(!checkDirPathPermissions(dirPath, "read")) {
+            return;
+        }
+
         let reason = null,
             data = await fs.promises.readdir(dirPath, options).catch(err => reason = err.message);
         return !reason && data ? {
@@ -280,6 +325,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     function readdirSync(dirPath, options = { encoding: "utf8" }) {
+
+        if(!checkDirPathPermissions(dirPath, "read")) {
+            return;
+        }
+
         try {
             let data = fs.readdirSync(dirPath, options);
             return {
@@ -299,6 +349,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     async function mkdir(dirPath, options = { recursive: true }) {
+
+        if(!checkDirPathPermissions(dirPath, "write")) {
+            return;
+        }
+
         try {
             let result = await fs.promises.mkdir(dirPath, options);
             if (!fileExists(dirPath)) throw Error(`We are unsuccessful in creating the folder directory for "${dirPath}".`)
@@ -317,6 +372,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     function mkdirSync(dirPath, options = { recursive: true }) {
+
+        if(!checkDirPathPermissions(dirPath, "write")) {
+            return;
+        }
+
         try {
             fs.mkdirSync(dirPath, options);
             return {
@@ -334,7 +394,12 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
         }
     }
 
-    async function deleteDir(dirPath, options = { recursive: false }) {
+    async function deleteDir(dirPath, options = { recursive: true }) {
+
+        if(!checkDirPathPermissions(dirPath, "delete")) {
+            return;
+        }
+
         let reason = null;
         await fs.promises.rm(dirPath, options).catch(err => reason = err.message);
         return !reason ? {
@@ -349,7 +414,12 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
         };
     }
 
-    function deleteDirSync(dirPath, options = { recursive: false }) {
+    function deleteDirSync(dirPath, options = { recursive: true }) {
+
+        if(!checkDirPathPermissions(dirPath, "delete")) {
+            return;
+        }
+
         try {
             fs.rmSync(dirPath, options);
             return {
@@ -369,6 +439,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     async function readFile(filePath, options = { encoding: "utf8" }) {
+
+        if(!checkDirPathPermissions(filePath, "read")) {
+            return;
+        }
+
         let reason = null,
             data = await fs.promises.readFile(filePath, options).catch(err => reason = err.message);
         return !reason ? {
@@ -385,6 +460,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     function readFileSync(filePath, options = { encoding: "utf8" }) {
+
+        if(!checkDirPathPermissions(filePath, "read")) {
+            return;
+        }
+
         try {
             let data = fs.readFileSync(filePath, options);
             return {
@@ -404,6 +484,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     async function writeFile(filePath, data, options = { encoding: "utf8" }) {
+
+        if(!checkDirPathPermissions(filePath, "write")) {
+            return;
+        }
+
         let reason = null;
         await fs.promises.writeFile(filePath, data, options).catch(err => reason = err.message);
         return !reason ? {
@@ -419,6 +504,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     function writeFileSync(filePath, data, options = { encoding: "utf8" }) {
+
+        if(!checkDirPathPermissions(filePath, "write")) {
+            return;
+        }
+
         try {
             fs.writeFileSync(filePath, data, options);
             return {
@@ -437,6 +527,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     async function deleteFile(filePath) {
+
+        if(!checkDirPathPermissions(filePath, "delete")) {
+            return;
+        }
+
         try {
             let reason = null;
             await fs.promises.unlink(filePath).catch(err => reason = err.message);
@@ -459,6 +554,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     function deleteFileSync(filePath) {
+
+        if(!checkDirPathPermissions(filePath, "delete")) {
+            return;
+        }
+
         try {
             fs.unlinkSync(filePath);
             return {
@@ -477,6 +577,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     async function getFileSize(filePath) {
+
+        if(!checkDirPathPermissions(filePath, "read")) {
+            return;
+        }
+
         if (!fs.existsSync(filePath)) {
             return false;
         }
@@ -494,27 +599,52 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     ********************************
     *******************************/
 
-    async function isFileEmpty(dirPath, options = { encoding: "utf8" }) {
-        let { data } = await readFile(dirPath, options);
+    async function isFileEmpty(filePath, options = { encoding: "utf8" }) {
+
+        if(!checkDirPathPermissions(filePath, "read")) {
+            return;
+        }
+
+        let { data } = await readFile(filePath, options);
         return data && data.length === 0 ? true : data && data.length ? false : true;
     }
 
-    function isFileEmptySync(dirPath, options = { encoding: "utf8" }) {
-        let { data } = readFileSync(dirPath, options);
+    function isFileEmptySync(filePath, options = { encoding: "utf8" }) {
+
+        if(!checkDirPathPermissions(filePath, "read")) {
+            return;
+        }
+
+        let { data } = readFileSync(filePath, options);
         return data && data.length === 0 ? true : data && data.length ? false : true;
     }
 
     async function isDirectoryEmpty(dirPath, options = { encoding: "utf8" }) {
+
+        if(!checkDirPathPermissions(dirPath, "read")) {
+            return;
+        }
+
         let { data } = await readdir(dirPath, options);
         return data && data.length === 0 ? true : data && data.length ? false : true;
     }
 
     function isDirectoryEmptySync(dirPath, options = { encoding: "utf8" }) {
+
+        if(!checkDirPathPermissions(dirPath, "read")) {
+            return;
+        }
+
         let { data } = readdirSync(dirPath, options);
         return data && data.length === 0 ? true : data && data.length ? false : true;
     }
 
     async function getAllFilesFromDirectory(dirPath, fileExt = null) {
+
+        if(!checkDirPathPermissions(dirPath, "read")) {
+            return;
+        }
+
         if (isDirectory(dirPath)) {
             let { data } = await readdir(dirPath);
             return data.filter(item => {
@@ -526,6 +656,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     function getAllFilesFromDirectorySync(dirPath, fileExt = null) {
+
+        if(!checkDirPathPermissions(dirPath, "read")) {
+            return;
+        }
+
         if (isDirectory(dirPath)) {
             let { data } = readdirSync(dirPath);
             return data.filter(item => {
@@ -537,6 +672,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     async function getAllDirsFromDirectory(dirPath) {
+
+        if(!checkDirPathPermissions(dirPath, "read")) {
+            return;
+        }
+
         if (isDirectory(dirPath)) {
             let { data } = await readdir(dirPath);
             return data.filter(item => {
@@ -547,6 +687,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     function getAllDirsFromDirectorySync(dirPath) {
+
+        if(!checkDirPathPermissions(dirPath, "read")) {
+            return;
+        }
+
         if (isDirectory(dirPath)) {
             let { data } = readdirSync(dirPath);
             return data.filter(item => {
@@ -557,6 +702,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     function getFileObject(filePath) {
+
+        if(!checkDirPathPermissions(filePath, "read")) {
+            return;
+        }
+
         let parentDir = getParentDir(filePath),
             file = path.basename(filePath);
         return isDirectory(filePath) ? {
@@ -574,6 +724,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     async function getAllFilesRecursively(dirPath, excludedFolders = []) {
+
+        if(!checkDirPathPermissions(dirPath, "read")) {
+            return;
+        }
+
         let allFiles = [],
             { data } = await readdir(dirPath);
 
@@ -592,6 +747,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     function getAllFilesRecursivelySync(dirPath, excludedFolders = []) {
+
+        if(!checkDirPathPermissions(dirPath, "read")) {
+            return;
+        }
+
         let allFiles = [],
             { data } = readdirSync(dirPath);
 
@@ -609,7 +769,12 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
         return allFiles;
     }
 
-    async function deleteAllFilesInDirPath(dirPath, recursive = false) {
+    async function deleteAllFilesInDirPath(dirPath, recursive = true) {
+
+        if(!checkDirPathPermissions(dirPath, "delete")) {
+            return;
+        }
+
         let readDirResultObject = await readdir(dirPath),
             { data, result } = readDirResultObject,
             results = [],
@@ -653,7 +818,12 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
         }
     }
 
-    async function deleteAllDirsInDirPath(dirPath, options = { recursive: false }) {
+    async function deleteAllDirsInDirPath(dirPath, options = { recursive: true }) {
+
+        if(!checkDirPathPermissions(dirPath, "delete")) {
+            return;
+        }
+
         let readDirResultObject = await readdir(dirPath),
             { data, result } = readDirResultObject,
             results = [],
@@ -693,6 +863,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     async function deleteAllInDirPath(dirPath) {
+
+        if(!checkDirPathPermissions(dirPath, "delete")) {
+            return;
+        }
+
         let resultsObject = await deleteAllFilesInDirPath(dirPath, true),
             resultsObject2 = await deleteAllDirsInDirPath(dirPath, { recursive: true }),
             finalResult = !resultsObject.result && !resultsObject2.result ? {
@@ -710,6 +885,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     async function deleteAllEmptyFilesInDirectory(dirPath, recursive) {
+
+        if(!checkDirPathPermissions(dirPath, "delete")) {
+            return;
+        }
+
         let resultObject = await readdir(dirPath),
             { data, result } = resultObject,
             results = [],
@@ -759,6 +939,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     async function deleteAllEmptyDirsInDirectory(dirPath, recursive) {
+
+        if(!checkDirPathPermissions(dirPath, "delete")) {
+            return;
+        }
+
         let resultObject = await readdir(dirPath),
             { result, data } = resultObject,
             results = [],
@@ -770,14 +955,15 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
         if (data.length) {
 
             for (let item of data) {
-                let filePath = `${dirPath}/${item}`,
+                let filePath = /* `${dirPath}/${item}` */path.join(dirPath, item),
                     isEmpty = await isDirectoryEmpty(filePath);
                 if (isDirectory(filePath)) {
                     if (isEmpty) {
-                        let { result, reason } = await deleteDir(filePath, { recursive });
+                        let { result, reason, message } = await deleteDir(filePath, { recursive : true });
                         results.push(result);
+
                         if (!result) {
-                            errorMessages.push(`${messge}. ${reason}.`);
+                            errorMessages.push(`${message}. ${reason}.`);
                         }
                     } else {
                         if (recursive) {
@@ -815,9 +1001,15 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     function getMimeType(file) {
+
+        if(typeof getParentDir(file) !== "undefined" && !checkDirPathPermissions(file, "read")) {
+            return;
+        }
+
         if (isDirectory(file)) {
             return;
         }
+
         let { fileType } = getFileObject(file);
 
         fileType = fileType.replace(".", "");
@@ -831,6 +1023,7 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     function getSpecifiedExt(url, fileExtensions) {
+
         if (fileExtensions.length > 1) {
             let foundExtensions = fileExtensions.filter(ext => url.includes(`.${ext}`));
             return foundExtensions.length >= 1 ? foundExtensions[0] : fileExtensions[0];
@@ -841,7 +1034,13 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
 
 
     async function createDirPath(...args) {
+
         let dirPath = path.join(...args);
+
+        if(!checkDirPathPermissions(dirPath, "write")) {
+            return;
+        }
+
         if (!fs.existsSync(dirPath)) {
             await fs.promises.mkdir(dirPath, { recursive: true });
         }
@@ -849,6 +1048,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     async function createSvgFile(filePath, svgName, svgData) {
+
+        if(!checkDirPathPermissions(filePath, "write")) {
+            return;
+        }
+
         let fileName = path.join(filePath, `${svgName}.svg`);
         await fs.promises.writeFile(fileName, svgData, { encoding: "utf8" });
         return { imageName: `${path.basename(fileName)}`, imagePath: filePath };
