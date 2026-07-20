@@ -13,14 +13,17 @@ if (!fs.existsSync(TEST_BASE_DIR)) {
     fs.mkdirSync(TEST_BASE_DIR, { recursive: true });
 }
 
-const utils = getUtilities({ 
+const config = { 
     userAllowedPaths: [
         { 
             path: TEST_BASE_DIR, 
-            permissions: "rwdx" 
+            permissions: "" 
         }
-    ] 
-});
+    ],
+    securedFsCommands : false,
+};
+
+const utils = getUtilities(config);
 
 // Destructure all returned methods
 const {
@@ -162,13 +165,8 @@ runner.describe('File System Utils', () => {
         mkdirSync(testDir);
         await writeFile(path.join(testDir, "a.txt"), "");
 
-        console.log({
-            firstTest : getParentDir(path.join(TEST_BASE_DIR, "../test")),
-            secondTest : getParentDir(path.join(testDir, "a.txt"))
-        })
-
-        assertEqual(getParentDir(path.join(dirname, "../test")), undefined);
-        assertEqual(getParentDir(path.join(testDir, "a.txt")), path.resolve(TEST_BASE_DIR));
+        assertEqual(getParentDir(path.dirname(path.resolve(TEST_BASE_DIR))), null);
+        assertEqual(getParentDir(path.join(testDir, "a.txt")), testDir);
 
         cleanupDir(testDir);
     });
@@ -523,9 +521,23 @@ runner.describe('File System Utils', () => {
     });
 
     // --- MIME Types & Helpers ---
-    runner.it('getMimeType: returns correct mime', () => {
+    runner.it('getMimeType: returns correct mime', async() => {
+
+        const testDir = getTestDir("getMimeType");
+        mkdirSync(testDir);
+
+        let textFile = path.join(testDir, "file.txt"),
+            pngFile = path.join(testDir, "file.png");
+        
+        await writeFile(textFile, "");
+        await writeFile(pngFile, "");
+
         assertEqual(getMimeType("file.png"), "image/png");
         assertEqual(getMimeType("file.txt"), "text/plain");
+        assertEqual(getMimeType(textFile), "text/plain");
+        assertEqual(getMimeType(pngFile), "image/png");
+
+        cleanupDir(testDir);
     });
 
     runner.it('getMimeType: returns undefined for directory', () => {

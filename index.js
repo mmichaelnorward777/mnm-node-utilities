@@ -23,8 +23,8 @@ export default function getUtilities(config)  {
         ] 
     */
 
-    const { userAllowedPaths } = config;
-    const fileSystemUtils = getFileSystemUtils(userAllowedPaths);
+    const { userAllowedPaths, securedFsCommands } = config;
+    const fileSystemUtils = getFileSystemUtils({userAllowedPaths, securedFsCommands});
     const dateUtils = getDateUtils();
     const stringUtils =  getStringUtils();
     const urlUtils = getUrlUtils();

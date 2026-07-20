@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from 'os';
 
-export default function getFileSystemUtils(fsPermisionsConfig = [])    {
+export default function getFileSystemUtils({userAllowedPaths, securedFsCommands})    {
 
     function isFileNonSecured(p) {
         try {
@@ -26,7 +26,11 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
         return path.dirname(filePath);
     }
 
-    function setUserFsPermissions(fsPermisionsConfig = []) {
+    function setUserFsPermissions(userAllowedPaths = []) {
+
+        if(!securedFsCommands)  {
+            return;    
+        }
 
         /* 
             if string of dirPaths, defaults to read only in the userFileSystemPermissions;
@@ -43,7 +47,7 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
         const userFileSystemPermissions = new Map();
 
 
-        for(let pathItem of fsPermisionsConfig)   {
+        for(let pathItem of userAllowedPaths)   {
             let obj = {},
                 readPermission = false,
                 writePermission = false,
@@ -123,20 +127,33 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
         fileSystemPermissionsConfig array of strings or array of objects,
 
     */
-    const userFileSystemPermissions = setUserFsPermissions(fsPermisionsConfig); // returns a map of the user file permissions
+    const userFileSystemPermissions = setUserFsPermissions(userAllowedPaths); // returns a map of the user file permissions
 
     function getUserAllowedPathsByPermissionType(permissionType = "read")   {
-        
+        if(!securedFsCommands)  {
+            return "*";    
+        }
         return typeof permissionType !== "undefined" ? Array.from(userFileSystemPermissions.values()).filter(item => item[permissionType]) : [];
 
     }
 
     function getUserAllowedPaths()  {
+        if(!securedFsCommands)  {
+            return "*";    
+        }
         return Array.from(userFileSystemPermissions.values());
     }
 
     function getUserFsPermission(dirPath)   {
-
+        if(!securedFsCommands)  {
+            return {
+                path : dirPath,
+                read : true,
+                write : true,
+                delete : true,
+                execute : true,
+            };    
+        }
         if(isFileNonSecured(dirPath)) {
             dirPath = getParentDirNonSecured(dirPath);
         }
@@ -155,6 +172,10 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     function checkDirPathPermissions(dirPath, permissionType = "read")   {
+
+        if(!securedFsCommands)  {
+            return true;    
+        }
 
         if(!permissionType) {
             return false
@@ -281,7 +302,6 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
 
     function isDirectory(dirPath) {
         if(!checkDirPathPermissions(dirPath, "read")) {
-            console.log({isAllowed: checkDirPathPermissions(dirPath, "read")})
             return;
         }
         try {
@@ -294,7 +314,7 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
 
     function getParentDir(filePath) {
         if(!checkDirPathPermissions(filePath, "read")) {
-            return;
+            return null;
         }
         return path.dirname(filePath) || null;
     }
@@ -702,8 +722,8 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
     }
 
     function getFileObject(filePath) {
-
         if(!checkDirPathPermissions(filePath, "read")) {
+            
             return;
         }
 
@@ -1002,19 +1022,34 @@ export default function getFileSystemUtils(fsPermisionsConfig = [])    {
 
     function getMimeType(file) {
 
-        if(typeof getParentDir(file) !== "undefined" && !checkDirPathPermissions(file, "read")) {
+        if(file.split(".").length <= 1)    {
             return;
         }
 
-        if (isDirectory(file)) {
-            return;
+        if(getParentDir(file))  {
+            if(!checkDirPathPermissions(file, "read")) {
+                return;
+            }
+
+            if (isDirectory(file)) {
+                return;
+            }
+        
+            let { fileType } = getFileObject(file);
+
+            fileType = fileType.replace(".", "");
+
+            return mimeTypes[fileType];
+
+        } else  {
+
+            // file not exiting, more like a query or verification
+            let strArr = file.split("."),
+                fileExt = strArr.pop();
+
+            return fileExt.length ? mimeTypes[fileExt] : null;
+
         }
-
-        let { fileType } = getFileObject(file);
-
-        fileType = fileType.replace(".", "");
-
-        return mimeTypes[fileType];
 
     }
 
