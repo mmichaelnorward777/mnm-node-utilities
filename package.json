@@ -1,7 +1,7 @@
 {
   "name": "mnm-node-utilities",
   "version": "2.0.2",
-  "description": "My personalize node utilities for creating node applications",
+  "description": "security-first Node.js utility library with strict permission controls, ideal for AI harnesses to safely manage file systems, commands, and data transformation.",
   "main": "index.js",
   "scripts": {
     "test-date" : "node ./test/date-utils-test.js",

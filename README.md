@@ -1,8 +1,11 @@
 # MNM-NODE-UTILITIES
 
-A comprehensive, modular utility library for Node.js applications. It provides robust helpers for **Date manipulation**, **File System operations** (with strict security permissions), **Data transformation** (Objects, Arrays, Strings, URLs), **JSON persistence**, and **Node.js runtime utilities**.
+**A modular, security-first utility library for Node.js applications**. It provides robust helpers for ***Date manipulation***, ***File System*** operations, ***Data transformation*** (Objects, Arrays, Strings, URLs), ***JSON persistence***, and ***Node.js*** runtime utilities.
 
-All modules are built as ES Modules and are designed to be lightweight, framework-agnostic, and easy to integrate into any Node.js project.
+**Security & AI Safety**:
+Built with a strict permission-based access control system, this library is ideal for integration into AI harnesses and automated systems. It ensures that all file system operations, system command executions, and child processes are strictly confined to pre-approved, safe directories. By preventing accidental or malicious access to protected system files, it mitigates risks associated with AI-generated code or unintended function calls, making it a secure foundation for automated workflows.
+
+All modules are built as ES Modules, are lightweight, framework-agnostic, and easy to integrate into any Node.js project.
 
 ## Table of Contents
 1. [Installation](#installation)
