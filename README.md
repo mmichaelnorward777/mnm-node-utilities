@@ -1,22 +1,101 @@
 # MNM-NODE-UTILITIES
 
-This library provides a set of utility functions for date manipulation, file system operations, general logic, object/array handling, string manipulation, URL handling, web page automation, and API requests. All modules are now ES Modules.
+A comprehensive, modular utility library for Node.js applications. It provides robust helpers for **Date manipulation**, **File System operations** (with strict security permissions), **Data transformation** (Objects, Arrays, Strings, URLs), **JSON persistence**, and **Node.js runtime utilities**.
+
+All modules are built as ES Modules and are designed to be lightweight, framework-agnostic, and easy to integrate into any Node.js project.
 
 ## Table of Contents
-1. [Date](#date)
-2. [File System](#file-system)
-3. [General](#general)
-4. [JSON](#json)
-5. [Node.js](#nodejs)
-6. [Objects/Array](#objectsarray)
-7. [String](#string)
-8. [URL](#url)
-9. [Web Page](#web-page)
-10. [Web Requests](#web-requests)
+1. [Installation](#installation)
+2. [Usage](#usage)
+3. Modules
+    - [Date Utils](#date-utils)
+    - [File System Utils](#file-system-utils)
+    - [General Utils](#general-utils)
+    - [JSON Utils](#json-utils)
+    - [Node Utils](#node-utils)
+    - [Objects/Array Utils](#objectsarray-utils)
+    - [String Utils](#string-utils)
+    - [URL Utils](#url-utils)
+4. [Testing](#testing)
+5. [License](#license)
 
 ---
 
-## Module: `date-utils`
+## Installation
+
+```bash
+npm install mnm-node-utilities
+```
+
+Or, if you are using this locally:
+
+```bash
+git clone https://github.com/yourusername/mnm-node-utilities.git
+cd mnm-node-utilities
+npm install
+```
+
+---
+
+## Usage
+
+Import the main `getUtilities` function from the `index.js` file. You must pass a `config` object containing `userAllowedPaths` to configure the File System security permissions.
+
+### Configuration: `userAllowedPaths`
+
+The `userAllowedPaths` configuration determines which directories the application is allowed to access. This is critical for security, especially for the `file-system-utils`.
+
+You can provide an array of either **Strings** or **Objects**.
+
+#### Option 1: Simple Strings (Read-Only Default)
+If you provide a string path, the library assumes **Read-Only** permissions.
+
+```javascript
+const utils = getUtilities({
+    userAllowedPaths: [
+        "E:/my-data/documents",
+        "E:/my-data/images"
+    ]
+});
+```
+
+#### Option 2: Objects (Custom Permissions)
+If you provide an object, you can specify granular permissions (`r`ead, `w`rite, `d`elete, `e`xecute).
+
+```javascript
+const utils = getUtilities({
+    userAllowedPaths: [
+        {
+            path: "E:/my-data/documents",
+            permissions: "rwdx" // Full access
+        },
+        {
+            path: "E:/my-data/backups",
+            permissions: "rw"   // Read and Write only
+        }
+    ]
+});
+```
+
+#### Option 3: Empty Array (Safe Defaults)
+If you pass an empty array `[]` or do not provide `userAllowedPaths`, the library automatically detects **Safe Writable Paths**. This includes:
+*   The User's Home Directory.
+*   Application Data directories (`%APPDATA%`, `~/.config`, `~/Library/Application Support`).
+*   Secondary drives (excluding the OS partition on Windows).
+*   Removable media.
+
+This ensures your app can always write to user-specific locations without needing explicit configuration, while remaining safe from accessing protected system files.
+
+```javascript
+const utils = getUtilities({
+    userAllowedPaths: [] // Defaults to Safe Writable Paths
+});
+```
+
+---
+
+## Date Utils
+
 
 This module provides a comprehensive suite of utility functions for date parsing, formatting, time zone conversions, and date range calculations. It handles both local time and UTC/Zulu time conversions, with a specific focus on normalizing local times to specific business time zones.
 
@@ -330,7 +409,7 @@ Similar to `getDateRangeObjects`, but adds ISO zero-offset strings for the start
 
 ---
 
-## Module: `file-system-utils`
+## File System Utils
 
 This module provides a secure wrapper around Node.js `fs` and `path` operations. It enforces a permission-based access control system defined by `userAllowedPaths`. All operations check if the target path is within the allowed paths and if the user has the specific permission (read, write, delete, execute) for that path.
 
@@ -894,7 +973,7 @@ Asynchronously creates a directory path if it does not exist.
 
 ---
 
-## Module: `general-utils`
+## General Utils
 
 This module provides a set of general-purpose utility functions for common programming tasks such as ID generation, array processing, time delays, string manipulation, and condition waiting. It is designed to be lightweight and framework-agnostic.
 
@@ -1031,7 +1110,7 @@ Converts a value to a string, but returns `null` if the input is `null` or `unde
 
 ---
 
-## Module: `json-utils`
+## JSON Utils
 
 This module provides utilities for parsing JSON strings and managing simple JSON files on the disk. It is designed for lightweight data persistence scenarios where you need to store and retrieve arrays of objects without requiring a full database.
 
@@ -1093,7 +1172,7 @@ Clears all data from the file by writing an empty array `[]`.
 
 ---
 
-## Module: `node-utils`
+## Node Utils
 
 This module provides utilities for interacting with the Node.js runtime and the operating system. It focuses on process management, system command execution with security checks, and platform-specific directory resolution.
 
@@ -1177,11 +1256,7 @@ Executes a system shell command within a specific working directory, after verif
 
 ---
 
-Here is the documentation for the `objects-array-utils` module.
-
----
-
-## Module: `objects-array-utils`
+## Objects/Array Utils
 
 This module provides utilities for manipulating objects and arrays. It includes functions for retrieving nested properties, sorting, comparing, merging, and filtering objects and arrays. It is designed to simplify complex data operations in JavaScript applications.
 
@@ -1346,7 +1421,7 @@ Deeply merges one or more source objects into the target object. It creates nest
 
 ---
 
-## Module: `string-utils`
+## String Utils
 
 This module provides a set of utility functions for string manipulation, including formatting, case conversion, slug generation, and abbreviation extraction. These utilities are essential for preparing data for URLs, database keys, or user-facing display text.
 
@@ -1434,8 +1509,7 @@ Converts a string into `camelCase` or `PascalCase`.
 
 ---
 
-
-## Module: `url-utils`
+## URL Utils
 
 This module provides a suite of utility functions for parsing, constructing, and manipulating URLs and query strings. It handles complex nested query parameters, converts between different object notations (dot notation vs. standard objects), and extracts domain information.
 
@@ -1446,8 +1520,6 @@ To run the tests for this module, execute the following command from the project
 ```bash
 npm run test-url-utils
 ```
-
-
 
 ### API Reference
 
@@ -1544,20 +1616,47 @@ Checks if `subUrl` is a subdomain of `mainUrl`.
 *   **Throws:**
     *   None.
 
+---
+
+## Testing
+
+Each module has its own test suite. You can test for specific modules using the scripts defined in `package.json`.
 
 
-------------------------------------------------------------------------
+### Run Specific Module Tests
+```bash
+npm run test-date
+npm run test-file-system
+npm run test-general-utils
+npm run test-json-utils
+npm run test-node-utils
+npm run test-objects-array-utils
+npm run test-string-utils
+npm run test-url-utils
+```
 
-# 🤝 Contribution
+---
 
-Contributions, improvements, and expanded documentation are welcome.
+## License
 
-1.  Fork the repository\
-2.  Create a feature branch\
-3.  Submit a Pull Request
+MIT License
 
-------------------------------------------------------------------------
+Copyright (c) 2024 Michael Norward Miranda
 
-# 📄 License
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-MIT License --- free to use, modify, and distribute.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

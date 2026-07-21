@@ -1,7 +1,3 @@
-Here is the documentation for the `objects-array-utils` module.
-
----
-
 ## Module: `objects-array-utils`
 
 This module provides utilities for manipulating objects and arrays. It includes functions for retrieving nested properties, sorting, comparing, merging, and filtering objects and arrays. It is designed to simplify complex data operations in JavaScript applications.
