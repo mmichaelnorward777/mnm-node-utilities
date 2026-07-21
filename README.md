@@ -1,12 +1,8 @@
-# MNM-NODE-UTILITIES
+# MNM-NODE-UTILITIES V3
 
-A capability-based, security-first utility library for Node.js applications.
-
-Built for modern Node.js applications, automation tools, AI agents, Electron apps, CLIs, and local AI runtimes, MNM Node Utilities provides a collection of lightweight utility modules while enforcing a strict permission-based security model for file system and system-level operations.
+**A modular, capability-based, security-first utility library for Node.js applications**. Built for modern Node.js applications, automation tools, AI agents, Electron apps, CLIs, and local AI runtimes, MNM Node Utilities provides a collection of lightweight utility modules while enforcing a strict permission-based security model for file system and system-level operations.
 
 Unlike traditional utility libraries that expose unrestricted access to the underlying operating system, this library treats security as a first-class feature. Every file system operation, child process execution, and system command can be sandboxed and restricted to explicitly allowed locations.
-
-**A modular, security-first utility library for Node.js applications**. It provides robust helpers for ***Date manipulation***, ***File System*** operations, ***Data transformation*** (Objects, Arrays, Strings, URLs), ***JSON persistence***, and ***Node.js*** runtime utilities.
 
 **Security & AI Safety**:
 Built with a strict permission-based access control system, this library is ideal for integration into AI harnesses and automated systems. It ensures that all file system operations, system command executions, and child processes are strictly confined to pre-approved, safe directories. By preventing accidental or malicious access to protected system files, it mitigates risks associated with AI-generated code or unintended function calls, making it a secure foundation for automated workflows.
@@ -18,16 +14,16 @@ All modules are built as ES Modules, are lightweight, framework-agnostic, and ea
 
 ---
 
-## Why MNM Node Utilities?
+## What is MNM Node Utilities V3 for?
 
-Most utility libraries solve one problem:
+Apart from solving the following problems:
 
 - Date manipulation
 - File system helpers
 - Object utilities
 - URL parsing
 
-MNM Node Utilities was designed to solve a different problem:
+MNM Node Utilities library was designed with great prioritization on security:
 
 > How do we build secure and reusable runtime capabilities for Node.js applications?
 
