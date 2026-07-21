@@ -21,7 +21,7 @@ Formats a date object into a string in the format `MM-DD-YYYY`.
 *   **Returns:**
     *   `string`: The formatted date string (e.g., `"05-23-2023"`).
 
-#### 2. `getDateTimeObect(dateTime)`
+#### 2. `getDateTimeObject(dateTime)`
 
 Parses various input formats into a standard JavaScript `Date` object.
 

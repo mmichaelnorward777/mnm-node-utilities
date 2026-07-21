@@ -14,7 +14,7 @@ const TEST_CONFIG = {
 const utils = getUtilities(TEST_CONFIG);
 
 const {
-    formattedDate, getDateTimeObect, dateTimeObject, getTimeElapsed,
+    formattedDate, getDateTimeObject, dateTimeObject, getTimeElapsed,
     createZuluStartDate, getOffsetMinutesForTimezone, toISOZeroOffset,
     getHourlyDuration, getDurationInMinutes, localDateToSelectedTimeZone,
     getFormattedTime, getIsoFormattedTime, fixTimeStr,
@@ -37,19 +37,19 @@ runner.describe('Date Utils', () => {
         assertTrue(res.length === 10); // MM-DD-YYYY
     });
 
-    // getDateTimeObect
-    runner.it('getDateTimeObect: parses string date', () => {
-        const d = getDateTimeObect("2023-05-05");
+    // getDateTimeObject
+    runner.it('getDateTimeObject: parses string date', () => {
+        const d = getDateTimeObject("2023-05-05");
         assertTrue(d instanceof Date);
     });
-    runner.it('getDateTimeObect: parses number timestamp', () => {
+    runner.it('getDateTimeObject: parses number timestamp', () => {
         const ts = new Date("2023-05-05").getTime();
-        const d = getDateTimeObect(ts);
+        const d = getDateTimeObject(ts);
         assertTrue(d instanceof Date);
         assertEqual(d.getFullYear(), 2023);
     });
-    runner.it('getDateTimeObect: invalid date returns new Date()', () => {
-        const d = getDateTimeObect("invalid");
+    runner.it('getDateTimeObject: invalid date returns new Date()', () => {
+        const d = getDateTimeObject("invalid");
         assertTrue(d instanceof Date);
     });
 

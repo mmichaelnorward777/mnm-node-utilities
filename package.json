@@ -14,8 +14,30 @@
     "test-objects-array-utils" : "node ./test/objects-array-utils-test.js"
   },
   "keywords": [
-    "mnm-node-utilities"
+    "nodejs",
+    "utilities",
+    "utils",
+    "security",
+    "filesystem",
+    "permission",
+    "sandbox",
+    "ai",
+    "ai-safety",
+    "agent",
+    "date",
+    "string",
+    "url",
+    "json",
+    "object",
+    "array",
+    "node-utilities",
+    "safe-io",
+    "permission-controlled"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mmichaelnorward777/mnm-node-utilities.git"
+  },
   "type": "module",
   "author": "Michael Norward Miranda",
   "license": "ISC"

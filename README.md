@@ -5,7 +5,11 @@
 **Security & AI Safety**:
 Built with a strict permission-based access control system, this library is ideal for integration into AI harnesses and automated systems. It ensures that all file system operations, system command executions, and child processes are strictly confined to pre-approved, safe directories. By preventing accidental or malicious access to protected system files, it mitigates risks associated with AI-generated code or unintended function calls, making it a secure foundation for automated workflows.
 
+**No External Dependencies**:
+This library doesn't require you to install any other external modules.
+
 All modules are built as ES Modules, are lightweight, framework-agnostic, and easy to integrate into any Node.js project.
+
 
 ## Table of Contents
 1. [Installation](#installation)
@@ -121,7 +125,7 @@ Formats a date object into a string in the format `MM-DD-YYYY`.
 *   **Returns:**
     *   `string`: The formatted date string (e.g., `"05-23-2023"`).
 
-#### 2. `getDateTimeObect(dateTime)`
+#### 2. `getDateTimeObject(dateTime)`
 
 Parses various input formats into a standard JavaScript `Date` object.
 

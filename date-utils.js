@@ -14,7 +14,7 @@ export default function getDateUtils()  {
         return `${month}-${date}-${year}`;
     }
 
-    function getDateTimeObect(dateTime) {
+    function getDateTimeObject(dateTime) {
 
         try {
             let dtObj;
@@ -471,7 +471,7 @@ export default function getDateUtils()  {
 
     return {
         formattedDate,
-        getDateTimeObect,
+        getDateTimeObject,
         dateTimeObject,
         getTimeElapsed,
         createZuluStartDate,
