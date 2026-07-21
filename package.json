@@ -4,11 +4,14 @@
   "description": "My personalize node utilities for creating node applications",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "test-all": "node ./test/run-all-tests.js",
     "test-date" : "node ./test/date-utils-test.js",
     "test-file-system" : "node ./test/file-system-utils-test.js",
-    "test-string-utils" : "node ./test/string-utils-test.js"
+    "test-string-utils" : "node ./test/string-utils-test.js",
+    "test-url-utils" : "node ./test/url-utils-test.js",
+    "test-general-utils" : "node ./test/general-utils-test.js",
+    "test-json-utils" : "node ./test/json-utils-test.js",
+    "test-node-utils" : "node ./test/node-utils-test.js",
+    "test-objects-array-utils" : "node ./test/objects-array-utils-test.js"
   },
   "keywords": [
     "mnm-node-utilities"

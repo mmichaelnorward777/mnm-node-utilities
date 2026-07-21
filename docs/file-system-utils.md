@@ -24,8 +24,6 @@ To run the tests for this module, ensure you are in the project root directory a
 npm run test-file-system
 ```
 
----
-
 ### API Reference
 
 #### 1. `getUserAllowedPathsByPermissionType(permissionType)`

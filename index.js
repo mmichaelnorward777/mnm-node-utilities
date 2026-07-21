@@ -8,8 +8,6 @@ import getDateUtils from './date-utils.js';
 import getObjectArrayUtils from './objects-array-utils.js';
 import getStringUtils from './string-utils.js';
 import getUrlUtils from './url-utils.js';
-import getWebPageUtils from './web-page-utils.js';
-import getWebRequestUtils from './web-requests-utils.js';
 
 
 export default function getUtilities(config)  {
@@ -30,19 +28,14 @@ export default function getUtilities(config)  {
     const urlUtils = getUrlUtils();
     const generalUtils = getGeneralUtils();
 
-    const { writeFileSync, fileExists, writeFile, readFile, mkdirSync, createDirPath, checkDirPathPermissions } = fileSystemUtils;
+    const { writeFileSync, fileExists, writeFile, readFile, mkdirSync, createDirPath, checkDirPathPermissions, getUserAllowedPaths } = fileSystemUtils;
     const { toUrl, toNormalString } = stringUtils;
     const { objectToDotNotation } = urlUtils;
     const { moderator, slowDown, waitForCondition } = generalUtils;
 
     const jsonUtils = getJsonUtils({ writeFileSync, fileExists, writeFile, readFile, mkdirSync });
-    const nodeUtils = getNodeUtils({ writeFile, createDirPath, checkDirPathPermissions });
+    const nodeUtils = getNodeUtils({ checkDirPathPermissions, getUserAllowedPaths });
     const objectArrayUtils = getObjectArrayUtils({ toNormalString, objectToDotNotation });
-    
-    const { getAllObjectKeys } = objectArrayUtils;
-
-    const webPageUtils = getWebPageUtils({ moderator, slowDown, waitForCondition, getAllObjectKeys, toUrl });
-    const webRequestUtils = getWebRequestUtils({ moderator });
 
 
     return {
@@ -54,8 +47,6 @@ export default function getUtilities(config)  {
         ...jsonUtils,
         ...nodeUtils,
         ...objectArrayUtils,
-        ...webPageUtils,
-        ...webRequestUtils,
     }
 
 }

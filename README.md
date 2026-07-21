@@ -28,8 +28,6 @@ To run the tests for this module, ensure you are in the project root directory a
 npm run test-date
 ```
 
----
-
 ### API Reference
 
 #### 1. `formattedDate(dateObject)`
@@ -357,8 +355,6 @@ To run the tests for this module, ensure you are in the project root directory a
 ```bash
 npm run test-file-system
 ```
-
----
 
 ### API Reference
 
@@ -898,188 +894,455 @@ Asynchronously creates a directory path if it does not exist.
 
 ---
 
-## General
+## Module: `general-utils`
 
-General-purpose utility functions.
+This module provides a set of general-purpose utility functions for common programming tasks such as ID generation, array processing, time delays, string manipulation, and condition waiting. It is designed to be lightweight and framework-agnostic.
 
-### `generateUuid(num)`
-- **Purpose**: Generates a UUID-like string.
-- **Arguments**: `num` (number, radix, default 16).
-- **Returns**: `string`.
+### Testing the Module
 
-### `waitForCondition({ conditionCallback, onTrueCallback, messageCallback })`
-- **Purpose**: Waits until a condition is true, polling every 100ms.
-- **Arguments**: `conditionCallback` (function returning boolean), `onTrueCallback` (function), `messageCallback` (function).
-- **Returns**: `Promise<void>`.
+To run the tests for this module, execute the following command from the project root:
 
-### `moderator(arr, callback, bulkCount)`
-- **Purpose**: Processes an array in chunks (batches).
-- **Arguments**: `arr` (array), `callback` (async function), `bulkCount` (number, default 5).
-- **Returns**: `Promise<void>`.
+```bash
+npm run test-general-utils
+```
 
-### `slowDown(timeDelay)`
-- **Purpose**: Pauses execution for a specified time.
-- **Arguments**: `timeDelay` (number, ms, default 7747).
-- **Returns**: `Promise<void>`.
+### API Reference
 
-### `enumerate(arr, and)`
-- **Purpose**: Joins array items into a grammatical string (e.g., "A, B, and C").
-- **Arguments**: `arr` (array), `and` (boolean, default false).
-- **Returns**: `string`.
+#### 1. `generateUuid(num)`
 
-### `getRandomNumber(initialIndex, limit)`
-- **Purpose**: Generates a random integer.
-- **Arguments**: `initialIndex` (number, default 0), `limit` (number, default 10).
-- **Returns**: `number`.
+Generates a pseudo-unique string identifier (UUID-like).
 
-### `replaceWithForwardSlash(str)`
-- **Purpose**: Replaces backslashes with forward slashes.
-- **Arguments**: `str` (string).
-- **Returns**: `string`.
+*   **Arguments:**
+    *   `num` (`number`, optional): The radix for the generated characters (default `16` for hexadecimal).
+*   **Returns:**
+    *   `string`: A random alphanumeric string (e.g., `"a1b2c3d4-e5f6-7890-abcd-ef1234567890"`).
+*   **Throws:**
+    *   None.
 
-### `debounce(fn, delay)`
-- **Purpose**: Creates a debounced version of a function.
-- **Arguments**: `fn` (function), `delay` (number, ms, default 2500).
-- **Returns**: `function`.
+#### 2. `waitForCondition({ conditionCallback, onTrueCallback, messageCallback })`
 
-### `getNumericValue(str)`
-- **Purpose**: Extracts a numeric value from a string.
-- **Arguments**: `str` (string).
-- **Returns**: `number` or `NaN`.
+Polls a condition at a fixed interval (100ms) until it returns `true`, then executes a callback and resolves the promise.
 
-### `getValidatedStringValue(input)`
-- **Purpose**: Converts input to string, returns null if undefined/null.
-- **Arguments**: `input` (any).
-- **Returns**: `string` or `null`.
+*   **Arguments:**
+    *   `conditionCallback` (`Function`): A function that returns a boolean. If `true`, the waiting stops.
+    *   `onTrueCallback` (`Function`, optional): Executed once when the condition becomes true.
+    *   `messageCallback` (`Function`, optional): Executed periodically (every 100 loops) to allow for progress updates or logging.
+*   **Returns:**
+    *   `Promise<void>`: Resolves when the condition is met.
+*   **Throws:**
+    *   None. (The promise resolves silently if the condition is met).
+
+#### 3. `moderator(arr, callback, bulkCount)`
+
+Processes an array in chunks (batches) to avoid blocking the event loop with large synchronous operations.
+
+*   **Arguments:**
+    *   `arr` (`Array`): The array to process.
+    *   `callback` (`Function`): An async function called for each chunk. Signature: `(chunk, firstIndex, lastIndex, globalIndex)`.
+    *   `bulkCount` (`number`, optional): The size of each chunk (default `5`).
+*   **Returns:**
+    *   `Promise<void>`: Resolves when all chunks have been processed.
+*   **Throws:**
+    *   None.
+
+#### 4. `slowDown(timeDelay)`
+
+Pauses execution for a specified amount of time.
+
+*   **Arguments:**
+    *   `timeDelay` (`number`, optional): The delay in milliseconds (default `7747`).
+*   **Returns:**
+    *   `Promise<void>`: Resolves after the delay.
+*   **Throws:**
+    *   None.
+
+#### 5. `enumerate(arr, and)`
+
+Formats an array of strings into a grammatically correct list (e.g., `"A, B, and C"`).
+
+*   **Arguments:**
+    *   `arr` (`Array`): The array of strings to enumerate.
+    *   `and` (`boolean`, optional): If `true`, uses `"and"` as the last connector; otherwise uses `"or"`. (Default `false`).
+*   **Returns:**
+    *   `string` | `undefined`:
+        *   If `arr.length === 0`: `undefined`.
+        *   If `arr.length === 1`: The single item.
+        *   If `arr.length === 2`: `"A or B"` (or `"A and B"`).
+        *   If `arr.length > 2`: `"A, B, or C"` (or `"A, B, and C"`).
+*   **Throws:**
+    *   None.
+
+#### 6. `getRandomNumber(initialIndex, limit)`
+
+Generates a random integer within a range.
+
+*   **Arguments:**
+    *   `initialIndex` (`number`, optional): The lower bound (inclusive).
+    *   `limit` (`number`, optional): The upper bound (exclusive).
+*   **Returns:**
+    *   `number`: A random integer.
+*   **Throws:**
+    *   None.
+
+#### 7. `replaceWithForwardSlash(str)`
+
+Replaces all backslashes (`\`) in a string with forward slashes (`/`).
+
+*   **Arguments:**
+    *   `str` (`string`): The input string.
+*   **Returns:**
+    *   `string`: The normalized string.
+*   **Throws:**
+    *   None.
+
+#### 8. `debounce(fn, delay)`
+
+Creates a debounced version of the provided function that delays invoking `fn` until after `delay` milliseconds have elapsed since the last time the debounced function was invoked.
+
+*   **Arguments:**
+    *   `fn` (`Function`): The function to debounce.
+    *   `delay` (`number`, optional): The delay in milliseconds (default `2500`).
+*   **Returns:**
+    *   `Function`: The debounced function.
+*   **Throws:**
+    *   None.
+
+#### 9. `getNumericValue(str)`
+
+Extracts the first numeric value (integer or decimal, optionally with commas) from a string.
+
+*   **Arguments:**
+    *   `str` (`string`): The input string.
+*   **Returns:**
+    *   `number` | `NaN`: The extracted number, or `NaN` if no number is found.
+*   **Throws:**
+    *   None.
+
+#### 10. `getValidatedStringValue(input)`
+
+Converts a value to a string, but returns `null` if the input is `null` or `undefined`.
+
+*   **Arguments:**
+    *   `input` (`any`): The value to convert.
+*   **Returns:**
+    *   `string` | `null`: The string representation of the input, or `null`.
+*   **Throws:**
+    *   None.
 
 ---
 
-## JSON
+## Module: `json-utils`
 
-JSON file manipulation.
+This module provides utilities for parsing JSON strings and managing simple JSON files on the disk. It is designed for lightweight data persistence scenarios where you need to store and retrieve arrays of objects without requiring a full database.
 
-### `parseValidatedJSON(inputValue)`
-- **Purpose**: Parses JSON, returns original value if invalid.
-- **Arguments**: `inputValue` (string).
-- **Returns**: `any` (parsed object or original string).
+### Testing the Module
 
-### `createJsonFileObject(targetPath, fileName)`
-- **Purpose**: Returns a class instance to manage a JSON file (read/write/clear).
-- **Arguments**: `targetPath` (string), `fileName` (string).
-- **Returns**: `object` (instance) with methods `getSavedData()`, `addData(data, newData)`, `clearData()`.
+To run the tests for this module, execute the following command from the project root:
+
+```bash
+npm run test-json-utils
+```
+
+### API Reference
+
+#### 1. `parseValidatedJSON(inputValue)`
+
+Attempts to parse a string as JSON. If parsing fails, it returns the original input value unchanged, preventing errors from crashing the application.
+
+*   **Arguments:**
+    *   `inputValue` (`string`): The string to parse.
+*   **Returns:**
+    *   `any`: The parsed JavaScript value (Object, Array, String, Number, etc.), or the original `inputValue` if it is not valid JSON.
+*   **Throws:**
+    *   None.
+
+#### 2. `createJsonFileObject(targetPath, fileName)`
+
+Creates a helper object to manage a JSON file. This helper automatically initializes the file with an empty array `[]` if it does not exist, and provides methods to read, append, and clear data.
+
+*   **Arguments:**
+    *   `targetPath` (`string`): The directory path where the JSON file will be stored.
+    *   `fileName` (`string`): The name of the JSON file (e.g., `"data.json"`).
+*   **Returns:**
+    *   `Object`: An instance with the following methods:
+        *   `getSavedData()`: Returns the current content of the file as an Array.
+        *   `addData(data, newData?)`: Appends data to the existing array.
+        *   `clearData()`: Clears the file, setting its content to an empty array `[]`.
+*   **Throws:**
+    *   None.
+
+##### Methods of the returned JsonFile Object
+
+###### `getSavedData()`
+Retrieves the data stored in the JSON file.
+*   **Returns:**
+    *   `Promise<Array>`: The array of objects stored in the file.
+
+###### `addData(data, newData)`
+Adds items to the stored array.
+*   **Arguments:**
+    *   `data` (`Array`): The items to add.
+    *   `newData` (`boolean`, optional): If `true`, replaces the existing data with `data` instead of appending. If `false` (default), appends `data` to the existing array.
+*   **Returns:**
+    *   `Promise<Object>`: A result object indicating success or failure (e.g., `{ status: "success", result: true }`).
+
+###### `clearData()`
+Clears all data from the file by writing an empty array `[]`.
+*   **Returns:**
+    *   `Promise<Object>`: A result object indicating success or failure.
 
 ---
 
-## Node.js
+## Module: `node-utils`
 
-Node-specific utilities.
+This module provides utilities for interacting with the Node.js runtime and the operating system. It focuses on process management, system command execution with security checks, and platform-specific directory resolution.
 
-### `spawnOnChildProcess(filePath)`
-- **Purpose**: Forks a child process and logs messages/errors.
-- **Arguments**: `filePath` (string).
-- **Returns**: `ChildProcess` object.
+**Security Note:**
+The `runSystemCommand` function enforces a permission-based access control. It will only execute commands if the target directory is explicitly allowed in the `userAllowedPaths` configuration with `"execute"` permissions. If permissions are denied, it returns a resolved Promise with an error object instead of throwing, allowing for synchronous error handling.
 
-### `createNodeModule(targetPath, fileName, textData)`
-- **Purpose**: Creates a new JS file in a directory.
-- **Arguments**: `targetPath` (string), `fileName` (string), `textData` (string).
-- **Returns**: `object` (write result).
+### Testing the Module
 
-### `getRequestResult(result, status, contentType)`
-- **Purpose**: Formats an HTTP response object.
-- **Arguments**: `result` (any), `status` (number, default 200), `contentType` (string, default "application/json").
-- **Returns**: `object`.
+To run the tests for this module, execute the following command from the project root:
 
-### `getAppDataDirPath()`
-- **Purpose**: Gets the OS-specific application data directory.
-- **Arguments**: None.
-- **Returns**: `string`.
+```bash
+npm run test-node-utils
+```
 
-### `getSystemCommandRunner(config)`
-- **Purpose**: A secure factory function that creates a restricted system command executor. It ensures commands are only run in user-approved directories (whitelist) to prevent path traversal attacks.
-- **Arguments**:
-  - `config` (object): Configuration object containing:
-    - `userAllowedPaths` (array of strings): List of absolute or relative directory paths that are permitted for command execution.
-- **Returns**: `Function`
-  - The returned function accepts:
-    - `command` (string): The shell command to execute.
-    - `cwd` (string): The current working directory where the command will run.
-  - The returned function returns a `Promise` that resolves to an object:
-    ```javascript
-    {
-        statusOk: boolean, // true if allowed and executed, false if denied or failed
-        message: string,   // Human-readable status message
-        stdout?: string,   // Standard output (if successful)
-        stderr?: string,   // Standard error (if failed)
-        command: string    // The command that was run
-    }
-    ```
-- **Security Note**: This function uses a whitelist approach. If the resolved `cwd` does not strictly start with any path in `userAllowedPaths`, it returns a rejected Promise with an error status. It prevents command injection by validating the execution context.
+### API Reference
+
+#### 1. `spawnOnChildProcess(filePath)`
+
+Spawns a new Node.js child process by forking the specified JavaScript file. It sets up default listeners for `message`, `error`, and `close` events.
+
+*   **Arguments:**
+    *   `filePath` (`string`): The path to the Node.js script to fork.
+*   **Returns:**
+    *   `ChildProcess`: The child process object.
+*   **Throws:**
+    *   `Error`: If the file at `filePath` does not exist or is not a valid module.
+
+#### 2. `getAppDataDirPath()`
+
+Returns the platform-specific path for application data storage. This path is typically used for storing configuration files or persistent app data.
+
+*   **Arguments:**
+    *   None.
+*   **Returns:**
+    *   `string`: The absolute path to the application data directory.
+        *   **Windows:** `%LOCALAPPDATA%` (or `~/AppData/Local`).
+        *   **Linux:** `$XDG_CONFIG_HOME` (or `~/.config`).
+        *   **macOS:** `~/Library/Application Support`.
+*   **Throws:**
+    *   `Error`: If the platform is unsupported.
+
+#### 3. `runSystemCommand(command, cwd)`
+
+Executes a system shell command within a specific working directory, after verifying that the user has the required permissions.
+
+*   **Arguments:**
+    *   `command` (`string`): The shell command to execute (e.g., `"echo hello"`).
+    *   `cwd` (`string`): The working directory where the command should be executed.
+*   **Returns:**
+    *   `Promise<Object>`:
+        *   **On Success:**
+            ```javascript
+            {
+                statusOk: true,
+                message: "Command Execution Successful...",
+                stdout: string,   // Standard output
+                stderr: string,   // Standard error (usually empty on success)
+                command: string   // The command executed
+            }
+            ```
+        *   **On Permission Denied:**
+            ```javascript
+            {
+                statusOk: false,
+                message: "Command Execution Failed: ...",
+                path: string,
+                allowedPaths: Array
+            }
+            ```
+        *   **On Execution Error:** (Rejected Promise)
+            ```javascript
+            {
+                statusOk: false,
+                message: "Command Execution Failed: ...",
+                stderr: string,
+                command: string
+            }
+            ```
+*   **Throws:**
+    *   None. (Errors are returned via the Promise rejection or the resolved error object).
 
 ---
 
-## Objects/Array
+Here is the documentation for the `objects-array-utils` module.
 
-Object and array manipulation.
+---
 
-### `getValidatedPropValues(obj, propNames, callback)`
-- **Purpose**: Safely navigates nested properties and runs a callback.
-- **Arguments**: `obj` (object), `propNames` (array of strings), `callback` (function).
-- **Returns**: `any` (the value at the last property).
+## Module: `objects-array-utils`
 
-### `isObjectInArray(object, array, keysToBeChecked)`
-- **Purpose**: Checks if an object exists in an array based on keys.
-- **Arguments**: `object` (object), `array` (array), `keysToBeChecked` (array, optional).
-- **Returns**: `boolean`.
+This module provides utilities for manipulating objects and arrays. It includes functions for retrieving nested properties, sorting, comparing, merging, and filtering objects and arrays. It is designed to simplify complex data operations in JavaScript applications.
 
-### `getAllObjectKeys(objects)`
-- **Purpose**: Gets all unique keys from an array of objects.
-- **Arguments**: `objects` (array of objects).
-- **Returns**: `array` of strings.
+### Testing the Module
 
-### `sortObjectsByDate(arr, datePropName, asc)`
-- **Purpose**: Sorts an array of objects by a date property.
-- **Arguments**: `arr` (array), `datePropName` (string), `asc` (boolean, default true).
-- **Returns**: `array` (sorted in place).
+To run the tests for this module, execute the following command from the project root:
 
-### `sortObjectsByPropName(arr, propName, asc)`
-- **Purpose**: Sorts an array of objects by a string/number property.
-- **Arguments**: `arr` (array), `propName` (string), `asc` (boolean, default true).
-- **Returns**: `array` (sorted in place).
+```bash
+npm run test-objects-array-utils
+```
 
-### `objectToString(object, delimiter)`
-- **Purpose**: Converts object keys/values to a string.
-- **Arguments**: `object` (object), `delimiter` (string, default ", ").
-- **Returns**: `string`.
+### API Reference
 
-### `isObjectUnique(obj, objectsArray, keys)`
-- **Purpose**: Checks if an object is unique in an array based on keys.
-- **Arguments**: `obj` (object), `objectsArray` (array), `keys` (array, optional).
-- **Returns**: `boolean`.
+#### 1. `getValidatedPropValues(obj, propNames, callback)`
 
-### `filterUnlistedObjects(localObjects, allObjects, keys)`
-- **Purpose**: Filters out objects present in `localObjects` from `allObjects`.
-- **Arguments**: `localObjects` (array), `allObjects` (array), `keys` (array, optional).
-- **Returns**: `array`.
+Retrieves a value from a nested object using an array of property names. It also allows you to monitor the traversal via a callback.
 
-### `shuffleArr(arr)`
-- **Purpose**: Shuffles an array in place (Fisher-Yates).
-- **Arguments**: `arr` (array).
-- **Returns**: `array`.
+*   **Arguments:**
+    *   `obj` (`Object`): The object to search.
+    *   `propNames` (`Array<string>`): An array of keys representing the path (e.g., `['user', 'profile', 'name']`).
+    *   `callback` (`Function`, optional): A function called at each step of the traversal with the current value.
+*   **Returns:**
+    *   `any` | `null`: The value found at the end of the path, or `null` if any key in the path is missing.
+*   **Throws:**
+    *   None.
 
-### `objectCompare(target, src, arrayInclusion)`
-- **Purpose**: Compares two objects, checking if `src` properties exist in `target`.
-- **Arguments**: `target` (object), `src` (object), `arrayInclusion` (boolean, default true).
-- **Returns**: `boolean`.
+#### 2. `isObjectInArray(object, array, keysToBeChecked)`
 
-### `assignProps(target, source)`
-- **Purpose**: Deeply assigns properties from source to target (mutates target).
-- **Arguments**: `target` (object), `source` (object).
-- **Returns**: `object` (target).
+Checks if an object exists in an array. By default, it compares all keys. If `keysToBeChecked` is provided, it only compares those specific keys.
 
-### `deepMerge(target, ...sources)`
-- **Purpose**: Deeply merges sources into target (mutates target).
-- **Arguments**: `target` (object), ...sources (objects).
-- **Returns**: `object` (target).
+*   **Arguments:**
+    *   `object` (`Object`): The object to find.
+    *   `array` (`Array<Object>`): The array to search.
+    *   `keysToBeChecked` (`Array<string>`, optional): Specific keys to compare. If empty, all keys are compared.
+*   **Returns:**
+    *   `boolean`: `true` if the object is found; `false` otherwise.
+*   **Throws:**
+    *   None.
+
+#### 3. `getAllObjectKey objects)`
+
+Returns a unique array of all keys present in any of the objects within the provided array.
+
+*   **Arguments:**
+    *   `objects` (`Array<Object>`): An array of objects.
+*   **Returns:**
+    *   `Array<string>`: An array of unique key names.
+*   **Throws:**
+    *   None.
+
+#### 4. `sortObjectsByDate(arr, datePropName, asc)`
+
+Sorts an array of objects based on a date property.
+
+*   **Arguments:**
+    *   `arr` (`Array<Object>`): The array to sort.
+    *   `datePropName` (`string`, optional): The key containing the date (default `"dateCreated"`).
+    *   `asc` (`boolean`, optional): `true` for ascending, `false` for descending (default `true`).
+*   **Returns:**
+    *   `Array<Object>`: The sorted array (mutates the original array).
+*   **Throws:**
+    *   None.
+
+#### 5. `sortObjectsByPropName(arr, propName, asc)`
+
+Sorts an array of objects based on a specific property value (supports numbers and strings).
+
+*   **Arguments:**
+    *   `arr` (`Array<Object>`): The array to sort.
+    *   `propName` (`string`): The key to sort by.
+    *   `asc` (`boolean`, optional): `true` for ascending, `false` for descending (default `true`).
+*   **Returns:**
+    *   `Array<Object>`: The sorted array (mutates the original array).
+*   **Throws:**
+    *   None.
+
+#### 6. `objectToString(object, delimiter)`
+
+Converts an object into a human-readable string. It uses `toNormalString` to format keys and values nicely.
+
+*   **Arguments:**
+    *   `object` (`Object`): The object to convert.
+    *   `delimiter` (`string`, optional): The separator between key-value pairs (default `", "`).
+*   **Returns:**
+    *   `string`: A formatted string (e.g., `"Name : John, Age : 30"`).
+*   **Throws:**
+    *   None.
+
+#### 7. `isObjectUnique(obj, objectsArray, keys)`
+
+Checks if an object is unique within an array (i.e., it does not match any object in the array).
+
+*   **Arguments:**
+    *   `obj` (`Object`): The object to check.
+    *   `objectsArray` (`Array<Object>`): The array to compare against.
+    *   `keys` (`Array<string>`, optional): Specific keys to check for uniqueness. If empty, all keys are checked.
+*   **Returns:**
+    *   `boolean`: `true` if the object is unique; `false` if it matches an object in the array.
+*   **Throws:**
+    *   None.
+
+#### 8. `filterUnlistedObjects(localObjects, allObjects, keys)`
+
+Filters an `allObjects` array to exclude any objects that are present in `localObjects`.
+
+*   **Arguments:**
+    *   `localObjects` (`Array<Object>`): The "local" or excluded objects.
+    *   `allObjects` (`Array<Object>`): The full list of objects.
+    *   `keys` (`Array<string>`, optional): Specific keys to use for comparison.
+*   **Returns:**
+    *   `Array<Object>`: The filtered array containing only unique objects.
+*   **Throws:**
+    *   None.
+
+#### 9. `shuffleArr(arr)`
+
+Randomly shuffles an array using the Fisher-Yates algorithm.
+
+*   **Arguments:**
+    *   `arr` (`Array`): The array to shuffle.
+*   **Returns:**
+    *   `Array`: The shuffled array (mutates the original array).
+*   **Throws:**
+    *   None.
+
+#### 10. `objectCompare(target, src, arrayInclusion)`
+
+Compares two objects. It supports nested object comparison via dot notation and can handle array values (either exact match or subset inclusion).
+
+*   **Arguments:**
+    *   `target` (`Object`): The target object.
+    *   `src` (`Object`): The source object to compare against.
+    *   `arrayInclusion` (`boolean`, optional): If `true`, array values in `src` are checked for inclusion in `target` arrays. If `false`, they must be identical (default `true`).
+*   **Returns:**
+    *   `boolean`: `true` if `src` is considered equal to/included in `target`; `false` otherwise.
+*   **Throws:**
+    *   None.
+
+#### 11. `assignProps(target, source)`
+
+Recursively assigns properties from `source` to `target`. If a property in `source` is an object and the corresponding property in `target` is not, it initializes it as an object before merging.
+
+*   **Arguments:**
+    *   `target` (`Object`): The object to assign properties to.
+    *   `source` (`Object`): The object to assign properties from.
+*   **Returns:**
+    *   `Object`: The modified `target` object.
+*   **Throws:**
+    *   None.
+
+#### 12. `deepMerge(target, ...sources)`
+
+Deeply merges one or more source objects into the target object. It creates nested objects as needed and overwrites scalar values.
+
+*   **Arguments:**
+    *   `target` (`Object`): The target object to merge into.
+    *   `...sources` (`Object`): One or more source objects.
+*   **Returns:**
+    *   `Object`: The modified `target` object.
+*   **Throws:**
+    *   None.
 
 ---
 
@@ -1092,12 +1355,8 @@ This module provides a set of utility functions for string manipulation, includi
 To run the tests for this module, ensure you are in the project root directory and execute the following command:
 
 ```bash
-npm run test-all
+npm run test-string-utils
 ```
-
-*(Note: There is no specific `npm run test-string` script defined in `package.json` yet, but the tests are included in the general test runner.)*
-
----
 
 ### API Reference
 
@@ -1175,110 +1434,116 @@ Converts a string into `camelCase` or `PascalCase`.
 
 ---
 
-## Web Page
 
-Browser-side automation utilities.
+## Module: `url-utils`
 
-### `scrollToBottom(num, containingEl)`
-- **Purpose**: Scrolls to the bottom of the page.
-- **Arguments**: `num` (number, buffer), `containingEl` (element, optional).
-- **Returns**: `Promise<void>`.
+This module provides a suite of utility functions for parsing, constructing, and manipulating URLs and query strings. It handles complex nested query parameters, converts between different object notations (dot notation vs. standard objects), and extracts domain information.
 
-### `scrollToTop()`
-- **Purpose**: Scrolls to the top of the page.
-- **Arguments**: None.
-- **Returns**: `Promise<void>`.
+### Testing the Module
 
-### `waitForSelector(callback, numberOfWaits)`
-- **Purpose**: Waits for an element to appear.
-- **Arguments**: `callback` (function returning element), `numberOfWaits` (number, default 300).
-- **Returns**: `Promise<element>`.
+To run the tests for this module, execute the following command from the project root:
 
-### `typeIt({ el, string, elPropKey, newText, duration })`
-- **Purpose**: Types a string into an input element character by character.
-- **Arguments**: Object `{ el, string, elPropKey (default 'value'), newText (boolean), duration (number) }`.
-- **Returns**: `Promise<boolean>`.
+```bash
+npm run test-url-utils
+```
 
-### `createJSONBlob(productObjects, excludedProps)`
-- **Purpose**: Creates a JSON Blob.
-- **Arguments**: `productObjects` (array), `excludedProps` (array, optional).
-- **Returns**: `object` `{ jsonBlob, data (string) }`.
 
-### `downloadJsonFile(productObjects, productProps)`
-- **Purpose**: Triggers a JSON file download.
-- **Arguments**: `productObjects` (array), `productProps` (object).
-- **Returns**: `Promise<void>`.
 
-### `downloadAllJsonFiles(dbInstances, dataRowProps)`
-- **Purpose**: Downloads JSON files for multiple database instances.
-- **Arguments**: `dbInstances` (array), `dataRowProps` (object).
-- **Returns**: `Promise<void>`.
+### API Reference
 
-### `downloadCsvData(productObjects, fileName)`
-- **Purpose**: Triggers a CSV file download.
-- **Arguments**: `productObjects` (array), `fileName` (string).
-- **Returns**: `void`.
+#### 1. `urlConstructor(urlString)`
 
-### `readBlobData(blob)`
-- **Purpose**: Reads a blob as base64.
-- **Arguments**: `blob` (Blob).
-- **Returns**: `Promise<string>` (base64).
+Constructs a normalized URL string from a potentially incomplete input. If the protocol is missing, it defaults to `https://`.
 
-### `timedReload(condition, timeLimit)`
-- **Purpose**: Reloads page if condition is met or time limit reached.
-- **Arguments**: `condition` (function), `timeLimit` (number, seconds).
-- **Returns**: `Promise<void>`.
+*   **Arguments:**
+    *   `urlString` (`string`): The URL to construct.
+*   **Returns:**
+    *   `string`: The normalized URL (e.g., `"https://example.com/path?query=1"`).
+*   **Throws:**
+    *   None.
 
-### `removeAttributes(containerEl, excludedAttributes)`
-- **Purpose**: Removes attributes from elements in a container.
-- **Arguments**: `containerEl` (element), `excludedAttributes` (array, optional).
-- **Returns**: `void`.
+#### 2. `objectToQueryString(obj, prefix)`
 
-### `extractTableData(table)`
-- **Purpose**: Extracts data from an HTML table.
-- **Arguments**: `table` (element).
-- **Returns**: `array` of objects.
+Converts a JavaScript object into a URL-encoded query string. It supports nested objects and arrays.
 
-### `detectDOMChanges(fnCallback, logOnConsole)`
-- **Purpose**: Returns a function to observe DOM changes.
-- **Arguments**: `fnCallback` (function), `logOnConsole` (boolean).
-- **Returns**: `function` (observer creator).
+*   **Arguments:**
+    *   `obj` (`Object`): The object to convert.
+    *   `prefix` (`string`, optional): A prefix key for nested objects (used internally for recursion).
+*   **Returns:**
+    *   `string`: The query string (e.g., `"name=John&user[email]=j@e.com"`).
+*   **Throws:**
+    *   None.
 
-### `xhrDetector(callback)`
-- **Purpose**: Intercepts XHR and Fetch requests.
-- **Arguments**: `callback` (function).
-- **Returns**: `void`.
+#### 3. `queryStringToObject(queryString)`
 
----
+Converts a URL-encoded query string back into a JavaScript object. It handles nested keys (e.g., `user[name]`) and arrays (e.g., `items[]`).
 
-## Web Requests
+*   **Arguments:**
+    *   `queryString` (`string`): The query string to parse (with or without leading `?`).
+*   **Returns:**
+    *   `Object`: The parsed JavaScript object.
+*   **Throws:**
+    *   None.
 
-HTTP request utilities.
+#### 4. `urlToQueryStringObject(urlString, trailingSlash)`
 
-### `apiRequest(url, options, jsonData, httpsConnection)`
-- **Purpose**: Makes a JSON API request.
-- **Arguments**: `url` (string), `options` (object), `jsonData` (boolean), `httpsConnection` (boolean).
-- **Returns**: `Promise<any>` (parsed JSON).
+Parses a full URL into a structured object containing the origin, pathname, and parsed query parameters.
 
-### `dynamicApiRequest(url, options, jsonData, httpsConnection)`
-- **Purpose**: Makes an API request and returns appropriate content type.
-- **Arguments**: `url` (string), `options` (object), `jsonData` (boolean), `httpsConnection` (boolean).
-- **Returns**: `Promise<any>` (json, text, or blob).
+*   **Arguments:**
+    *   `urlString` (`string`): The full URL to parse.
+    *   `trailingSlash` (`boolean`, optional): If `true`, ensures the pathname ends with a slash.
+*   **Returns:**
+    *   `Object` | `null`: An object containing `queryObject`, `originalUrl`, `origin`, `pathName`, `queryString`, and `urlWithoutQueryString`. Returns `null` if the URL is invalid.
+*   **Throws:**
+    *   None.
 
-### `postDataObjects(url, dataObjects, options, limit, callback, jsonData, httpsConnection)`
-- **Purpose**: Posts an array of objects in batches.
-- **Arguments**: `url` (string), `dataObjects` (array), `options` (object), `limit` (number), `callback` (function), `jsonData` (boolean), `httpsConnection` (boolean).
-- **Returns**: `Promise<array>`.
+#### 5. `objectToDotNotation(obj, prefix, res)`
 
-### `verifyUrl(newUrl, sameOriginUrl)`
-- **Purpose**: Verifies a URL and optionally checks same-origin.
-- **Arguments**: `newUrl` (string), `sameOriginUrl` (string, optional).
-- **Returns**: `Promise<object>` `{ statusOk, url }`.
+Flattens a nested JavaScript object into dot notation keys (e.g., `user.name`).
 
-### `getRequestResult(result, status, contentType)`
-- **Purpose**: Formats an HTTP response object.
-- **Arguments**: `result` (any), `status` (number), `contentType` (string).
-- **Returns**: `object`.
+*   **Arguments:**
+    *   `obj` (`Object`): The nested object to flatten.
+    *   `prefix` (`string`, optional): The current key prefix (used for recursion).
+    *   `res` (`Object`, optional): The accumulator object for the result.
+*   **Returns:**
+    *   `Object`: The flattened object (e.g., `{ 'user.name': 'John' }`).
+*   **Throws:**
+    *   None.
+
+#### 6. `dotNotationToObject(dotObj)`
+
+Reconstructs a nested JavaScript object from a flat object with dot notation keys.
+
+*   **Arguments:**
+    *   `dotObj` (`Object`): The flat object with dot notation keys.
+*   **Returns:**
+    *   `Object`: The nested object.
+*   **Throws:**
+    *   None.
+
+#### 7. `getDomain(url)`
+
+Extracts the domain name from a URL, removing the protocol (`http://`, `https://`) and `www.` prefix.
+
+*   **Arguments:**
+    *   `url` (`string`): The URL to process.
+*   **Returns:**
+    *   `string`: The domain name (e.g., `"example.com"`).
+*   **Throws:**
+    *   None.
+
+#### 8. `checkSubDomain(mainUrl, subUrl)`
+
+Checks if `subUrl` is a subdomain of `mainUrl`.
+
+*   **Arguments:**
+    *   `mainUrl` (`string`): The main domain URL.
+    *   `subUrl` (`string`): The subdomain URL to check.
+*   **Returns:**
+    *   `boolean`: `true` if `subUrl` is a subdomain of `mainUrl`; `false` otherwise.
+*   **Throws:**
+    *   None.
+
 
 
 ------------------------------------------------------------------------

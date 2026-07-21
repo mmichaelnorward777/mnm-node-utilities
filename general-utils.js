@@ -23,7 +23,7 @@ export default function getGeneralUtils()   {
                         clearInterval(interval);
                         resolve();
                     }
-                    if (i === 100) {
+                    if (i === 10) {
                         messageCallback();
                         i = 0;
                     }
@@ -72,9 +72,12 @@ export default function getGeneralUtils()   {
 
     function enumerate(arr, and = false) {
         arr = [...arr];
-        if (arr.length > 1) {
+        if (arr.length > 2) {
             let lastIndex = arr.pop();
             return `${arr.join(", ")}, ${and ? "and" : "or"} ${lastIndex}`;
+        } else if(arr.length === 2) {
+            let lastIndex = arr.pop();
+            return `${arr.join(", ")} ${and ? "and" : "or"} ${lastIndex}`;
         } else {
             return arr[0];
         }

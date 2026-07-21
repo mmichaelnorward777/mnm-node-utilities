@@ -7,12 +7,8 @@ This module provides a set of utility functions for string manipulation, includi
 To run the tests for this module, ensure you are in the project root directory and execute the following command:
 
 ```bash
-npm run test-all
+npm run test-string-utils
 ```
-
-*(Note: There is no specific `npm run test-string` script defined in `package.json` yet, but the tests are included in the general test runner.)*
-
----
 
 ### API Reference
 

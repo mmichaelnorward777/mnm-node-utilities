@@ -82,7 +82,7 @@ export default function getObjectArrayUtils({toNormalString, objectToDotNotation
     function objectToString(object, delimiter = ", ") {
         let output = [];
         for (let key in object) {
-            output.push(`${toNormalString(key)} : ${toNormalString(`${object[key]}`)}`);
+            output.push(`${toNormalString(key)} : ${object[key]}`);
         }
         return output.join(delimiter);
     }

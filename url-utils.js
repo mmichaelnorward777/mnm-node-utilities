@@ -81,6 +81,8 @@ export default function getUrlUtils()   {
     function queryStringToObject(queryString) {
         const result = {};
 
+        if (!queryString) return result;
+
         const pairs = queryString.replace(/^\?/, '').split('&');
 
         for (let pair of pairs) {
@@ -90,51 +92,64 @@ export default function getUrlUtils()   {
             const key = decodeURIComponent(rawKey);
             const value = decodeURIComponent(rawValue || '');
 
-            const keyParts = [];
-            key.replace(/\[([^\]]*)\]/g, (_, k) => {
-                keyParts.push(k);
-                return '';
-            });
-
+            // 1. Parse the key into parts
+            // "user[email]" -> ["user", "email"]
+            // "items[]" -> ["items", undefined]  (undefined signals array push)
+            // "items[0][name]" -> ["items", "0", "name"]
+            const parts = [];
             const baseKey = key.split('[')[0];
-            keyParts.unshift(baseKey);
+            parts.push(baseKey);
 
+            const bracketRegex = /\[([^\]]*)\]/g;
+            let match;
+            while ((match = bracketRegex.exec(key)) !== null) {
+                // If the content is empty string "", it means [], so we use undefined
+                parts.push(match[1] === '' ? undefined : match[1]);
+            }
+
+            // 2. Navigate or Create the Structure
             let current = result;
 
-            for (let i = 0; i < keyParts.length; i++) {
-                const part = keyParts[i] === '' ? undefined : keyParts[i];
+            // We iterate through all parts EXCEPT the last one to build the path
+            for (let i = 0; i < parts.length - 1; i++) {
+                const part = parts[i];
 
-                if (i === keyParts.length - 1) {
-                    if (part === undefined) {
-                        // handle array push
-                        if (!Array.isArray(current)) current = [];
-                        current.push(value);
+                if (!current[part]) {
+                    // If the next part is undefined, this container must be an array
+                    // If the next part is a string, this container must be an object
+                    const nextPart = parts[i + 1];
+                    
+                    if (nextPart === undefined) {
+                        current[part] = [];
                     } else {
-                        if (current[part] === undefined) {
-                            current[part] = value;
-                        } else if (Array.isArray(current[part])) {
-                            current[part].push(value);
-                        } else {
-                            current[part] = [current[part], value];
-                        }
-                    }
-                } else {
-                    if (part === undefined) {
-                        if (!Array.isArray(current)) current = [];
-                        current.push({});
-                        current = current[current.length - 1];
-                    } else {
-                        if (!current[part] || typeof current[part] !== 'object') {
-                            current[part] = {};
-                        }
-                        current = current[part];
+                        current[part] = {};
                     }
                 }
+
+                current = current[part];
+            }
+
+            // 3. Assign the Value to the Final Part
+            const finalPart = parts[parts.length - 1];
+
+            if (finalPart === undefined) {
+                // This means the key ended with []
+                // Ensure current is an array
+                if (!Array.isArray(current)) {
+                    current = [];
+                }
+                current.push(value);
+            } else {
+                // Standard assignment
+                current[finalPart] = value;
             }
         }
 
         return result;
     }
+
+
+    
 
     function urlToQueryStringObject(urlString, trailingSlash = false) {
         try {
@@ -204,69 +219,21 @@ export default function getUrlUtils()   {
 
     }
 
-
     function getDomain(url) {
         // Remove "https://" or "http://"
-        url = url.replace(/^(https?:\/\/)?/, '');
+        let cleanUrl = url.replace(/^(https?:\/\/)?/, '');
 
         // Remove "www."
-        url = url.replace(/^(www\.)?/, '');
+        cleanUrl = cleanUrl.replace(/^www\./, '');
 
-        return url;
+        // Split by slash and return the first part (the domain)
+        return cleanUrl.split('/')[0];
     }
+
 
     function checkSubDomain(mainUrl, subUrl) {
 
         return subUrl.toLowerCase().includes(getDomain(mainUrl.toLowerCase()));
-
-    }
-
-    function cleanApiUrl(apiEndpoint, baseUrl, categorizedSetId, page = 1, limit = 10, pathFilter = "paginated") {
-
-        try {
-            let urlObject = queryStringToObject(apiEndpoint, false);
-            // console.log(urlObject);
-            if (!urlObject) {
-                apiEndpoint = `${baseUrl}/${apiEndpoint.split("/").filter(item => item.trim() !== "").join("/")}`;
-                urlObject = queryStringToObject(apiEndpoint);
-            }
-
-            let { queryObject, origin, pathName: pathname } = urlObject;
-
-            if (pathname.includes(baseUrl)) {
-
-                pathname.replace(`${baseUrl}/`, "");
-
-            }
-
-            pathname = pathname.trim().split("/").filter(item => item !== "");
-
-
-
-            if (!pathname.includes("api") && pathname[0] !== "api") {
-                pathname.unshift("api");
-            }
-
-            if ((pathname[pathname.length - 1] === "single" || pathname[pathname.length - 1] === "all" || pathname[pathname.length - 1] === "paginated") && pathFilter) {
-                pathname[pathname.length - 1] = pathFilter;
-            }
-
-
-            if (pathFilter && (!pathname.includes(pathFilter) && pathname[pathname.length - 1] !== pathFilter)) {
-                pathname.push(pathFilter);
-            }
-
-            queryObject.categorizedSetId = categorizedSetId;
-            queryObject.page = page;
-            queryObject.limit = limit;
-
-
-
-
-            return `${[origin, ...pathname].join("/")}?${objectToQueryString(queryObject)}`;
-        } catch (err) {
-            console.log(err);
-        }
 
     }
 
@@ -279,7 +246,6 @@ export default function getUrlUtils()   {
         dotNotationToObject,
         getDomain,
         checkSubDomain,
-        cleanApiUrl,
     }
 
 }
