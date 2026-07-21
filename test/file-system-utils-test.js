@@ -14,12 +14,12 @@ if (!fs.existsSync(TEST_BASE_DIR)) {
 }
 
 const config = { 
-    userAllowedPaths: [
-        { 
-            path: TEST_BASE_DIR, 
-            permissions: "rwdx" 
-        }
-    ],
+    // userAllowedPaths: [
+    //     { 
+    //         path: TEST_BASE_DIR, 
+    //         permissions: "rwdx" 
+    //     }
+    // ],
 };
 
 const utils = getUtilities(config);
@@ -91,7 +91,7 @@ runner.describe('File System Utils', () => {
     // --- Permission Helpers ---
     runner.it('getUserAllowedPaths: returns array of permissions', () => {
         const paths = getUserAllowedPaths();
-        // console.log(paths);
+        console.log(paths);
         assertTrue(Array.isArray(paths));
         assertTrue(paths.length > 0);
         // Verify the base dir is in the list
