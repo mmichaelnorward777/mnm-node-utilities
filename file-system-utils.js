@@ -1,10 +1,11 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as os from 'os';
+import getSafeWritablePaths from "./helpers/get-safe-writable-paths.js";
 
-export default function getFileSystemUtils({userAllowedPaths, securedFsCommands})    {
+export default function getFileSystemUtils({userAllowedPaths})    {
 
-    function isFileNonSecured(p) {
+    function isFileNsVersion(p) {
         try {
             const stats = fs.statSync(p);
             return stats.isFile();
@@ -13,7 +14,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
         }
     }
 
-    function isDirectoryNonSecured(p) {
+    function isDirectoryNsVersion(p) {
         try {
             const stats = fs.statSync(p);
             return stats.isDirectory();
@@ -22,16 +23,13 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
         }
     }
 
-    function getParentDirNonSecured(filePath) {
+    function getParentDirNsVersion(filePath) {
         return path.dirname(filePath);
     }
 
     function setUserFsPermissions(userAllowedPaths = []) {
 
-        if(!securedFsCommands)  {
-            return;    
-        }
-
+        
         /* 
             if string of dirPaths, defaults to read only in the userFileSystemPermissions;
             fsPermissionsConfig = [...dirPaths]
@@ -44,8 +42,16 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
         
         */
 
-        const userFileSystemPermissions = new Map();
+        if(!userAllowedPaths.length)  {
+            userAllowedPaths = getSafeWritablePaths().map(item => {
+                return {
+                    path : item.path,
+                    permissions : "rwdx", // defaults to read only
+                }
+            });
+        }
 
+        const userFileSystemPermissions = new Map();
 
         for(let pathItem of userAllowedPaths)   {
             let obj = {},
@@ -57,7 +63,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
 
             if(typeof pathItem === "string")    {
                 let absolutePath = path.resolve(pathItem).replace(/\\/g, "/");
-                if(isDirectoryNonSecured(absolutePath))   {
+                if(isDirectoryNsVersion(absolutePath))   {
                     dirPath = absolutePath;
                     readPermission = true;
                 } else  {
@@ -65,7 +71,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
                 }
             } else if(typeof pathItem === "object") {
                 let absolutePath = path.resolve(pathItem.path).replace(/\\/g, "/");
-                if(isDirectoryNonSecured(absolutePath))   {
+                if(isDirectoryNsVersion(absolutePath))   {
                     dirPath = absolutePath;
                     readPermission = pathItem.permissions.includes("r");
                     writePermission = pathItem.permissions.includes("w");
@@ -130,32 +136,17 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     const userFileSystemPermissions = setUserFsPermissions(userAllowedPaths); // returns a map of the user file permissions
 
     function getUserAllowedPathsByPermissionType(permissionType = "read")   {
-        if(!securedFsCommands)  {
-            return "*";    
-        }
-        return typeof permissionType !== "undefined" ? Array.from(userFileSystemPermissions.values()).filter(item => item[permissionType]) : [];
+        return Array.from(userFileSystemPermissions.values()).filter(item => item[permissionType]);
 
     }
 
     function getUserAllowedPaths()  {
-        if(!securedFsCommands)  {
-            return "*";    
-        }
         return Array.from(userFileSystemPermissions.values());
     }
 
     function getUserFsPermission(dirPath)   {
-        if(!securedFsCommands)  {
-            return {
-                path : dirPath,
-                read : true,
-                write : true,
-                delete : true,
-                execute : true,
-            };    
-        }
-        if(isFileNonSecured(dirPath)) {
-            dirPath = getParentDirNonSecured(dirPath);
+        if(isFileNsVersion(dirPath)) {
+            dirPath = getParentDirNsVersion(dirPath);
         }
 
         let absoluteCwd = path.resolve(dirPath).replace(/\\/g, "/"),
@@ -171,14 +162,19 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
 
     }
 
+    function getDeniedError()   {
+        console.error({
+            status : "FAILED",
+            result : false,
+            message : "Denied Acced Permission : This file/directory you are trying to access may not be listed in the userAllowedPaths in the configuration, or may not have the read, write, delete or execute permissions that may be required to proceed with the operation."
+        });
+        throw new Error("Denied Access Error");
+    }
+
     function checkDirPathPermissions(dirPath, permissionType = "read")   {
 
-        if(!securedFsCommands)  {
-            return true;    
-        }
-
         if(!permissionType) {
-            return false
+            return false;
         }
         
         let foundUserFsPermission = getUserFsPermission(dirPath);
@@ -277,18 +273,28 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     };
 
     function baseName(fileName, ...args) {
+
+        if(isFileNsVersion(fileName) || isDirectoryNsVersion(fileName)) {
+            if(!checkDirPathPermissions(fileName, "read")) {
+                getDeniedError();
+                return;
+            }
+        }
+
         return path.basename(fileName, ...args);
     }
 
-    function fileExists(filePath) {
-        if(!checkDirPathPermissions(filePath, "read")) {
+    function fileExists(fileName) {
+        if(!checkDirPathPermissions(fileName, "read")) {
+            getDeniedError();
             return;
         }
-        return fs.existsSync(filePath);
+        return fs.existsSync(fileName);
     }
 
     function isFile(p) {
         if(!checkDirPathPermissions(p, "read")) {
+            getDeniedError();
             return;
         }
 
@@ -302,6 +308,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
 
     function isDirectory(dirPath) {
         if(!checkDirPathPermissions(dirPath, "read")) {
+            getDeniedError();
             return;
         }
         try {
@@ -314,7 +321,8 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
 
     function getParentDir(filePath) {
         if(!checkDirPathPermissions(filePath, "read")) {
-            return null;
+            getDeniedError();
+            return;
         }
         return path.dirname(filePath) || null;
     }
@@ -326,6 +334,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     async function readdir(dirPath, options = { encoding: "utf8" }) {
 
         if(!checkDirPathPermissions(dirPath, "read")) {
+            getDeniedError();
             return;
         }
 
@@ -347,6 +356,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     function readdirSync(dirPath, options = { encoding: "utf8" }) {
 
         if(!checkDirPathPermissions(dirPath, "read")) {
+            getDeniedError();
             return;
         }
 
@@ -371,6 +381,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     async function mkdir(dirPath, options = { recursive: true }) {
 
         if(!checkDirPathPermissions(dirPath, "write")) {
+            getDeniedError();
             return;
         }
 
@@ -394,6 +405,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     function mkdirSync(dirPath, options = { recursive: true }) {
 
         if(!checkDirPathPermissions(dirPath, "write")) {
+            getDeniedError();
             return;
         }
 
@@ -417,6 +429,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     async function deleteDir(dirPath, options = { recursive: true }) {
 
         if(!checkDirPathPermissions(dirPath, "delete")) {
+            getDeniedError();
             return;
         }
 
@@ -437,6 +450,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     function deleteDirSync(dirPath, options = { recursive: true }) {
 
         if(!checkDirPathPermissions(dirPath, "delete")) {
+            getDeniedError();
             return;
         }
 
@@ -461,6 +475,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     async function readFile(filePath, options = { encoding: "utf8" }) {
 
         if(!checkDirPathPermissions(filePath, "read")) {
+            getDeniedError();
             return;
         }
 
@@ -482,6 +497,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     function readFileSync(filePath, options = { encoding: "utf8" }) {
 
         if(!checkDirPathPermissions(filePath, "read")) {
+            getDeniedError();
             return;
         }
 
@@ -495,8 +511,8 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
             };
         } catch (err) {
             return {
-                result: true,
-                status: "success",
+                result: false,
+                status: "failed",
                 message: `We were not able to retrieve the data from ${baseName(filePath)}.`,
                 reason: err.message,
             };
@@ -506,6 +522,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     async function writeFile(filePath, data, options = { encoding: "utf8" }) {
 
         if(!checkDirPathPermissions(filePath, "write")) {
+            getDeniedError();
             return;
         }
 
@@ -526,6 +543,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     function writeFileSync(filePath, data, options = { encoding: "utf8" }) {
 
         if(!checkDirPathPermissions(filePath, "write")) {
+            getDeniedError();
             return;
         }
 
@@ -549,6 +567,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     async function deleteFile(filePath) {
 
         if(!checkDirPathPermissions(filePath, "delete")) {
+            getDeniedError();
             return;
         }
 
@@ -576,6 +595,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     function deleteFileSync(filePath) {
 
         if(!checkDirPathPermissions(filePath, "delete")) {
+            getDeniedError();
             return;
         }
 
@@ -588,7 +608,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
             }
         } catch (err) {
             return {
-                result: true,
+                result: false,
                 status: "false",
                 message: `We weren't successful in deleting the file : ${filePath}`,
                 reason: err.message,
@@ -599,6 +619,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     async function getFileSize(filePath) {
 
         if(!checkDirPathPermissions(filePath, "read")) {
+            getDeniedError();
             return;
         }
 
@@ -622,6 +643,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     async function isFileEmpty(filePath, options = { encoding: "utf8" }) {
 
         if(!checkDirPathPermissions(filePath, "read")) {
+            getDeniedError();
             return;
         }
 
@@ -632,6 +654,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     function isFileEmptySync(filePath, options = { encoding: "utf8" }) {
 
         if(!checkDirPathPermissions(filePath, "read")) {
+            getDeniedError();
             return;
         }
 
@@ -642,6 +665,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     async function isDirectoryEmpty(dirPath, options = { encoding: "utf8" }) {
 
         if(!checkDirPathPermissions(dirPath, "read")) {
+            getDeniedError();
             return;
         }
 
@@ -652,6 +676,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     function isDirectoryEmptySync(dirPath, options = { encoding: "utf8" }) {
 
         if(!checkDirPathPermissions(dirPath, "read")) {
+            getDeniedError();
             return;
         }
 
@@ -662,6 +687,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     async function getAllFilesFromDirectory(dirPath, fileExt = null) {
 
         if(!checkDirPathPermissions(dirPath, "read")) {
+            getDeniedError();
             return;
         }
 
@@ -678,6 +704,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     function getAllFilesFromDirectorySync(dirPath, fileExt = null) {
 
         if(!checkDirPathPermissions(dirPath, "read")) {
+            getDeniedError();
             return;
         }
 
@@ -694,6 +721,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     async function getAllDirsFromDirectory(dirPath) {
 
         if(!checkDirPathPermissions(dirPath, "read")) {
+            getDeniedError();
             return;
         }
 
@@ -709,6 +737,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     function getAllDirsFromDirectorySync(dirPath) {
 
         if(!checkDirPathPermissions(dirPath, "read")) {
+            getDeniedError();
             return;
         }
 
@@ -724,6 +753,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     function getFileObject(filePath) {
         if(!checkDirPathPermissions(filePath, "read")) {
             
+            getDeniedError();
             return;
         }
 
@@ -746,6 +776,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     async function getAllFilesRecursively(dirPath, excludedFolders = []) {
 
         if(!checkDirPathPermissions(dirPath, "read")) {
+            getDeniedError();
             return;
         }
 
@@ -769,6 +800,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     function getAllFilesRecursivelySync(dirPath, excludedFolders = []) {
 
         if(!checkDirPathPermissions(dirPath, "read")) {
+            getDeniedError();
             return;
         }
 
@@ -792,6 +824,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     async function deleteAllFilesInDirPath(dirPath, recursive = true) {
 
         if(!checkDirPathPermissions(dirPath, "delete")) {
+            getDeniedError();
             return;
         }
 
@@ -841,6 +874,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     async function deleteAllDirsInDirPath(dirPath, options = { recursive: true }) {
 
         if(!checkDirPathPermissions(dirPath, "delete")) {
+            getDeniedError();
             return;
         }
 
@@ -885,6 +919,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     async function deleteAllInDirPath(dirPath) {
 
         if(!checkDirPathPermissions(dirPath, "delete")) {
+            getDeniedError();
             return;
         }
 
@@ -907,6 +942,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     async function deleteAllEmptyFilesInDirectory(dirPath, recursive) {
 
         if(!checkDirPathPermissions(dirPath, "delete")) {
+            getDeniedError();
             return;
         }
 
@@ -961,6 +997,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
     async function deleteAllEmptyDirsInDirectory(dirPath, recursive) {
 
         if(!checkDirPathPermissions(dirPath, "delete")) {
+            getDeniedError();
             return;
         }
 
@@ -1022,16 +1059,14 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
 
     function getMimeType(file) {
 
-        if(file.split(".").length <= 1)    {
-            return;
-        }
-
-        if(getParentDir(file))  {
+        if(isFileNsVersion(file) || isDirectoryNsVersion(file))  {
             if(!checkDirPathPermissions(file, "read")) {
+                getDeniedError();
                 return;
             }
 
             if (isDirectory(file)) {
+                throw Error("The argument provided is a directory path.")
                 return;
             }
         
@@ -1042,8 +1077,11 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
             return mimeTypes[fileType];
 
         } else  {
-
-            // file not exiting, more like a query or verification
+            if(file.split(".").length <= 1)    {
+                throw Error("This function requires a file extension to identify the mime type.")
+                return;
+            }
+            // file not existing, more like a query or verification
             let strArr = file.split("."),
                 fileExt = strArr.pop();
 
@@ -1073,6 +1111,7 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
         let dirPath = path.join(...args);
 
         if(!checkDirPathPermissions(dirPath, "write")) {
+            getDeniedError();
             return;
         }
 
@@ -1081,18 +1120,6 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
         }
         return dirPath;
     }
-
-    async function createSvgFile(filePath, svgName, svgData) {
-
-        if(!checkDirPathPermissions(filePath, "write")) {
-            return;
-        }
-
-        let fileName = path.join(filePath, `${svgName}.svg`);
-        await fs.promises.writeFile(fileName, svgData, { encoding: "utf8" });
-        return { imageName: `${path.basename(fileName)}`, imagePath: filePath };
-    }
-
 
     return {
         getUserAllowedPathsByPermissionType,
@@ -1138,7 +1165,6 @@ export default function getFileSystemUtils({userAllowedPaths, securedFsCommands}
         getFileExtensionsByMimeType,
         getSpecifiedExt,
         createDirPath,
-        createSvgFile,
     }
 
 }

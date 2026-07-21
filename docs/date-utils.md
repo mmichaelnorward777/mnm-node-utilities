@@ -1,10 +1,20 @@
-### Module: `date-utils`
+## Module: `date-utils`
 
-This module provides a suite of utility functions for date parsing, formatting, time zone conversions, and date range calculations. It handles both local time and UTC/Zulu time conversions, particularly focusing on converting local times to specific business time zones.
+This module provides a comprehensive suite of utility functions for date parsing, formatting, time zone conversions, and date range calculations. It handles both local time and UTC/Zulu time conversions, with a specific focus on normalizing local times to specific business time zones.
 
+### Testing the Module
 
+To run the tests for this module, ensure you are in the project root directory and execute the following command:
 
-### 1. `formattedDate(dateObject)`
+```bash
+npm run test-date
+```
+
+---
+
+### API Reference
+
+#### 1. `formattedDate(dateObject)`
 
 Formats a date object into a string in the format `MM-DD-YYYY`.
 
@@ -13,9 +23,7 @@ Formats a date object into a string in the format `MM-DD-YYYY`.
 *   **Returns:**
     *   `string`: The formatted date string (e.g., `"05-23-2023"`).
 
-
-
-### 2. `getDateTimeObect(dateTime)`
+#### 2. `getDateTimeObect(dateTime)`
 
 Parses various input formats into a standard JavaScript `Date` object.
 
@@ -28,9 +36,7 @@ Parses various input formats into a standard JavaScript `Date` object.
     *   `Date`: A valid `Date` object.
     *   If the input is invalid, it catches the error and returns `new Date()` (current date).
 
-
-
-### 3. `dateTimeObject(dateObj)`
+#### 3. `dateTimeObject(dateObj)`
 
 Extracts detailed components of a date and time, providing various helper methods.
 
@@ -53,9 +59,7 @@ Extracts detailed components of a date and time, providing various helper method
         *   `fullDate` (`string`): Combined date and day (e.g., `"May 5, 2023 - Friday"`).
         *   `fullDateTime` (`string`): Full date, day, and time (e.g., `"May 5, 2023 - Friday - 03:30:45 PM"`).
 
-
-
-### 4. `getTimeElapsed(time1, time2)`
+#### 4. `getTimeElapsed(time1, time2)`
 
 Calculates the time difference between two timestamps and returns a human-readable summary.
 
@@ -67,9 +71,7 @@ Calculates the time difference between two timestamps and returns a human-readab
         *   `timeElapsed` (`string`): Detailed breakdown (e.g., `"1 hours, 30 minutes, and 45.5 seconds"`).
         *   `momentsPassed` (`string`): Human-readable summary (e.g., `"1 hour has passed."`). Note: Logic handles singular/plural grammar.
 
-
-
-### 5. `createZuluStartDate(dateObj)`
+#### 5. `createZuluStartDate(dateObj)`
 
 Creates a `Date` object representing the start of the day in UTC (Zulu time) based on the local time components of the input.
 
@@ -78,9 +80,7 @@ Creates a `Date` object representing the start of the day in UTC (Zulu time) bas
 *   **Returns:**
     *   `Date`: A new `Date` object set to UTC `+00:00` with the same year, month, day, hour, minute, second, and millisecond as the input.
 
-
-
-### 6. `getOffsetMinutesForTimezone(timeZone)`
+#### 6. `getOffsetMinutesForTimezone(timeZone)`
 
 Calculates the timezone offset in minutes relative to UTC for a given timezone.
 
@@ -89,9 +89,7 @@ Calculates the timezone offset in minutes relative to UTC for a given timezone.
 *   **Returns:**
     *   `number`: The offset in minutes (e.g., `0` for UTC, `-300` for EST).
 
-
-
-### 7. `toISOZeroOffset(input, tz)`
+#### 7. `toISOZeroOffset(input, tz)`
 
 Converts a local date/time to an ISO string with a zero offset (`+00:00`) adjusted for the specified timezone. This is useful for normalizing local times to a specific business time zone before converting to UTC.
 
@@ -101,9 +99,7 @@ Converts a local date/time to an ISO string with a zero offset (`+00:00`) adjust
 *   **Returns:**
     *   `string` | `null`: An ISO formatted string ending in `+00:00` (e.g., `"2023-05-05T10:00:00.000+00:00"`). Returns `null` if input is invalid.
 
-
-
-### 8. `getHourlyDuration(numOfMinutes)`
+#### 8. `getHourlyDuration(numOfMinutes)`
 
 Breaks down a total number of minutes into hours and remaining minutes.
 
@@ -114,9 +110,7 @@ Breaks down a total number of minutes into hours and remaining minutes.
         *   `hours` (`number`): Whole hours.
         *   `minutes` (`number`): Remaining minutes.
 
-
-
-### 9. `getDurationInMinutes(dateObj1, dateObj2)`
+#### 9. `getDurationInMinutes(dateObj1, dateObj2)`
 
 Calculates the duration in minutes between two date objects.
 
@@ -126,9 +120,7 @@ Calculates the duration in minutes between two date objects.
 *   **Returns:**
     *   `number`: The difference in minutes. Can be negative if `dateObj1` is before `dateObj2`.
 
-
-
-### 10. `localDateToSelectedTimeZone(dateObj, selectedTimeZone)`
+#### 10. `localDateToSelectedTimeZone(dateObj, selectedTimeZone)`
 
 Converts a date from the local system timezone to a selected target timezone.
 
@@ -138,9 +130,7 @@ Converts a date from the local system timezone to a selected target timezone.
 *   **Returns:**
     *   `Date`: A new `Date` object representing the time in the selected timezone.
 
-
-
-### 11. `getFormattedTime(dateObj)`
+#### 11. `getFormattedTime(dateObj)`
 
 Formats a date object into a 12-hour time string with AM/PM.
 
@@ -149,9 +139,7 @@ Formats a date object into a 12-hour time string with AM/PM.
 *   **Returns:**
     *   `string`: Formatted time (e.g., `"03:05 PM"`). Handles midnight (12 AM) and noon (12 PM) correctly.
 
-
-
-### 12. `getIsoFormattedTime(hours, minutes, seconds)`
+#### 12. `getIsoFormattedTime(hours, minutes, seconds)`
 
 Formats individual time components into an ISO-like time string with zero-padding.
 
@@ -162,9 +150,7 @@ Formats individual time components into an ISO-like time string with zero-paddin
 *   **Returns:**
     *   `string`: ISO formatted time (e.g., `"01:05:09"`).
 
-
-
-### 13. `fixTimeStr(timeStr)`
+#### 13. `fixTimeStr(timeStr)`
 
 Normalizes a time string that might be missing spaces or zero-padding.
 
@@ -173,9 +159,7 @@ Normalizes a time string that might be missing spaces or zero-padding.
 *   **Returns:**
     *   `string`: Normalized string (e.g., `"03:05 PM"`).
 
-
-
-### 14. `getCurrentMonthByIndex(monthIndex)`
+#### 14. `getCurrentMonthByIndex(monthIndex)`
 
 Returns the full name of a month based on its 0-indexed integer.
 
@@ -184,9 +168,7 @@ Returns the full name of a month based on its 0-indexed integer.
 *   **Returns:**
     *   `string`: Full month name (e.g., `"May"`). Returns `"January"` for invalid indices.
 
-
-
-### 15. `getNextMonth(dateObj)`
+#### 15. `getNextMonth(dateObj)`
 
 Returns a `Date` object representing the 1st day of the next month.
 
@@ -195,9 +177,7 @@ Returns a `Date` object representing the 1st day of the next month.
 *   **Returns:**
     *   `Date`: The first day of the next month. Handles year rollover (e.g., December -> January of next year).
 
-
-
-### 16. `getPrevMonth(dateObject)`
+#### 16. `getPrevMonth(dateObject)`
 
 Returns a `Date` object representing a day in the previous month. It attempts to keep the same day number, clamping to the last day of the previous month if necessary (e.g., Jan 31 -> Feb 28).
 
@@ -206,9 +186,7 @@ Returns a `Date` object representing a day in the previous month. It attempts to
 *   **Returns:**
     *   `Date`: The date in the previous month.
 
-
-
-### 17. `getNumberOfDaysOfMonth(dateObj)`
+#### 17. `getNumberOfDaysOfMonth(dateObj)`
 
 Calculates the number of days in the month of the given date.
 
@@ -217,9 +195,7 @@ Calculates the number of days in the month of the given date.
 *   **Returns:**
     *   `number`: Number of days (e.g., `28`, `30`, `31`).
 
-
-
-### 18. `getFormattedDateStr(scheduledDateObj)`
+#### 18. `getFormattedDateStr(scheduledDateObj)`
 
 Formats a date object into a readable string format.
 
@@ -228,9 +204,7 @@ Formats a date object into a readable string format.
 *   **Returns:**
     *   `string`: Format like `"May 5, 2023"`.
 
-
-
-### 19. `toLocalBusinessTimeZone(dateObj, businessTimeZone)`
+#### 19. `toLocalBusinessTimeZone(dateObj, businessTimeZone)`
 
 Converts a UTC date object to the local business time zone.
 
@@ -240,9 +214,7 @@ Converts a UTC date object to the local business time zone.
 *   **Returns:**
     *   `Date`: The date adjusted to the business timezone.
 
-
-
-### 20. `createTzScheduleObject(scheduledDate, timeOfDay, timeZone)`
+#### 20. `createTzScheduleObject(scheduledDate, timeOfDay, timeZone)`
 
 Creates a comprehensive object representing a scheduled time in a specific business timezone, converting it to ISO formats. This is the core method for handling timezone-aware scheduling.
 
@@ -265,9 +237,7 @@ Creates a comprehensive object representing a scheduled time in a specific busin
         *   `formattedDate` (`string`): Readable date (e.g., `"May 5, 2023"`).
     *   If an error occurs, returns an error object: `{ statusOk: false, message: string, src: "createLbtzSchedule" }`.
 
-
-
-### 21. `getISOFormattedDate(dateObject)`
+#### 21. `getISOFormattedDate(dateObject)`
 
 Formats a date object into an ISO-like date string.
 
@@ -276,9 +246,7 @@ Formats a date object into an ISO-like date string.
 *   **Returns:**
     *   `string`: Format `YYYY-MM-DD` (e.g., `"2023-05-05"`).
 
-
-
-### 22. `createDateRangeObject(dateObject, lastDateObject)`
+#### 22. `createDateRangeObject(dateObject, lastDateObject)`
 
 Creates an object representing a date range.
 
@@ -291,9 +259,7 @@ Creates an object representing a date range.
         *   `formattedEndDate` (`string`): ISO end date.
         *   `nextMonthDateObject` (`Date`): The first day of the month after the end date.
 
-
-
-### 23. `checkDateFlow(startDate, endDate)`
+#### 23. `checkDateFlow(startDate, endDate)`
 
 Determines if the date range is moving forward in time or backward.
 
@@ -303,9 +269,7 @@ Determines if the date range is moving forward in time or backward.
 *   **Returns:**
     *   `string`: `"forward"` if start is before end, `"backward"` otherwise.
 
-
-
-### 24. `getForwardDateRangeObjects(startDate, endDate)`
+#### 24. `getForwardDateRangeObjects(startDate, endDate)`
 
 Generates an array of date range objects covering the period from start to end, month by month.
 
@@ -315,9 +279,7 @@ Generates an array of date range objects covering the period from start to end, 
 *   **Returns:**
     *   `Array<Object>`: An array of objects returned by `createDateRangeObject`, covering each month in the range.
 
-
-
-### 25. `getBackwardDateRangeObjects(startDate, endDate)`
+#### 25. `getBackwardDateRangeObjects(startDate, endDate)`
 
 Generates an array of date range objects for a backward time range (from later date to earlier date).
 
@@ -327,9 +289,7 @@ Generates an array of date range objects for a backward time range (from later d
 *   **Returns:**
     *   `Array<Object>`: Array of date range objects, reversed to reflect the backward flow.
 
-
-
-### 26. `getDateRangeObjects(startDate, endDate)`
+#### 26. `getDateRangeObjects(startDate, endDate)`
 
 Automatically determines the direction of the date range and returns the appropriate array of range objects.
 
@@ -339,9 +299,7 @@ Automatically determines the direction of the date range and returns the appropr
 *   **Returns:**
     *   `Array<Object>`: Array of date range objects.
 
-
-
-### 27. `getDateRangeObjectsWithIsoZeroOffset(startDate, endDate, timeZone)`
+#### 27. `getDateRangeObjectsWithIsoZeroOffset(startDate, endDate, timeZone)`
 
 Similar to `getDateRangeObjects`, but adds ISO zero-offset strings for the start and end of each range in the specified timezone.
 

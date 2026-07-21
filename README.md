@@ -16,10 +16,23 @@ This library provides a set of utility functions for date manipulation, file sys
 
 ---
 
-## Date
+## Module: `date-utils`
 
-Utility functions for formatting, parsing, and manipulating dates and time zones.
-### 1. `formattedDate(dateObject)`
+This module provides a comprehensive suite of utility functions for date parsing, formatting, time zone conversions, and date range calculations. It handles both local time and UTC/Zulu time conversions, with a specific focus on normalizing local times to specific business time zones.
+
+### Testing the Module
+
+To run the tests for this module, ensure you are in the project root directory and execute the following command:
+
+```bash
+npm run test-date
+```
+
+---
+
+### API Reference
+
+#### 1. `formattedDate(dateObject)`
 
 Formats a date object into a string in the format `MM-DD-YYYY`.
 
@@ -28,9 +41,7 @@ Formats a date object into a string in the format `MM-DD-YYYY`.
 *   **Returns:**
     *   `string`: The formatted date string (e.g., `"05-23-2023"`).
 
-
-
-### 2. `getDateTimeObect(dateTime)`
+#### 2. `getDateTimeObect(dateTime)`
 
 Parses various input formats into a standard JavaScript `Date` object.
 
@@ -43,9 +54,7 @@ Parses various input formats into a standard JavaScript `Date` object.
     *   `Date`: A valid `Date` object.
     *   If the input is invalid, it catches the error and returns `new Date()` (current date).
 
-
-
-### 3. `dateTimeObject(dateObj)`
+#### 3. `dateTimeObject(dateObj)`
 
 Extracts detailed components of a date and time, providing various helper methods.
 
@@ -68,9 +77,7 @@ Extracts detailed components of a date and time, providing various helper method
         *   `fullDate` (`string`): Combined date and day (e.g., `"May 5, 2023 - Friday"`).
         *   `fullDateTime` (`string`): Full date, day, and time (e.g., `"May 5, 2023 - Friday - 03:30:45 PM"`).
 
-
-
-### 4. `getTimeElapsed(time1, time2)`
+#### 4. `getTimeElapsed(time1, time2)`
 
 Calculates the time difference between two timestamps and returns a human-readable summary.
 
@@ -82,9 +89,7 @@ Calculates the time difference between two timestamps and returns a human-readab
         *   `timeElapsed` (`string`): Detailed breakdown (e.g., `"1 hours, 30 minutes, and 45.5 seconds"`).
         *   `momentsPassed` (`string`): Human-readable summary (e.g., `"1 hour has passed."`). Note: Logic handles singular/plural grammar.
 
-
-
-### 5. `createZuluStartDate(dateObj)`
+#### 5. `createZuluStartDate(dateObj)`
 
 Creates a `Date` object representing the start of the day in UTC (Zulu time) based on the local time components of the input.
 
@@ -93,9 +98,7 @@ Creates a `Date` object representing the start of the day in UTC (Zulu time) bas
 *   **Returns:**
     *   `Date`: A new `Date` object set to UTC `+00:00` with the same year, month, day, hour, minute, second, and millisecond as the input.
 
-
-
-### 6. `getOffsetMinutesForTimezone(timeZone)`
+#### 6. `getOffsetMinutesForTimezone(timeZone)`
 
 Calculates the timezone offset in minutes relative to UTC for a given timezone.
 
@@ -104,9 +107,7 @@ Calculates the timezone offset in minutes relative to UTC for a given timezone.
 *   **Returns:**
     *   `number`: The offset in minutes (e.g., `0` for UTC, `-300` for EST).
 
-
-
-### 7. `toISOZeroOffset(input, tz)`
+#### 7. `toISOZeroOffset(input, tz)`
 
 Converts a local date/time to an ISO string with a zero offset (`+00:00`) adjusted for the specified timezone. This is useful for normalizing local times to a specific business time zone before converting to UTC.
 
@@ -116,9 +117,7 @@ Converts a local date/time to an ISO string with a zero offset (`+00:00`) adjust
 *   **Returns:**
     *   `string` | `null`: An ISO formatted string ending in `+00:00` (e.g., `"2023-05-05T10:00:00.000+00:00"`). Returns `null` if input is invalid.
 
-
-
-### 8. `getHourlyDuration(numOfMinutes)`
+#### 8. `getHourlyDuration(numOfMinutes)`
 
 Breaks down a total number of minutes into hours and remaining minutes.
 
@@ -129,9 +128,7 @@ Breaks down a total number of minutes into hours and remaining minutes.
         *   `hours` (`number`): Whole hours.
         *   `minutes` (`number`): Remaining minutes.
 
-
-
-### 9. `getDurationInMinutes(dateObj1, dateObj2)`
+#### 9. `getDurationInMinutes(dateObj1, dateObj2)`
 
 Calculates the duration in minutes between two date objects.
 
@@ -141,9 +138,7 @@ Calculates the duration in minutes between two date objects.
 *   **Returns:**
     *   `number`: The difference in minutes. Can be negative if `dateObj1` is before `dateObj2`.
 
-
-
-### 10. `localDateToSelectedTimeZone(dateObj, selectedTimeZone)`
+#### 10. `localDateToSelectedTimeZone(dateObj, selectedTimeZone)`
 
 Converts a date from the local system timezone to a selected target timezone.
 
@@ -153,9 +148,7 @@ Converts a date from the local system timezone to a selected target timezone.
 *   **Returns:**
     *   `Date`: A new `Date` object representing the time in the selected timezone.
 
-
-
-### 11. `getFormattedTime(dateObj)`
+#### 11. `getFormattedTime(dateObj)`
 
 Formats a date object into a 12-hour time string with AM/PM.
 
@@ -164,9 +157,7 @@ Formats a date object into a 12-hour time string with AM/PM.
 *   **Returns:**
     *   `string`: Formatted time (e.g., `"03:05 PM"`). Handles midnight (12 AM) and noon (12 PM) correctly.
 
-
-
-### 12. `getIsoFormattedTime(hours, minutes, seconds)`
+#### 12. `getIsoFormattedTime(hours, minutes, seconds)`
 
 Formats individual time components into an ISO-like time string with zero-padding.
 
@@ -177,9 +168,7 @@ Formats individual time components into an ISO-like time string with zero-paddin
 *   **Returns:**
     *   `string`: ISO formatted time (e.g., `"01:05:09"`).
 
-
-
-### 13. `fixTimeStr(timeStr)`
+#### 13. `fixTimeStr(timeStr)`
 
 Normalizes a time string that might be missing spaces or zero-padding.
 
@@ -188,9 +177,7 @@ Normalizes a time string that might be missing spaces or zero-padding.
 *   **Returns:**
     *   `string`: Normalized string (e.g., `"03:05 PM"`).
 
-
-
-### 14. `getCurrentMonthByIndex(monthIndex)`
+#### 14. `getCurrentMonthByIndex(monthIndex)`
 
 Returns the full name of a month based on its 0-indexed integer.
 
@@ -199,9 +186,7 @@ Returns the full name of a month based on its 0-indexed integer.
 *   **Returns:**
     *   `string`: Full month name (e.g., `"May"`). Returns `"January"` for invalid indices.
 
-
-
-### 15. `getNextMonth(dateObj)`
+#### 15. `getNextMonth(dateObj)`
 
 Returns a `Date` object representing the 1st day of the next month.
 
@@ -210,9 +195,7 @@ Returns a `Date` object representing the 1st day of the next month.
 *   **Returns:**
     *   `Date`: The first day of the next month. Handles year rollover (e.g., December -> January of next year).
 
-
-
-### 16. `getPrevMonth(dateObject)`
+#### 16. `getPrevMonth(dateObject)`
 
 Returns a `Date` object representing a day in the previous month. It attempts to keep the same day number, clamping to the last day of the previous month if necessary (e.g., Jan 31 -> Feb 28).
 
@@ -221,9 +204,7 @@ Returns a `Date` object representing a day in the previous month. It attempts to
 *   **Returns:**
     *   `Date`: The date in the previous month.
 
-
-
-### 17. `getNumberOfDaysOfMonth(dateObj)`
+#### 17. `getNumberOfDaysOfMonth(dateObj)`
 
 Calculates the number of days in the month of the given date.
 
@@ -232,9 +213,7 @@ Calculates the number of days in the month of the given date.
 *   **Returns:**
     *   `number`: Number of days (e.g., `28`, `30`, `31`).
 
-
-
-### 18. `getFormattedDateStr(scheduledDateObj)`
+#### 18. `getFormattedDateStr(scheduledDateObj)`
 
 Formats a date object into a readable string format.
 
@@ -243,9 +222,7 @@ Formats a date object into a readable string format.
 *   **Returns:**
     *   `string`: Format like `"May 5, 2023"`.
 
-
-
-### 19. `toLocalBusinessTimeZone(dateObj, businessTimeZone)`
+#### 19. `toLocalBusinessTimeZone(dateObj, businessTimeZone)`
 
 Converts a UTC date object to the local business time zone.
 
@@ -255,9 +232,7 @@ Converts a UTC date object to the local business time zone.
 *   **Returns:**
     *   `Date`: The date adjusted to the business timezone.
 
-
-
-### 20. `createTzScheduleObject(scheduledDate, timeOfDay, timeZone)`
+#### 20. `createTzScheduleObject(scheduledDate, timeOfDay, timeZone)`
 
 Creates a comprehensive object representing a scheduled time in a specific business timezone, converting it to ISO formats. This is the core method for handling timezone-aware scheduling.
 
@@ -280,9 +255,7 @@ Creates a comprehensive object representing a scheduled time in a specific busin
         *   `formattedDate` (`string`): Readable date (e.g., `"May 5, 2023"`).
     *   If an error occurs, returns an error object: `{ statusOk: false, message: string, src: "createLbtzSchedule" }`.
 
-
-
-### 21. `getISOFormattedDate(dateObject)`
+#### 21. `getISOFormattedDate(dateObject)`
 
 Formats a date object into an ISO-like date string.
 
@@ -291,9 +264,7 @@ Formats a date object into an ISO-like date string.
 *   **Returns:**
     *   `string`: Format `YYYY-MM-DD` (e.g., `"2023-05-05"`).
 
-
-
-### 22. `createDateRangeObject(dateObject, lastDateObject)`
+#### 22. `createDateRangeObject(dateObject, lastDateObject)`
 
 Creates an object representing a date range.
 
@@ -306,9 +277,7 @@ Creates an object representing a date range.
         *   `formattedEndDate` (`string`): ISO end date.
         *   `nextMonthDateObject` (`Date`): The first day of the month after the end date.
 
-
-
-### 23. `checkDateFlow(startDate, endDate)`
+#### 23. `checkDateFlow(startDate, endDate)`
 
 Determines if the date range is moving forward in time or backward.
 
@@ -318,9 +287,7 @@ Determines if the date range is moving forward in time or backward.
 *   **Returns:**
     *   `string`: `"forward"` if start is before end, `"backward"` otherwise.
 
-
-
-### 24. `getForwardDateRangeObjects(startDate, endDate)`
+#### 24. `getForwardDateRangeObjects(startDate, endDate)`
 
 Generates an array of date range objects covering the period from start to end, month by month.
 
@@ -330,9 +297,7 @@ Generates an array of date range objects covering the period from start to end, 
 *   **Returns:**
     *   `Array<Object>`: An array of objects returned by `createDateRangeObject`, covering each month in the range.
 
-
-
-### 25. `getBackwardDateRangeObjects(startDate, endDate)`
+#### 25. `getBackwardDateRangeObjects(startDate, endDate)`
 
 Generates an array of date range objects for a backward time range (from later date to earlier date).
 
@@ -342,9 +307,7 @@ Generates an array of date range objects for a backward time range (from later d
 *   **Returns:**
     *   `Array<Object>`: Array of date range objects, reversed to reflect the backward flow.
 
-
-
-### 26. `getDateRangeObjects(startDate, endDate)`
+#### 26. `getDateRangeObjects(startDate, endDate)`
 
 Automatically determines the direction of the date range and returns the appropriate array of range objects.
 
@@ -354,9 +317,7 @@ Automatically determines the direction of the date range and returns the appropr
 *   **Returns:**
     *   `Array<Object>`: Array of date range objects.
 
-
-
-### 27. `getDateRangeObjectsWithIsoZeroOffset(startDate, endDate, timeZone)`
+#### 27. `getDateRangeObjectsWithIsoZeroOffset(startDate, endDate, timeZone)`
 
 Similar to `getDateRangeObjects`, but adds ISO zero-offset strings for the start and end of each range in the specified timezone.
 
@@ -371,214 +332,558 @@ Similar to `getDateRangeObjects`, but adds ISO zero-offset strings for the start
 
 ---
 
-## File System
+## Module: `file-system-utils`
 
-Safe wrappers for Node.js `fs` and `path` modules.
+This module provides a secure wrapper around Node.js `fs` and `path` operations. It enforces a permission-based access control system defined by `userAllowedPaths`. All operations check if the target path is within the allowed paths and if the user has the specific permission (read, write, delete, execute) for that path.
 
-### `baseName(fileName, ...args)`
-- **Purpose**: Returns the base name of a file path.
-- **Arguments**: `fileName` (string), ...args (extension, optional).
-- **Returns**: `string`.
+**Security & Error Handling:**
+If a path is not within the `userAllowedPaths` or the user lacks the required permission, the function **will throw an Error** with the message `"Denied Access Error"`. It will not return `undefined` or a failure object. Consumers of this library must use `try/catch` blocks when calling these functions.
 
-### `fileExists(filePath)`
-- **Purpose**: Checks if a file exists synchronously.
-- **Arguments**: `filePath` (string).
-- **Returns**: `boolean`.
+### Testing the Module
 
-### `isFile(path)`
-- **Purpose**: Checks if a path is a file.
-- **Arguments**: `path` (string).
-- **Returns**: `boolean`.
+To run the tests for this module, ensure you are in the project root directory and execute the following command:
 
-### `isDirectory(path)`
-- **Purpose**: Checks if a path is a directory.
-- **Arguments**: `path` (string).
-- **Returns**: `boolean`.
+```bash
+npm run test-file-system
+```
 
-### `getFileExt(filePath)`
-- **Purpose**: Gets the file extension.
-- **Arguments**: `filePath` (string).
-- **Returns**: `string`.
+---
 
-### `getParentDir(filePath)`
-- **Purpose**: Gets the parent directory of a file path.
-- **Arguments**: `filePath` (string).
-- **Returns**: `string`.
+### API Reference
 
-### `readdir(dirPath, options)`
-- **Purpose**: Reads directory contents asynchronously.
-- **Arguments**: `dirPath` (string), `options` (object, optional).
-- **Returns**: `object` `{ status, result, message, data }`.
+#### 1. `getUserAllowedPathsByPermissionType(permissionType)`
 
-### `readdirSync(dirPath, options)`
-- **Purpose**: Reads directory contents synchronously.
-- **Arguments**: `dirPath` (string), `options` (object, optional).
-- **Returns**: `object` `{ status, result, message, data }`.
+Returns an array of all allowed paths that grant the specified permission type.
 
-### `mkdir(dirPath, options)`
-- **Purpose**: Creates a directory asynchronously.
-- **Arguments**: `dirPath` (string), `options` (object, optional).
-- **Returns**: `object` `{ status, result, message }`.
+*   **Arguments:**
+    *   `permissionType` (`string`): The type of permission to filter by. Common values: `"read"`, `"write"`, `"delete"`, `"execute"`.
+*   **Returns:**
+    *   `Array<Object>`: An array of permission objects (from the internal `Map`) that have the requested permission set to `true`.
+*   **Throws:**
+    *   None.
 
-### `mkdirSync(dirPath, options)`
-- **Purpose**: Creates a directory synchronously.
-- **Arguments**: `dirPath` (string), `options` (object, optional).
-- **Returns**: `object` `{ status, result, message }`.
+#### 2. `getUserAllowedPaths()`
 
-### `deleteDir(dirPath, options)`
-- **Purpose**: Deletes a directory asynchronously.
-- **Arguments**: `dirPath` (string), `options` (object, optional).
-- **Returns**: `object` `{ status, result, message }`.
+Returns an array of all allowed paths configured for the user.
 
-### `deleteDirSync(dirPath, options)`
-- **Purpose**: Deletes a directory synchronously.
-- **Arguments**: `dirPath` (string), `options` (object, optional).
-- **Returns**: `object` `{ status, result, message }`.
+*   **Arguments:**
+    *   None.
+*   **Returns:**
+    *   `Array<Object>`: An array of permission objects containing `path`, `read`, `write`, `delete`, and `execute` properties.
+*   **Throws:**
+    *   None.
 
-### `readFile(filePath, options)`
-- **Purpose**: Reads file content asynchronously.
-- **Arguments**: `filePath` (string), `options` (object, optional).
-- **Returns**: `object` `{ result, status, message, data }`.
+#### 3. `getUserFsPermission(dirPath)`
 
-### `readFileSync(filePath, options)`
-- **Purpose**: Reads file content synchronously.
-- **Arguments**: `filePath` (string), `options` (object, optional).
-- **Returns**: `object` `{ result, status, message, data }`.
+Determines if a specific path falls within any of the user's allowed paths and returns the permissions for that path.
 
-### `writeFile(filePath, data, options)`
-- **Purpose**: Writes data to a file asynchronously.
-- **Arguments**: `filePath` (string), `data` (string/buffer), `options` (object, optional).
-- **Returns**: `object` `{ result, status, message }`.
+*   **Arguments:**
+    *   `dirPath` (`string`): The file or directory path to check.
+*   **Returns:**
+    *   `Object` | `undefined`: The permission object for the containing allowed path, or `undefined` if the path is not within any allowed root.
+*   **Throws:**
+    *   None.
 
-### `writeFileSync(filePath, data, options)`
-- **Purpose**: Writes data to a file synchronously.
-- **Arguments**: `filePath` (string), `data` (string/buffer), `options` (object, optional).
-- **Returns**: `object` `{ result, status, message }`.
+#### 4. `checkDirPathPermissions(dirPath, permissionType)`
 
-### `deleteFile(filePath)`
-- **Purpose**: Deletes a file asynchronously.
-- **Arguments**: `filePath` (string).
-- **Returns**: `object` `{ status, result, message }`.
+A convenience function to check if a specific path has a specific permission.
 
-### `deleteFileSync(filePath)`
-- **Purpose**: Deletes a file synchronously.
-- **Arguments**: `filePath` (string).
-- **Returns**: `object` `{ result, status, message }`.
+*   **Arguments:**
+    *   `dirPath` (`string`): The file or directory path to check.
+    *   `permissionType` (`string`): The permission to check (e.g., `"read"`, `"write"`).
+*   **Returns:**
+    *   `boolean`: `true` if the path is allowed and has the permission; `false` otherwise.
+*   **Throws:**
+    *   None.
 
-### `getFileSize(filePath)`
-- **Purpose**: Gets file size in bytes.
-- **Arguments**: `filePath` (string).
-- **Returns**: `number` or `false`.
+#### 5. `mimeTypes`
 
-### `isFileEmpty(dirPath, options)`
-- **Purpose**: Checks if a file is empty.
-- **Arguments**: `dirPath` (string, path to file), `options` (object, optional).
-- **Returns**: `boolean`.
+A constant object mapping file extensions to their MIME types.
 
-### `isFileEmptySync(dirPath, options)`
-- **Purpose**: Checks if a file is empty (sync).
-- **Arguments**: `dirPath` (string), `options` (object, optional).
-- **Returns**: `boolean`.
+*   **Arguments:**
+    *   None.
+*   **Returns:**
+    *   `Object`: An object where keys are extensions (e.g., `"jpg"`) and values are MIME types (e.g., `"image/jpeg"`).
+*   **Throws:**
+    *   None.
 
-### `isDirectoryEmpty(dirPath, options)`
-- **Purpose**: Checks if a directory is empty.
-- **Arguments**: `dirPath` (string), `options` (object, optional).
-- **Returns**: `boolean`.
+#### 6. `baseName(fileName, ...args)`
 
-### `isDirectoryEmptySync(dirPath, options)`
-- **Purpose**: Checks if a directory is empty (sync).
-- **Arguments**: `dirPath` (string), `options` (object, optional).
-- **Returns**: `boolean`.
+Returns the last portion of a path, similar to `path.basename`.
 
-### `getAllFilesFromDirectory(dirPath, fileExt)`
-- **Purpose**: Gets all files in a directory, optionally filtered by extension.
-- **Arguments**: `dirPath` (string), `fileExt` (string, optional).
-- **Returns**: `array` of file names.
+*   **Arguments:**
+    *   `fileName` (`string`): The path to process.
+    *   `...args` (`string`): Additional arguments passed to `path.basename` (e.g., suffix to remove).
+*   **Returns:**
+    *   `string`: The base name of the file.
+*   **Throws:**
+    *   `Error`: Only if the `fileName` exists in the filesystem and the user lacks "read" permission. If the file does not exist or is a pure string, it proceeds without checking permissions.
 
-### `getAllFilesFromDirectorySync(dirPath, fileExt)`
-- **Purpose**: Sync version of `getAllFilesFromDirectory`.
-- **Arguments**: `dirPath` (string), `fileExt` (string, optional).
-- **Returns**: `array` of file names.
+#### 7. `fileExists(fileName)`
 
-### `getAllDirsFromDirectory(dirPath)`
-- **Purpose**: Gets all subdirectories in a directory.
-- **Arguments**: `dirPath` (string).
-- **Returns**: `array` of directory names.
+Checks if a file or directory exists at the given path.
 
-### `getAllDirsFromDirectorySync(dirPath)`
-- **Purpose**: Sync version of `getAllDirsFromDirectory`.
-- **Arguments**: `dirPath` (string).
-- **Returns**: `array` of directory names.
+*   **Arguments:**
+    *   `fileName` (`string`): The path to check.
+*   **Returns:**
+    *   `boolean`: `true` if it exists, `false` if it does not.
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
 
-### `getFileObject(filePath)`
-- **Purpose**: Returns an object describing a file or directory.
-- **Arguments**: `filePath` (string).
-- **Returns**: `object` `{ name, parentDir, fileType, path }`.
+#### 8. `isFile(p)`
 
-### `getAllFilesRecursively(dirPath, excludedFolders)`
-- **Purpose**: Recursively gets all files in a directory.
-- **Arguments**: `dirPath` (string), `excludedFolders` (array, optional).
-- **Returns**: `array` of file objects.
+Checks if the given path is a file.
 
-### `getAllFilesRecursivelySync(dirPath, excludedFolders)`
-- **Purpose**: Sync version of `getAllFilesRecursively`.
-- **Arguments**: `dirPath` (string), `excludedFolders` (array, optional).
-- **Returns**: `array` of file objects.
+*   **Arguments:**
+    *   `p` (`string`): The path to check.
+*   **Returns:**
+    *   `boolean`: `true` if it is a file, `false` otherwise.
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
 
-### `deleteAllFilesInDirPath(dirPath, recursive)`
-- **Purpose**: Deletes all files in a directory.
-- **Arguments**: `dirPath` (string), `recursive` (boolean, optional).
-- **Returns**: `object` `{ status, result, message, errorMessages }`.
+#### 9. `isDirectory(dirPath)`
 
-### `deleteAllDirsInDirPath(dirPath, options)`
-- **Purpose**: Deletes all subdirectories in a directory.
-- **Arguments**: `dirPath` (string), `options` (object, optional).
-- **Returns**: `object` `{ status, result, message, errorMessages }`.
+Checks if the given path is a directory.
 
-### `deleteAllInDirPath(dirPath)`
-- **Purpose**: Deletes all files and directories inside a path.
-- **Arguments**: `dirPath` (string).
-- **Returns**: `object` `{ status, result, message }`.
+*   **Arguments:**
+    *   `dirPath` (`string`): The path to check.
+*   **Returns:**
+    *   `boolean`: `true` if it is a directory, `false` otherwise.
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
 
-### `deleteAllEmptyFilesInDirectory(dirPath, recursive)`
-- **Purpose**: Deletes only empty files.
-- **Arguments**: `dirPath` (string), `recursive` (boolean).
-- **Returns**: `object` `{ status, result, message, errorMessages }`.
+#### 10. `getParentDir(filePath)`
 
-### `deleteAllEmptyDirsInDirectory(dirPath, recursive)`
-- **Purpose**: Deletes only empty directories.
-- **Arguments**: `dirPath` (string), `recursive` (boolean).
-- **Returns**: `object` `{ status, result, message, errorMessages }`.
+Returns the parent directory of the given file path.
 
-### `getMimeType(file)`
-- **Purpose**: Gets the MIME type for a file based on extension.
-- **Arguments**: `file` (string, path).
-- **Returns**: `string` (MIME type) or `undefined`.
+*   **Arguments:**
+    *   `filePath` (`string`): The file path.
+*   **Returns:**
+    *   `string` | `null`: The parent directory path, `null` if it doesn't exist (or root).
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
 
-### `getFileExtensionsByMimeType(mimeType)`
-- **Purpose**: Gets all file extensions for a MIME type.
-- **Arguments**: `mimeType` (string).
-- **Returns**: `array` of strings.
+#### 11. `getFileExt(filePath)`
 
-### `getSpecifiedExt(url, fileExtensions)`
-- **Purpose**: Finds the first matching extension in a URL.
-- **Arguments**: `url` (string), `fileExtensions` (array of strings).
-- **Returns**: `string` (extension).
+Returns the file extension of the given path.
 
-### `createDirPath(...args)`
-- **Purpose**: Creates a directory path if it doesn't exist.
-- **Arguments**: ...args (path segments).
-- **Returns**: `string` (absolute path).
+*   **Arguments:**
+    *   `filePath` (`string`): The file path.
+*   **Returns:**
+    *   `string`: The file extension (including the dot, e.g., `.txt`).
+*   **Throws:**
+    *   None. (Note: This function does *not* check permissions in the current code).
 
-### `createSvgFile(filePath, svgName, svgData)`
-- **Purpose**: Writes an SVG file.
-- **Arguments**: `filePath` (directory path), `svgName` (name), `svgData` (string).
-- **Returns**: `object` `{ imageName, imagePath }`.
+#### 12. `readdir(dirPath, options)`
 
-### `getAppDataDirPath()`
-- **Purpose**: Gets the OS-specific application data directory.
-- **Arguments**: None.
-- **Returns**: `string` (path).
+Asynchronously reads the contents of a directory.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The path to the directory.
+    *   `options` (`Object`): Options for `fs.promises.readdir` (default: `{ encoding: "utf8" }`).
+*   **Returns:**
+    *   `Promise<Object>`:
+        *   On success: `{ status: "success", result: true, message: string, data: Array<string> }`
+        *   On failure: `{ status: "failed", result: false, message: string, reason: string }`
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
+
+#### 13. `readdirSync(dirPath, options)`
+
+Synchronously reads the contents of a directory.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The path to the directory.
+    *   `options` (`Object`): Options for `fs.readdirSync` (default: `{ encoding: "utf8" }`).
+*   **Returns:**
+    *   `Object`:
+        *   On success: `{ status: "success", result: true, message: string, data: Array<string> }`
+        *   On failure: `{ status: "failed", result: false, message: string, reason: string }`
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
+
+#### 14. `mkdir(dirPath, options)`
+
+Asynchronously creates a directory.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The path to the new directory.
+    *   `options` (`Object`): Options for `fs.promises.mkdir` (default: `{ recursive: true }`).
+*   **Returns:**
+    *   `Promise<Object>`:
+        *   On success: `{ status: "success", result: true, message: string }`
+        *   On failure: `{ status: "failed", result: false, message: string, reason: string }`
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "write" permission.
+
+#### 15. `mkdirSync(dirPath, options)`
+
+Synchronously creates a directory.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The path to the new directory.
+    *   `options` (`Object`): Options for `fs.mkdirSync` (default: `{ recursive: true }`).
+*   **Returns:**
+    *   `Object`:
+        *   On success: `{ status: "success", result: true, message: string }`
+        *   On failure: `{ status: "failed", result: false, message: string, reason: string }`
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "write" permission.
+
+#### 16. `deleteDir(dirPath, options)`
+
+Asynchronously deletes a directory.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The path to the directory to delete.
+    *   `options` (`Object`): Options for `fs.promises.rm` (default: `{ recursive: true }`).
+*   **Returns:**
+    *   `Promise<Object>`:
+        *   On success: `{ status: "success", result: true, message: string }`
+        *   On failure: `{ status: "failed", result: false, message: string, reason: string }`
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "delete" permission.
+
+#### 17. `deleteDirSync(dirPath, options)`
+
+Synchronously deletes a directory.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The path to the directory to delete.
+    *   `options` (`Object`): Options for `fs.rmSync` (default: `{ recursive: true }`).
+*   **Returns:**
+    *   `Object`:
+        *   On success: `{ status: "success", result: true, message: string }`
+        *   On failure: `{ status: "failed", result: false, message: string, reason: string }`
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "delete" permission.
+
+#### 18. `readFile(filePath, options)`
+
+Asynchronously reads the content of a file.
+
+*   **Arguments:**
+    *   `filePath` (`string`): The path to the file.
+    *   `options` (`Object`): Options for `fs.promises.readFile` (default: `{ encoding: "utf8" }`).
+*   **Returns:**
+    *   `Promise<Object>`:
+        *   On success: `{ result: true, status: "success", message: string, data: string | Buffer }`
+        *   On failure: `{ result: false, status: "failed", message: string, reason: string }`
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
+
+#### 19. `readFileSync(filePath, options)`
+
+Synchronously reads the content of a file.
+
+*   **Arguments:**
+    *   `filePath` (`string`): The path to the file.
+    *   `options` (`Object`): Options for `fs.readFileSync` (default: `{ encoding: "utf8" }`).
+*   **Returns:**
+    *   `Object`:
+        *   On success: `{ result: true, status: "success", message: string, data: string | Buffer }`
+        *   On failure: `{ result: false, status: "failed", message: string, reason: string }`
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
+
+#### 20. `writeFile(filePath, data, options)`
+
+Asynchronously writes data to a file.
+
+*   **Arguments:**
+    *   `filePath` (`string`): The path to the file.
+    *   `data` (`string` | `Buffer`): The data to write.
+    *   `options` (`Object`): Options for `fs.promises.writeFile` (default: `{ encoding: "utf8" }`).
+*   **Returns:**
+    *   `Promise<Object>`:
+        *   On success: `{ result: true, status: "success", message: string }`
+        *   On failure: `{ result: false, status: "failed", message: string, reason: string }`
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "write" permission.
+
+#### 21. `writeFileSync(filePath, data, options)`
+
+Synchronously writes data to a file.
+
+*   **Arguments:**
+    *   `filePath` (`string`): The path to the file.
+    *   `data` (`string` | `Buffer`): The data to write.
+    *   `options` (`Object`): Options for `fs.writeFileSync` (default: `{ encoding: "utf8" }`).
+*   **Returns:**
+    *   `Object`:
+        *   On success: `{ result: true, status: "success", message: string }`
+        *   On failure: `{ result: false, status: "failed", message: string, reason: string }`
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "write" permission.
+
+#### 22. `deleteFile(filePath)`
+
+Asynchronously deletes a file.
+
+*   **Arguments:**
+    *   `filePath` (`string`): The path to the file.
+*   **Returns:**
+    *   `Promise<Object>`:
+        *   On success: `{ status: "successful", result: true, message: string }`
+        *   On failure: `{ status: "unchanged", result: false, message: string, reason: string }`
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "delete" permission.
+
+#### 23. `deleteFileSync(filePath)`
+
+Synchronously deletes a file.
+
+*   **Arguments:**
+    *   `filePath` (`string`): The path to the file.
+*   **Returns:**
+    *   `Object`:
+        *   On success: `{ result: true, status: "success", message: string }`
+        *   On failure: `{ result: false, status: "failed", message: string, reason: string }`
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "delete" permission.
+
+#### 24. `getFileSize(filePath)`
+
+Asynchronously gets the size of a file in bytes.
+
+*   **Arguments:**
+    *   `filePath` (`string`): The path to the file.
+*   **Returns:**
+    *   `Promise<number>` | `Promise<false>`: The size in bytes, or `false` if the file does not exist.
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
+
+#### 25. `isFileEmpty(filePath, options)`
+
+Asynchronously checks if a file is empty.
+
+*   **Arguments:**
+    *   `filePath` (`string`): The path to the file.
+    *   `options` (`Object`): Options for reading the file.
+*   **Returns:**
+    *   `Promise<boolean>`: `true` if the file is empty, `false` if it has content.
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
+
+#### 26. `isFileEmptySync(filePath, options)`
+
+Synchronously checks if a file is empty.
+
+*   **Arguments:**
+    *   `filePath` (`string`): The path to the file.
+    *   `options` (`Object`): Options for reading the file.
+*   **Returns:**
+    *   `boolean`: `true` if the file is empty, `false` if it has content.
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
+
+#### 27. `isDirectoryEmpty(dirPath, options)`
+
+Asynchronously checks if a directory is empty.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The path to the directory.
+    *   `options` (`Object`): Options for reading the directory.
+*   **Returns:**
+    *   `Promise<boolean>`: `true` if the directory is empty, `false` otherwise.
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
+
+#### 28. `isDirectoryEmptySync(dirPath, options)`
+
+Synchronously checks if a directory is empty.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The path to the directory.
+    *   `options` (`Object`): Options for reading the directory.
+*   **Returns:**
+    *   `boolean`: `true` if the directory is empty, `false` otherwise.
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
+
+#### 29. `getAllFilesFromDirectory(dirPath, fileExt)`
+
+Asynchronously retrieves a list of files in a directory, optionally filtered by extension.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The path to the directory.
+    *   `fileExt` (`string`): Optional extension filter (e.g., `".txt"`).
+*   **Returns:**
+    *   `Promise<Array<string>>`: An array of filenames (not full paths).
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
+
+#### 30. `getAllFilesFromDirectorySync(dirPath, fileExt)`
+
+Synchronously retrieves a list of files in a directory, optionally filtered by extension.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The path to the directory.
+    *   `fileExt` (`string`): Optional extension filter (e.g., `".txt"`).
+*   **Returns:**
+    *   `Array<string>`: An array of filenames (not full paths).
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
+
+#### 31. `getAllDirsFromDirectory(dirPath)`
+
+Asynchronously retrieves a list of subdirectories in a directory.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The path to the directory.
+*   **Returns:**
+    *   `Promise<Array<string>>`: An array of subdirectory names.
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
+
+#### 32. `getAllDirsFromDirectorySync(dirPath)`
+
+Synchronously retrieves a list of subdirectories in a directory.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The path to the directory.
+*   **Returns:**
+    *   `Array<string>`: An array of subdirectory names.
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
+
+#### 33. `getAllFilesRecursively(dirPath, excludedFolders)`
+
+Asynchronously retrieves all files in a directory tree.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The root directory.
+    *   `excludedFolders` (`Array<string>`): Names of folders to skip.
+*   **Returns:**
+    *   `Promise<Array<Object>>`: An array of file objects with `name`, `parentDir`, `fileType`, `path`, and `includedFiles` (if directory).
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
+
+#### 34. `getAllFilesRecursivelySync(dirPath, excludedFolders)`
+
+Synchronously retrieves all files in a directory tree.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The root directory.
+    *   `excludedFolders` (`Array<string>`): Names of folders to skip.
+*   **Returns:**
+    *   `Array<Object>`: An array of file objects with `name`, `parentDir`, `fileType`, `path`, and `includedFiles` (if directory).
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "read" permission.
+
+#### 35. `deleteAllFilesInDirPath(dirPath, recursive)`
+
+Asynchronously deletes all files in a directory, optionally recursing into subdirectories.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The root directory.
+    *   `recursive` (`boolean`): If `true`, deletes files in subdirectories too.
+*   **Returns:**
+    *   `Promise<Object>`:
+        *   On success: `{ status: "success", result: true, message: string }`
+        *   On failure: `{ status: "failed", result: false, message: string, errorMessages: Array<string> }`
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "delete" permission.
+
+#### 36. `deleteAllDirsInDirPath(dirPath, options)`
+
+Asynchronously deletes all subdirectories in a directory.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The root directory.
+    *   `options` (`Object`): Options for deletion.
+*   **Returns:**
+    *   `Promise<Object>`:
+        *   On success: `{ status: "success", result: true, message: string }`
+        *   On failure: `{ status: "failed", result: false, message: string, errorMessages: Array<string> }`
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "delete" permission.
+
+#### 37. `deleteAllInDirPath(dirPath)`
+
+Asynchronously deletes all files and directories inside a directory.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The root directory.
+*   **Returns:**
+    *   `Promise<Object>`:
+        *   On success: `{ result: true, status: "success", message: string }`
+        *   On failure: `{ result: false, status: "failed", errorMessages: Array<string> }`
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "delete" permission.
+
+#### 38. `deleteAllEmptyFilesInDirectory(dirPath, recursive)`
+
+Asynchronously deletes all empty files in a directory, optionally recursing.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The root directory.
+    *   `recursive` (`boolean`): If `true`, deletes empty files in subdirectories.
+*   **Returns:**
+    *   `Promise<Object>`:
+        *   On success: `{ status: "success", result: true, message: string }`
+        *   On failure: `{ status: "failed", result: false, message: string, errorMessages: Array<string> }`
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "delete" permission.
+
+#### 39. `deleteAllEmptyDirsInDirectory(dirPath, recursive)`
+
+Asynchronously deletes all empty directories in a directory, optionally recursing.
+
+*   **Arguments:**
+    *   `dirPath` (`string`): The root directory.
+    *   `recursive` (`boolean`): If `true`, deletes empty directories in subdirectories.
+*   **Returns:**
+    *   `Promise<Object>`:
+        *   On success: `{ status: "success", result: true, message: string }`
+        *   On failure: `{ status: "failed", result: false, message: string, errorMessages: Array<string> }`
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "delete" permission.
+
+#### 40. `getMimeType(file)`
+
+Gets the MIME type for a file based on its extension.
+
+*   **Arguments:**
+    *   `file` (`string`): The file path or filename.
+*   **Returns:**
+    *   `string` | `null`: The MIME type, or `null` if the extension is not found in the `mimeTypes` map.
+*   **Throws:**
+    *   `Error`: If the path is provided, exists in the filesystem, is a directory, or if a filename is provided without an extension.
+
+#### 41. `getFileExtensionsByMimeType(mimeType)`
+
+Gets all file extensions associated with a specific MIME type.
+
+*   **Arguments:**
+    *   `mimeType` (`string`): The MIME type (e.g., `"image/png"`).
+*   **Returns:**
+    *   `Array<string>`: An array of extensions (e.g., `["png"]`).
+*   **Throws:**
+    *   None.
+
+#### 42. `getSpecifiedExt(url, fileExtensions)`
+
+Finds the first extension from a list that appears in the URL.
+
+*   **Arguments:**
+    *   `url` (`string`): The URL or filename.
+    *   `fileExtensions` (`Array<string>`): List of extensions to check.
+*   **Returns:**
+    *   `string`: The first matching extension found in the URL.
+*   **Throws:**
+    *   None.
+
+#### 43. `createDirPath(...args)`
+
+Asynchronously creates a directory path if it does not exist.
+
+*   **Arguments:**
+    *   `...args` (`string`): Parts of the path to join and create.
+*   **Returns:**
+    *   `Promise<string>`: The created directory path.
+*   **Throws:**
+    *   `Error`: If the path is not allowed or lacks "write" permission.
 
 ---
 
