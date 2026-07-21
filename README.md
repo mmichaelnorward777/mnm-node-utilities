@@ -78,6 +78,9 @@ This means:
 
 By default, the library operates using safe writable locations when no paths are provided, helping prevent accidental access to protected system files.
 
+
+
+
 ---
 
 ## Example Use Cases
@@ -165,7 +168,7 @@ const utils = getUtilities({
 ```
 
 #### Option 2: Objects (Custom Permissions)
-If you provide an object, you can specify granular permissions (`r`ead, `w`rite, `d`elete, `e`xecute).
+If you provide an object, you can specify granular permissions (`r`ead, `w`rite, `d`elete, `x` execute).
 
 ```javascript
 const utils = getUtilities({
@@ -196,6 +199,42 @@ const utils = getUtilities({
     userAllowedPaths: [] // Defaults to Safe Writable Paths
 });
 ```
+
+### Immutable Security Configuration
+
+The `userAllowedPaths` configuration is immutable after the library has been initialized. Once the utility instance is created, the configured paths and their associated permissions become part of the library's internal security model and cannot be modified at runtime.
+
+This design choice ensures that the application's security boundaries remain constant throughout its lifecycle.
+
+#### Reasons for this implementation?
+
+- Prevents accidental or malicious runtime modification of filesystem permissions.
+- Ensures that security-sensitive operations always operate against a trusted and predictable permission set.
+- Makes permission checks deterministic and easier to reason about.
+
+#### Runtime Security
+
+Once initialized, an application's allowed paths and permissions are locked for the lifetime of that utility instance.
+
+```javascript
+const utils = getUtilities({
+    userAllowedPaths: [
+        {
+            path: "./workspace",
+            permissions: "rwd"
+        }
+    ]
+});
+
+// Permissions cannot be modified at runtime.
+```
+
+#### Updating Permissions
+
+Any changes to the configured `userAllowedPaths` require the creation of a new utility instance or a full application restart.
+
+This behavior is intentional and follows the principle that security capabilities should be established during initialization rather than modified dynamically at runtime.
+
 
 ---
 
