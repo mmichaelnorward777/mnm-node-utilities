@@ -337,7 +337,18 @@ Similar to `getDateRangeObjects`, but adds ISO zero-offset strings for the start
 This module provides a secure wrapper around Node.js `fs` and `path` operations. It enforces a permission-based access control system defined by `userAllowedPaths`. All operations check if the target path is within the allowed paths and if the user has the specific permission (read, write, delete, execute) for that path.
 
 **Security & Error Handling:**
-If a path is not within the `userAllowedPaths` or the user lacks the required permission, the function **will throw an Error** with the message `"Denied Access Error"`. It will not return `undefined` or a failure object. Consumers of this library must use `try/catch` blocks when calling these functions.
+
+To ensure data safety and strict access control, all file system operations are governed by the `userAllowedPaths` configuration. If a requested path is not explicitly included in this list, or if the user lacks the necessary permission (read, write, delete, or execute) for that path, the function will immediately **throw an Error** with the message `"Denied Access Error"`.
+
+*   **No Silent Failures:** Functions will never return `undefined` or a failure object to indicate permission denial. This design choice ensures that security breaches are never accidentally ignored.
+*   **Required Error Handling:** Consumers of this library **must** wrap their file system calls in `try/catch` blocks to handle potential permission errors gracefully.
+*   **Automatic Safe Path Resolution:** If no `userAllowedPaths` are provided (or an empty array is passed), the library automatically initializes a secure set of writable paths. This includes:
+    *   The user's Home Directory.
+    *   The Application Data directory (e.g., `~/.config` on Linux/Mac, `%APPDATA%` on Windows).
+    *   Secondary drives (excluding the primary OS partition on Windows).
+    *   Removable media (mounted volumes on macOS/Linux).
+    
+    This ensures that the application always operates within a safe, user-writable context by default, preventing accidental access to protected system files.
 
 ### Testing the Module
 
@@ -1072,90 +1083,95 @@ Object and array manipulation.
 
 ---
 
-## String
+## Module: `string-utils`
 
-String manipulation utilities.
+This module provides a set of utility functions for string manipulation, including formatting, case conversion, slug generation, and abbreviation extraction. These utilities are essential for preparing data for URLs, database keys, or user-facing display text.
 
-### `toUrl(str)`
-- **Purpose**: Converts string to URL-friendly slug (lowercase, hyphens).
-- **Arguments**: `str` (string).
-- **Returns**: `string`.
+### Testing the Module
 
-### `toCapitalize(str)`
-- **Purpose**: Capitalizes first letter, lowers rest.
-- **Arguments**: `str` (string).
-- **Returns**: `string`.
+To run the tests for this module, ensure you are in the project root directory and execute the following command:
 
-### `toCapitalizeAll(str)`
-- **Purpose**: Capitalizes first letter of each word.
-- **Arguments**: `str` (string).
-- **Returns**: `string`.
+```bash
+npm run test-all
+```
 
-### `toNormalString(str, previousFormat)`
-- **Purpose**: Converts camelCase/kebab-case/underscored to normal title case.
-- **Arguments**: `str` (string), `previousFormat` (string, default "camel-case").
-- **Returns**: `string`.
-
-### `getInitials(str)`
-- **Purpose**: Gets initials from a name string.
-- **Arguments**: `str` (string).
-- **Returns**: `string`.
-
-### `toCamelCase(str, url, initialCap)`
-- **Purpose**: Converts string to camelCase.
-- **Arguments**: `str` (string), `url` (boolean, use hyphens), `initialCap` (boolean).
-- **Returns**: `string`.
+*(Note: There is no specific `npm run test-string` script defined in `package.json` yet, but the tests are included in the general test runner.)*
 
 ---
 
-## URL
+### API Reference
 
-URL parsing and construction.
+#### 1. `toUrl(str)`
 
-### `urlConstructor(urlString)`
-- **Purpose**: Reconstructs a URL with protocol and domain.
-- **Arguments**: `urlString` (string).
-- **Returns**: `string`.
+Converts a string into a URL-friendly slug by lowercasing, trimming, removing special characters, and replacing spaces with hyphens.
 
-### `objectToQueryString(obj, prefix)`
-- **Purpose**: Converts an object to a query string.
-- **Arguments**: `obj` (object), `prefix` (string, optional).
-- **Returns**: `string`.
+*   **Arguments:**
+    *   `str` (`string`): The input string to convert.
+*   **Returns:**
+    *   `string`: A URL-safe slug (e.g., `"hello-world"`).
+*   **Throws:**
+    *   None.
 
-### `queryStringToObject(queryString)`
-- **Purpose**: Parses a query string into an object.
-- **Arguments**: `queryString` (string).
-- **Returns**: `object`.
+#### 2. `toCapitalize(str)`
 
-### `urlToQueryStringObject(urlString, trailingSlash)`
-- **Purpose**: Parses a URL into origin, path, and query object.
-- **Arguments**: `urlString` (string), `trailingSlash` (boolean, default false).
-- **Returns**: `object` `{ queryObject, originalUrl, origin, pathName, queryString, urlWithoutQueryString }`.
+Capitalizes the first letter of a string and lowercases the rest.
 
-### `objectToDotNotation(obj, prefix, res)`
-- **Purpose**: Converts nested object to dot notation keys.
-- **Arguments**: `obj` (object), `prefix` (string, optional), `res` (object, optional).
-- **Returns**: `object`.
+*   **Arguments:**
+    *   `str` (`string`): The input string.
+*   **Returns:**
+    *   `string`: The capitalized string (e.g., `"Hello"`).
+*   **Throws:**
+    *   None.
 
-### `dotNotationToObject(dotObj)`
-- **Purpose**: Converts dot notation object back to nested object.
-- **Arguments**: `dotObj` (object).
-- **Returns**: `object`.
+#### 3. `toCapitalizeAll(str)`
 
-### `getDomain(url)`
-- **Purpose**: Removes protocol and www from URL.
-- **Arguments**: `url` (string).
-- **Returns**: `string`.
+Capitalizes the first letter of every word in a string.
 
-### `checkSubDomain(mainUrl, subUrl)`
-- **Purpose**: Checks if subUrl is a subdomain of mainUrl.
-- **Arguments**: `mainUrl` (string), `subUrl` (string).
-- **Returns**: `boolean`.
+*   **Arguments:**
+    *   `str` (`string`): The input string.
+*   **Returns:**
+    *   `string`: The string with all words capitalized (e.g., `"Hello World"`).
+*   **Throws:**
+    *   None.
 
-### `cleanApiUrl(apiEndpoint, baseUrl, categorizedSetId, page, limit, pathFilter)`
-- **Purpose**: Cleans and constructs an API URL with standard params.
-- **Arguments**: `apiEndpoint` (string), `baseUrl` (string), `categorizedSetId` (string/number), `page` (number), `limit` (number), `pathFilter` (string).
-- **Returns**: `string` (clean URL).
+#### 4. `toNormalString(str, previousFormat)`
+
+Converts a formatted string (like `camelCase`, `kebab-case`, or `snake_case`) into a readable "Normal Case" string with spaces.
+
+*   **Arguments:**
+    *   `str` (`string`): The input string.
+    *   `previousFormat` (`string`, optional): The previous formatting style.
+        *   `"camel-case"` (default): e.g., `"helloWorld"` -> `"Hello World"`.
+        *   `"kebab-case"`: e.g., `"hello-world"` -> `"Hello World"`.
+        *   `"underscored"`: e.g., `"hello_world"` -> `"Hello World"`.
+*   **Returns:**
+    *   `string`: The normalised string (e.g., `"Hello World"`).
+*   **Throws:**
+    *   None.
+
+#### 5. `getInitials(str)`
+
+Extracts the initials from a full name or string.
+
+*   **Arguments:**
+    *   `str` (`string`): The input string (e.g., `"John Doe"`).
+*   **Returns:**
+    *   `string` | `null`: The initials in uppercase (e.g., `"JD"`), or `null` if the input is empty or null.
+*   **Throws:**
+    *   None.
+
+#### 6. `toCamelCase(str, url, initialCap)`
+
+Converts a string into `camelCase` or `PascalCase`.
+
+*   **Arguments:**
+    *   `str` (`string`): The input string.
+    *   `url` (`boolean`, optional): If `true`, treats hyphens (`-`) as separators instead of spaces.
+    *   `initialCap` (`boolean`, optional): If `true`, capitalizes the first letter of the resulting camelCase string (PascalCase).
+*   **Returns:**
+    *   `string`: The camelCase string (e.g., `"helloWorld"` or `"HelloWorld"`).
+*   **Throws:**
+    *   None.
 
 ---
 

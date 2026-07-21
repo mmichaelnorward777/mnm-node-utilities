@@ -5,6 +5,8 @@ import getSafeWritablePaths from "./helpers/get-safe-writable-paths.js";
 
 export default function getFileSystemUtils({userAllowedPaths})    {
 
+    userAllowedPaths = Array.isArray(userAllowedPaths) ? userAllowedPaths : [];
+
     function isFileNsVersion(p) {
         try {
             const stats = fs.statSync(p);

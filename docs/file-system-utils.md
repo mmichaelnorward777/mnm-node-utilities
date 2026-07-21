@@ -3,7 +3,18 @@
 This module provides a secure wrapper around Node.js `fs` and `path` operations. It enforces a permission-based access control system defined by `userAllowedPaths`. All operations check if the target path is within the allowed paths and if the user has the specific permission (read, write, delete, execute) for that path.
 
 **Security & Error Handling:**
-If a path is not within the `userAllowedPaths` or the user lacks the required permission, the function **will throw an Error** with the message `"Denied Access Error"`. It will not return `undefined` or a failure object. Consumers of this library must use `try/catch` blocks when calling these functions.
+
+To ensure data safety and strict access control, all file system operations are governed by the `userAllowedPaths` configuration. If a requested path is not explicitly included in this list, or if the user lacks the necessary permission (read, write, delete, or execute) for that path, the function will immediately **throw an Error** with the message `"Denied Access Error"`.
+
+*   **No Silent Failures:** Functions will never return `undefined` or a failure object to indicate permission denial. This design choice ensures that security breaches are never accidentally ignored.
+*   **Required Error Handling:** Consumers of this library **must** wrap their file system calls in `try/catch` blocks to handle potential permission errors gracefully.
+*   **Automatic Safe Path Resolution:** If no `userAllowedPaths` are provided (or an empty array is passed), the library automatically initializes a secure set of writable paths. This includes:
+    *   The user's Home Directory.
+    *   The Application Data directory (e.g., `~/.config` on Linux/Mac, `%APPDATA%` on Windows).
+    *   Secondary drives (excluding the primary OS partition on Windows).
+    *   Removable media (mounted volumes on macOS/Linux).
+    
+    This ensures that the application always operates within a safe, user-writable context by default, preventing accidental access to protected system files.
 
 ### Testing the Module
 

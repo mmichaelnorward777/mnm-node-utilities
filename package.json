@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "test-all": "node ./test/run-all-tests.js",
     "test-date" : "node ./test/date-utils-test.js",
-    "test-file-system" : "node ./test/file-system-utils-test.js"
+    "test-file-system" : "node ./test/file-system-utils-test.js",
+    "test-string-utils" : "node ./test/string-utils-test.js"
   },
   "keywords": [
     "mnm-node-utilities"

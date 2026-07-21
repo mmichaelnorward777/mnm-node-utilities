@@ -14,7 +14,7 @@ export default function getStringUtils()   {
     }
 
     function toCapitalizeAll(str) {
-        return str.split(" ").map(item => toCapitalize(item)).join(" ");
+        return str.split(" ").map(item => toCapitalize(item.trim())).join(" ");
     }
 
     function toNormalString(str, previousFormat = "camel-case") {
