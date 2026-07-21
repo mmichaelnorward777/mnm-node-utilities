@@ -146,30 +146,43 @@ export default function getFileSystemUtils({userAllowedPaths})    {
         return Array.from(userFileSystemPermissions.values());
     }
 
-    function getUserFsPermission(dirPath)   {
-        if(isFileNsVersion(dirPath)) {
-            dirPath = getParentDirNsVersion(dirPath);
+    function isPathContained(parentPath, targetPath, permissionType) {
+        
+        const resolvedParent = path.resolve(parentPath); // fs.realpathSync(path.resolve(parentPath));
+        const resolvedTarget = path.resolve(targetPath); // fs.realpathSync();
+
+        // const resolvedParent = fs.realpathSync(path.resolve(parentPath));
+        // const resolvedTarget = fs.realpathSync(targetPath);
+
+        // Exact match
+        if (resolvedTarget === resolvedParent) {
+            return true;
         }
+        // Child path match
+        return resolvedTarget.startsWith(
+            resolvedParent + path.sep
+        );
+    }
 
-        let absoluteCwd = path.resolve(dirPath).replace(/\\/g, "/"),
-            userAllowedPaths = getUserAllowedPaths();
+    function getUserFsPermission(dirPath, permissionType)   {
+        const absoluteDirPath = path.resolve(dirPath);
+        const userAllowedPaths = getUserAllowedPaths();
 
-        return userAllowedPaths.find(allowedPath => {
-            const resolvedAllowed = path.resolve(allowedPath.path).replace(/\\/g, "/");
-            // Ensure we check for directory containment strictly
-            const isContained = absoluteCwd.startsWith(resolvedAllowed) || 
-                                absoluteCwd === resolvedAllowed;
-            return isContained;
+        return userAllowedPaths.find(({ path: allowedPath }) => {
+            try {
+                return isPathContained(
+                    allowedPath,
+                    absoluteDirPath,
+                    permissionType
+                );
+            } catch {
+                return false;
+            }
         });
 
     }
 
     function getDeniedError()   {
-        console.error({
-            status : "FAILED",
-            result : false,
-            message : "Denied Acced Permission : This file/directory you are trying to access may not be listed in the userAllowedPaths in the configuration, or may not have the read, write, delete or execute permissions that may be required to proceed with the operation."
-        });
         throw new Error("Denied Access Error");
     }
 
@@ -179,7 +192,7 @@ export default function getFileSystemUtils({userAllowedPaths})    {
             return false;
         }
         
-        let foundUserFsPermission = getUserFsPermission(dirPath);
+        let foundUserFsPermission = getUserFsPermission(dirPath, permissionType);
 
         if(!foundUserFsPermission)    {
             return false;

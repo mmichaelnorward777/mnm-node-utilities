@@ -28,7 +28,7 @@ export default function getGeneralUtils()   {
                         i = 0;
                     }
                     i++;
-                }, 100);
+                }, 10);
         });
     }
 

@@ -1,5 +1,11 @@
 # MNM-NODE-UTILITIES
 
+A capability-based, security-first utility library for Node.js applications.
+
+Built for modern Node.js applications, automation tools, AI agents, Electron apps, CLIs, and local AI runtimes, MNM Node Utilities provides a collection of lightweight utility modules while enforcing a strict permission-based security model for file system and system-level operations.
+
+Unlike traditional utility libraries that expose unrestricted access to the underlying operating system, this library treats security as a first-class feature. Every file system operation, child process execution, and system command can be sandboxed and restricted to explicitly allowed locations.
+
 **A modular, security-first utility library for Node.js applications**. It provides robust helpers for ***Date manipulation***, ***File System*** operations, ***Data transformation*** (Objects, Arrays, Strings, URLs), ***JSON persistence***, and ***Node.js*** runtime utilities.
 
 **Security & AI Safety**:
@@ -10,8 +16,104 @@ This library doesn't require you to install any other external modules.
 
 All modules are built as ES Modules, are lightweight, framework-agnostic, and easy to integrate into any Node.js project.
 
+---
 
-## Table of Contents
+## Why MNM Node Utilities?
+
+Most utility libraries solve one problem:
+
+- Date manipulation
+- File system helpers
+- Object utilities
+- URL parsing
+
+MNM Node Utilities was designed to solve a different problem:
+
+> How do we build secure and reusable runtime capabilities for Node.js applications?
+
+The library combines commonly used utility functions with a capability-based permission system that allows developers to safely expose file system and operating system functionality without giving unrestricted access to the host machine.
+
+This makes it particularly useful for:
+
+- AI agents and AI runtimes
+- Automation tools
+- Electron applications
+- CLIs
+- Multi-agent systems
+- Local AI models
+- Secure scripting environments
+- General Node.js applications
+
+---
+
+## Core Principles
+
+- Security First
+- Capability Based Permissions
+- Zero External Dependencies
+- Lightweight and Modular
+- Framework Agnostic
+- AI Friendly
+- Cross Platform Support
+
+---
+
+## Security Model
+
+Every operation in this library follows an explicit permission model.
+
+```javascript
+getUtilities({
+    userAllowedPaths: [
+        {
+            path: "./workspace",
+            permissions: "rw"
+        }
+    ]
+});
+```
+
+This means:
+
+- Reading outside the workspace is denied.
+- Writing outside the workspace is denied.
+- System commands cannot be executed unless explicitly allowed.
+- Child processes are restricted to approved locations.
+
+By default, the library operates using safe writable locations when no paths are provided, helping prevent accidental access to protected system files.
+
+---
+
+## Example Use Cases
+
+AI Runtime
+
+- Restrict AI generated code to a sandboxed workspace.
+- Safely expose file system capabilities to local LLMs.
+- Prevent destructive operations on host machines.
+
+Automation Tools
+
+- Securely execute scripts.
+- Manage files and directories.
+- Create portable automation workflows.
+
+Electron Applications
+
+- Store application data.
+- Restrict user accessible directories.
+- Execute trusted commands.
+
+CLI Tools
+
+- Create capability-based command line applications.
+- Perform safe file operations.
+- Build portable developer tools.
+
+
+---
+
+## What's Included?
 1. [Installation](#installation)
 2. [Usage](#usage)
 3. Modules
