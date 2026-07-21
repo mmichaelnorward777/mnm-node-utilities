@@ -1,17 +1,17 @@
 {
   "name": "mnm-node-utilities",
-  "version": "2.0.2",
+  "version": "3.0.0",
   "description": "security-first Node.js utility library with strict permission controls, ideal for AI harnesses to safely manage file systems, commands, and data transformation.",
   "main": "index.js",
   "scripts": {
-    "test-date" : "node ./test/date-utils-test.js",
-    "test-file-system" : "node ./test/file-system-utils-test.js",
-    "test-string-utils" : "node ./test/string-utils-test.js",
-    "test-url-utils" : "node ./test/url-utils-test.js",
-    "test-general-utils" : "node ./test/general-utils-test.js",
-    "test-json-utils" : "node ./test/json-utils-test.js",
-    "test-node-utils" : "node ./test/node-utils-test.js",
-    "test-objects-array-utils" : "node ./test/objects-array-utils-test.js"
+    "test-date": "node ./test/date-utils-test.js",
+    "test-file-system": "node ./test/file-system-utils-test.js",
+    "test-string-utils": "node ./test/string-utils-test.js",
+    "test-url-utils": "node ./test/url-utils-test.js",
+    "test-general-utils": "node ./test/general-utils-test.js",
+    "test-json-utils": "node ./test/json-utils-test.js",
+    "test-node-utils": "node ./test/node-utils-test.js",
+    "test-objects-array-utils": "node ./test/objects-array-utils-test.js"
   },
   "keywords": [
     "nodejs",
