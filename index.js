@@ -50,22 +50,3 @@ export default function getUtilities(config)  {
     }
 
 }
-
-// const {} = getFileSystemUtils()
-
-// // Merge all named exports into a single utilities object
-// export const utilities = {
-//     ...nodeUtilities,
-//     ...generalUtilities,
-//     ...jsonUtilities,
-//     ...fileSystemUtilities,
-//     ...dateUtilities,
-//     ...objectsArrayUtilities,
-//     ...stringUtilities,
-//     ...urlUtilities,
-//     ...webPageUtilities,
-//     ...webRequestsUtilities,
-// };
-
-// // Export the combined object as default for easy importing
-// export default utilities;

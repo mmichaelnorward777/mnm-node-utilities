@@ -5,153 +5,150 @@ import * as fs from 'fs';
 
 export default function getNodeUtils({ checkDirPathPermissions, getUserAllowedPaths }) {
 
-    // 1. Secure Child Process Spawning
+    // Strict list of explicitly banned system binaries
+    const BANNED_BINARIES = new Set([
+        'git', // Explicitly block git execution vectors
+        'rm', 'shred', 'dd', 'mkfs', 'truncate', 
+        'mv', 'chmod', 'chown', 'ln', 
+        'kill', 'pkill', 'top', 'ps', 
+        'sh', 'bash', 'zsh', 'cmd', 'powershell',
+        'cat', 'less', 'more', 'tail', 'head'
+    ]);
+
+    // Strict list of package manager flags that change target directories [npm Docs]
+    const BANNED_FLAGS = new Set([
+        '--prefix', '-g', '--global', // npm overrides [npm Docs]
+        '--target', '-t', '--root'     // pip overrides
+    ]);
+
     function spawnOnChildProcess(filePath) {
-        // Security: Resolve to real physical path to prevent symlink attacks
         let realFilePath;
         try {
             realFilePath = fs.realpathSync(path.resolve(filePath));
         } catch (error) {
-            // If file doesn't exist, we can't resolve it. 
-            // You might allow creation, but for execution, it usually must exist.
             throw new Error(`File not found or invalid path: ${filePath}`);
         }
 
-        // Security: Check if the file itself is allowed to be executed
         if (!checkDirPathPermissions(realFilePath, "execute")) {
             throw new Error(`Denied Access Error: Execution of ${realFilePath} is not allowed.`);
         }
 
-        const childProcess = fork(realFilePath);
-
-        childProcess.on('message', (data) => {
-            console.log({
-                message: "received message",
-                data,
-            });
-        });
-
-        childProcess.on('error', (error) => {
-            console.error({
-                message: `error occurred`,
-                error,
-            });
-        });
-
-        childProcess.on('close', (code) => {
-            console.log({
-                message: `child process exited with code : ${code}`
-            });
-        });
-
-        return childProcess;
+        // Keep it isolated from the main process context
+        return fork(realFilePath, [], { env: { NODE_ENV: 'production' }, serialization: 'json' });
     }
 
     function getAppDataDirPath() {
         const platform = os.platform();
-
-        if (platform === 'win32') {
-            return process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
-        } else if (platform === 'linux') {
-            return process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config');
-        } else if (platform === 'darwin') {
-            return path.join(os.homedir(), 'Library', 'Application Support');
-        } else {
-            throw new Error(`Unsupported platform: ${platform}`);
-        }
+        if (platform === 'win32') return process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
+        if (platform === 'linux') return process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config');
+        if (platform === 'darwin') return path.join(os.homedir(), 'Library', 'Application Support');
+        throw new Error(`Unsupported platform: ${platform}`);
     }
 
-    // 2. Secure System Command Execution
     function runSystemCommand(command, cwd) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             try {
-                // 1. Resolve to absolute path
-                const absCwd = path.resolve(cwd);
-
-                // 2. Resolve to REAL physical path (Symlink Protection)
+                // 1. Canonicalize the directory to defeat symlink path routing trickery
+                const absoluteCwd = path.resolve(cwd);
                 let realCwd;
                 try {
-                    realCwd = fs.realpathSync(absCwd);
+                    realCwd = fs.realpathSync(absoluteCwd);
                 } catch (error) {
-                    return resolve({
-                        statusOk: false,
-                        message: `Command Execution Failed: Directory does not exist or cannot be resolved: ${cwd}`,
-                        path: absCwd
-                    });
+                    return resolve({ statusOk: false, message: "Directory path invalid or missing." });
                 }
 
-                // 3. Check Permissions on the REAL directory
+                // 2. Validate userAllowedPaths permissions against the TRUE physical path
                 if (!checkDirPathPermissions(realCwd, "execute")) {
+                    return resolve({ statusOk: false, message: "Unauthorized directory execution path." });
+                }
+
+                // 3. Block Command Chaining entirely (forces the AI to execute single commands one by one)
+                if (/[\;&\|\n\r]/.test(command)) {
                     return resolve({
                         statusOk: false,
-                        message: `Command Execution Failed: This path (${realCwd}) is not allowed by the user.`,
-                        path: realCwd,
-                        allowedPaths: getUserAllowedPaths()
+                        message: "Security Filter Violation: Command chaining tokens (; && | or newlines) are prohibited."
                     });
                 }
 
-                // 4. Security: Parse Command to Prevent Injection
-                // We split by whitespace, but this is basic. For advanced security, 
-                // consider a whitelist of allowed commands.
+                // Tokenize command securely into structural array parts
                 const parts = command.trim().split(/\s+/);
                 const cmd = parts[0];
-                const args = parts.slice(1);
+                let args = parts.slice(1);
 
-                // Optional: Whitelist check for dangerous commands
-                const dangerousCommands = ['rm', 'mv', 'chown', 'chmod', 'dd', 'mkfs'];
-                if (dangerousCommands.includes(cmd)) {
-                     // Check if dangerous flags are present
-                     if (args.some(arg => arg.includes('-rf') || arg.includes('-f') || arg.includes('-r'))) {
-                         return resolve({
-                             statusOk: false,
-                             message: `Command Execution Failed: Dangerous command '${cmd}' with recursive force flag detected.`,
-                             command: command
-                         });
-                     }
+                // 4. Block Dangerous System Binaries (Catches git here)
+                if (BANNED_BINARIES.has(cmd)) {
+                    return resolve({
+                        statusOk: false,
+                        message: `Security Filter Violation: Binary command '${cmd}' is explicitly banned.`
+                    });
                 }
 
-                // 5. Execute using execFile (NO SHELL)
-                // This prevents command injection because it does not invoke sh -c
+                // 5. Automatic Flag Injection for Ecosystem Lifecycle Safety [npm Docs]
+                if (cmd === 'npm' || cmd === 'yarn' || cmd === 'pnpm') {
+                    const isInstall = args.some(arg => arg === 'install' || arg === 'i' || arg === 'add');
+                    if (isInstall && !args.includes('--ignore-scripts')) {
+                        args.push('--ignore-scripts'); // Stop package-level malware execution dead [npm Docs]
+                    }
+                } else if (cmd === 'pip' || cmd === 'pip3') {
+                    const isInstall = args.some(arg => arg === 'install');
+                    if (isInstall && !args.includes('--no-scripts')) {
+                        args.push('--no-scripts'); // Python variant lifecycle script isolation
+                    }
+                }
+
+                // 6. Block Path Traversals and System Override Flags
+                for (const arg of args) {
+                    if (BANNED_FLAGS.has(arg)) {
+                        return resolve({
+                            statusOk: false,
+                            message: `Security Filter Violation: Directory override flag '${arg}' is prohibited. All actions must remain local.`
+                        });
+                    }
+
+                    // Strict Out-of-Bounds evaluation (Blocks basic absolute parameters and path hops)
+                    if (arg.includes('..') || arg.startsWith('/') || /^[A-Z]:\\/i.test(arg)) {
+                        return resolve({
+                            statusOk: false,
+                            message: `Security Filter Violation: Out-of-bounds path target detected in arguments: '${arg}'`
+                        });
+                    }
+                }
+
+                // 7. Secure Local Execution Routing
+                const platform = os.platform();
+                const binaryPath = platform === 'win32' ? cmd : `/usr/bin/${cmd}`;
+
                 execFile(
-                    cmd,
+                    binaryPath,
                     args,
                     { 
                         cwd: realCwd, 
-                        timeout: 5000, // 5 second timeout to prevent hanging
-                        maxBuffer: 1024 * 1024 // 1MB output limit
+                        timeout: 90000,              // 1.5 minute cutoff threshold allocation
+                        maxBuffer: 5 * 1024 * 1024,  // 5MB data streaming allocation
+                        env: {
+                            // Provide lookups only. This hides database tokens, cloud keys, and app secrets completely.
+                            PATH: platform === 'win32' 
+                                ? 'C:\\Windows\\system32;C:\\Windows' 
+                                : '/usr/bin:/bin:/usr/local/bin'
+                        }
                     },
                     (error, stdout, stderr) => {
                         if (error) {
-                            reject({
-                                statusOk: false,
-                                message: `Command Execution Failed: ${error.message}`,
-                                stderr: stderr,
-                                command: command
-                            });
+                            resolve({ statusOk: false, message: `Command returned an error state.`, stderr: stderr || error.message });
                         } else {
-                            resolve({
-                                statusOk: true,
-                                message: `Command Execution Successful`,
-                                stdout: stdout,
-                                stderr: stderr,
-                                command: command
-                            });
+                            resolve({ statusOk: true, message: "Execution finished successfully within workspace boundaries.", stdout, stderr });
                         }
                     }
                 );
             } catch (err) {
-                reject({
-                    statusOk: false,
-                    message: `Command Execution Failed: Internal Error - ${err.message}`,
-                    command: command
-                });
+                resolve({ statusOk: false, message: `Internal code validation crash: ${err.message}` });
             }
         });
     }
 
     return {
-        spawnOnChildProcess,
-        getAppDataDirPath,
+        spawnOnChildProcess, 
+        getAppDataDirPath, 
         runSystemCommand
-    }
+    };
 }

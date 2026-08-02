@@ -1360,13 +1360,13 @@ Returns the platform-specific path for application data storage. This path is ty
 
 #### 3. `runSystemCommand(command, cwd)`
 
-Executes a system shell command within a specific working directory, after verifying that the user has the required permissions.
+Executes a system binary within a restricted working directory, verifying execution path boundaries, sanitizing arguments, and stripping environment variables to prevent host machine compromise.
 
 *   **Arguments:**
     *   `command` (`string`): The shell command to execute (e.g., `"echo hello"`).
-    *   `cwd` (`string`): The working directory where the command should be executed.
+    *   `cwd` (`string`): The target working directory where the execution boundary should be enforced.
 *   **Returns:**
-    *   `Promise<Object>`:
+    *   `Promise<Object>`:  (All results resolve the Promise; there are no active rejections).
         *   **On Success:**
             ```javascript
             {
@@ -1396,7 +1396,15 @@ Executes a system shell command within a specific working directory, after verif
             }
             ```
 *   **Throws:**
-    *   None. (Errors are returned via the Promise rejection or the resolved error object).
+    * None. (Errors are returned via the Promise rejection or the resolved error object).
+    * Security Restrictions Enforced Automatically:
+    * Direct Execution Protocol: Bypasses the system shell (sh/cmd) to neutralize shell injection vectors.
+    * Physical Path Checking: Forces resolution of symbolic links and directory shortcuts via physical canonicalization before checking paths.
+    * Command Chaining Block: Instantly rejects any payload utilizing tokens like ;, &&, or |.
+    * Binary Restrictions: Explicitly denies entry points for git, rm, shell interpreters (bash, powershell), or file view primitives (cat).
+    * Lifecycle Shield: Automatically appends --ignore-scripts to ecosystem installers (npm, yarn) to block embedded package malware execution hooks [npm Docs].
+    * Secret Masking: Overwrites global process.env properties to hide critical host credentials from the child runtime process context.
+
 
 ---
 
