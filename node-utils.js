@@ -12,13 +12,14 @@ export default function getNodeUtils({ checkDirPathPermissions, getUserAllowedPa
         'mv', 'chmod', 'chown', 'ln', 
         'kill', 'pkill', 'top', 'ps', 
         'sh', 'bash', 'zsh', 'cmd', 'powershell',
-        'cat', 'less', 'more', 'tail', 'head'
+        'cat', 'less', 'more', 'tail', 'head',
+        'sudo', 'su', 'chroot', 'mount', 'umount', 'fdisk',
     ]);
 
     // Strict list of package manager flags that change target directories [npm Docs]
     const BANNED_FLAGS = new Set([
         '--prefix', '-g', '--global', // npm overrides [npm Docs]
-        '--target', '-t', '--root'     // pip overrides
+        '--target', '-t', '--root',    // pip overrides
     ]);
 
     function spawnOnChildProcess(filePath) {
