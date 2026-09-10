@@ -1789,6 +1789,12 @@ npm run test-url-utils
 
 ---
 
+## MCP Server Integration
+
+### I added a getMcpTools method that can be imported from the main index of this library, for easier MCP server tool registration.
+
+---
+
 ## License
 
 MIT License
