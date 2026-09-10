@@ -8,7 +8,9 @@ import getDateUtils from './date-utils.js';
 import getObjectArrayUtils from './objects-array-utils.js';
 import getStringUtils from './string-utils.js';
 import getUrlUtils from './url-utils.js';
+import getMcpToolsFn from './tools.js';
 
+export const getMcpTools = getMcpToolsFn;
 
 export default function getUtilities(config)  {
 
