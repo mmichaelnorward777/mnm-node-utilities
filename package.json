@@ -1,6 +1,6 @@
 {
   "name": "mnm-node-utilities",
-  "version": "3.0.2",
+  "version": "3.1.0",
   "description": "security-first Node.js utility library with strict permission controls, ideal for AI harnesses to safely manage file systems, commands, and data transformation.",
   "main": "index.js",
   "scripts": {
