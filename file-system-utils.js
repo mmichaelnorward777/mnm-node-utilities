@@ -1082,7 +1082,6 @@ export default function getFileSystemUtils({userAllowedPaths})    {
 
             if (isDirectory(file)) {
                 throw Error("The argument provided is a directory path.")
-                return;
             }
         
             let { fileType } = getFileObject(file);
@@ -1094,7 +1093,6 @@ export default function getFileSystemUtils({userAllowedPaths})    {
         } else  {
             if(file.split(".").length <= 1)    {
                 throw Error("This function requires a file extension to identify the mime type.")
-                return;
             }
             // file not existing, more like a query or verification
             let strArr = file.split("."),
@@ -1141,6 +1139,7 @@ export default function getFileSystemUtils({userAllowedPaths})    {
         getUserAllowedPaths,
         getUserFsPermission,
         checkDirPathPermissions,
+        getFileObject,
         mimeTypes,
         baseName,
         fileExists,

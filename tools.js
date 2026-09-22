@@ -11,6 +11,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("Formatted date string in MM-DD-YYYY format (e.g., '05-23-2023')")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ date }) => {
         const result = utils.formattedDate(date);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -26,6 +29,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.any().describe("A valid JavaScript Date object")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ dateInput }) => {
         const result = utils.getDateTimeObject(dateInput);
         return { content: [{ type: "text", text: JSON.stringify({ result: result.toISOString() }) }] };
@@ -47,6 +53,9 @@ export default function getMcpTools(z, utils) {
           time: z.string().describe("Current time in 12-hour format (e.g., '03:30:45 PM')")
         })
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ date }) => {
         const result = utils.dateTimeObject(date);
         return { content: [{ type: "text", text: JSON.stringify({ result: { day: result.day, month: result.month, year: result.year, date: result.date, time: result.time } }) }] };
@@ -66,6 +75,9 @@ export default function getMcpTools(z, utils) {
           momentsPassed: z.string().describe("Human-readable summary (e.g., '1 hour has passed.')")
         })
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ time1, time2 }) => {
         const result = utils.getTimeElapsed(time1, time2);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -81,6 +93,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.any().describe("A new Date object set to UTC +00:00")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ date }) => {
         const result = utils.createZuluStartDate(new Date(date));
         return { content: [{ type: "text", text: JSON.stringify({ result: result.toISOString() }) }] };
@@ -96,6 +111,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.number().describe("The offset in minutes (e.g., 0 for UTC, -300 for EST)")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ timeZone }) => {
         const result = utils.getOffsetMinutesForTimezone(timeZone);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -112,6 +130,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().nullable().describe("ISO formatted string ending in +00:00 (e.g., '2023-05-05T10:00:00.000+00:00'). Returns null if input is invalid.")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ input, tz }) => {
         const result = utils.toISOZeroOffset(input, tz);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -130,6 +151,9 @@ export default function getMcpTools(z, utils) {
           minutes: z.number().describe("Remaining minutes")
         })
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ numOfMinutes }) => {
         const result = utils.getHourlyDuration(numOfMinutes);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -146,6 +170,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.number().describe("The difference in minutes. Can be negative.")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ dateObj1, dateObj2 }) => {
         const result = utils.getDurationInMinutes(new Date(dateObj1), new Date(dateObj2));
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -162,6 +189,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.any().describe("A new Date object representing the time in the selected timezone")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ date, selectedTimeZone }) => {
         const result = utils.localDateToSelectedTimeZone(new Date(date), selectedTimeZone);
         return { content: [{ type: "text", text: JSON.stringify({ result: result.toISOString() }) }] };
@@ -177,6 +207,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("Formatted time string (e.g., '03:05 PM')")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ date }) => {
         const result = utils.getFormattedTime(new Date(date));
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -194,6 +227,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("ISO formatted time (e.g., '01:05:09')")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ hours, minutes, seconds }) => {
         const result = utils.getIsoFormattedTime(hours, minutes, seconds);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -209,6 +245,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("Normalized time string (e.g., '03:05 PM')")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ timeStr }) => {
         const result = utils.fixTimeStr(timeStr);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -224,6 +263,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("Full month name (e.g., 'May'). Returns 'January' for invalid indices.")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ monthIndex }) => {
         const result = utils.getCurrentMonthByIndex(monthIndex);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -239,6 +281,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.any().describe("Date object for the first day of the next month")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ date }) => {
         const result = utils.getNextMonth(new Date(date));
         return { content: [{ type: "text", text: JSON.stringify({ result: result.toISOString() }) }] };
@@ -251,6 +296,9 @@ export default function getMcpTools(z, utils) {
       inputSchema: z.object({
         date: z.string().describe("The reference date (Date)")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       outputSchema: z.object({
         result: z.any().describe("Date object for the previous month")
       }),
@@ -266,6 +314,9 @@ export default function getMcpTools(z, utils) {
       inputSchema: z.object({
         date: z.string().describe("Any date in the month of interest (Date)")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       outputSchema: z.object({
         result: z.number().describe("Number of days (e.g., 28, 30, 31)")
       }),
@@ -281,6 +332,9 @@ export default function getMcpTools(z, utils) {
       inputSchema: z.object({
         date: z.string().describe("The date object (Date)")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       outputSchema: z.object({
         result: z.string().describe("Formatted date string (e.g., 'May 5, 2023')")
       }),
@@ -297,6 +351,9 @@ export default function getMcpTools(z, utils) {
         date: z.string().describe("A date object, typically UTC (Date)"),
         businessTimeZone: z.string().describe("The target IANA timezone")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       outputSchema: z.object({
         result: z.any().describe("The date adjusted to the business timezone")
       }),
@@ -329,6 +386,9 @@ export default function getMcpTools(z, utils) {
           formattedDate: z.string().describe("Readable date (e.g., 'May 5, 2023')")
         })
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ scheduledDate, timeOfDay, timeZone }) => {
         const result = utils.createTzScheduleObject(scheduledDate, timeOfDay, timeZone);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -344,6 +404,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("ISO date string in YYYY-MM-DD format")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ date }) => {
         const result = utils.getISOFormattedDate(new Date(date));
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -364,6 +427,9 @@ export default function getMcpTools(z, utils) {
           nextMonthDateObject: z.any().describe("The first day of the month after the end date")
         })
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ date, lastDate }) => {
         const result = utils.createDateRangeObject(new Date(date), lastDate ? new Date(lastDate) : null);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -380,6 +446,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.enum(["forward", "backward"]).describe("'forward' if start is before end, 'backward' otherwise")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ startDate, endDate }) => {
         const result = utils.checkDateFlow(startDate, endDate);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -396,6 +465,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.array(z.any()).describe("Array of date range objects")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ startDate, endDate }) => {
         const result = utils.getForwardDateRangeObjects(startDate, endDate);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -412,6 +484,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.array(z.any()).describe("Array of date range objects, reversed")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ startDate, endDate }) => {
         const result = utils.getBackwardDateRangeObjects(startDate, endDate);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -428,6 +503,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.array(z.any()).describe("Array of date range objects")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ startDate, endDate }) => {
         const result = utils.getDateRangeObjects(startDate, endDate);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -445,6 +523,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.array(z.any()).describe("Each object includes ztzStartDate and ztzEndDate (ISO strings with +00:00)")
       }),
+      metadata : {
+        group : "date-utillities",
+      },
       handler: async ({ startDate, endDate, timeZone }) => {
         const result = utils.getDateRangeObjectsWithIsoZeroOffset(startDate, endDate, timeZone);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -462,6 +543,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.array(z.any()).describe("Array of permission objects with the requested permission set to true")
       }),
+      metadata : {
+        group : "fs-utillities",
+      },
       handler: async ({ permissionType }) => {
         const result = utils.getUserAllowedPathsByPermissionType(permissionType);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -475,6 +559,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.array(z.any()).describe("Array of permission objects")
       }),
+      metadata : {
+        group : "fs-utillities",
+      },
       handler: async () => {
         const result = utils.getUserAllowedPaths();
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -490,6 +577,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.any().nullable().describe("The permission object for the containing allowed path, or undefined if not found")
       }),
+      metadata : {
+        group : "fs-utillities",
+      },
       handler: async ({ dirPath }) => {
         const result = utils.getUserFsPermission(dirPath);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -506,6 +596,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.boolean().describe("true if path is allowed and has permission; false otherwise")
       }),
+      metadata : {
+        group : "fs-utillities",
+      },
       handler: async ({ dirPath, permissionType }) => {
         const result = utils.checkDirPathPermissions(dirPath, permissionType);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -522,6 +615,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("The base name of the file")
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ fileName, suffix }) => {
         const result = utils.baseName(fileName, suffix);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -537,6 +633,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.boolean().describe("true if it exists, false if it does not")
       }),
+      metadata : {
+        group : "fs-utillities",
+      },
       handler: async ({ path }) => {
         const result = utils.fileExists(path);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -552,6 +651,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.boolean().describe("true if it is a file, false otherwise")
       }),
+      metadata : {
+        group : "fs-utillities",
+      },
       handler: async ({ path }) => {
         const result = utils.isFile(path);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -567,6 +669,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.boolean().describe("true if it is a directory, false otherwise")
       }),
+      metadata : {
+        group : "fs-utillities",
+      },
       handler: async ({ path }) => {
         const result = utils.isDirectory(path);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -582,6 +687,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().nullable().describe("The parent directory path, or null if root")
       }),
+      metadata : {
+        group : "fs-utillities",
+      },
       handler: async ({ path }) => {
         const result = utils.getParentDir(path);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -597,6 +705,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("The file extension (e.g., '.txt')")
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ path }) => {
         const result = utils.getFileExt(path);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -618,6 +729,9 @@ export default function getMcpTools(z, utils) {
           data: z.array(z.string()).optional().describe("Array of filenames on success")
         })
       }),
+      metadata : {
+        group : "fs-directory-utillities",
+      },
       handler: async ({ path, encoding }) => {
         const result = await utils.readdir(path, { encoding: encoding || "utf8" });
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -639,10 +753,14 @@ export default function getMcpTools(z, utils) {
           data: z.array(z.string()).optional()
         })
       }),
+      metadata : {
+        group : "fs-directory-utillities",
+      },
       handler: async ({ path, encoding }) => {
         const result = utils.readdirSync(path, { encoding: encoding || "utf8" });
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
-      }
+      },
+      isSync: true,
     },
     mkdir: {
       urlName: "mkdir",
@@ -659,6 +777,9 @@ export default function getMcpTools(z, utils) {
           message: z.string()
         })
       }),
+      metadata : {
+        group : "fs-directory-utillities",
+      },
       handler: async ({ path, recursive }) => {
         const result = await utils.mkdir(path, { recursive: recursive !== undefined ? recursive : true });
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -679,10 +800,14 @@ export default function getMcpTools(z, utils) {
           message: z.string()
         })
       }),
+      metadata : {
+        group : "fs-directory-utillities",
+      },
       handler: async ({ path, recursive }) => {
         const result = utils.mkdirSync(path, { recursive: recursive !== undefined ? recursive : true });
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
-      }
+      },
+      isSync: true,
     },
     deleteDir: {
       urlName: "delete-dir",
@@ -699,6 +824,9 @@ export default function getMcpTools(z, utils) {
           message: z.string()
         })
       }),
+      metadata : {
+        group : "fs-directory-utillities",
+      },
       handler: async ({ path, recursive }) => {
         const result = await utils.deleteDir(path, { recursive: recursive !== undefined ? recursive : true });
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -719,10 +847,14 @@ export default function getMcpTools(z, utils) {
           message: z.string()
         })
       }),
+      metadata : {
+        group : "fs-directory-utillities",
+      },
       handler: async ({ path, recursive }) => {
         const result = utils.deleteDirSync(path, { recursive: recursive !== undefined ? recursive : true });
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
-      }
+      },
+      isSync: true,
     },
     readFile: {
       urlName: "read-file",
@@ -732,6 +864,9 @@ export default function getMcpTools(z, utils) {
         path: z.string().describe("The path to the file"),
         encoding: z.string().optional().default("utf8").describe("File encoding (default: 'utf8')")
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       outputSchema: z.object({
         result: z.object({
           result: z.boolean(),
@@ -761,10 +896,14 @@ export default function getMcpTools(z, utils) {
           data: z.any().describe("File content (string or Buffer)")
         })
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ path, encoding }) => {
         const result = utils.readFileSync(path, { encoding: encoding || "utf8" });
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
-      }
+      },
+      isSync: true,
     },
     writeFile: {
       urlName: "write-file",
@@ -782,6 +921,9 @@ export default function getMcpTools(z, utils) {
           message: z.string()
         })
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ path, content, encoding }) => {
         const result = await utils.writeFile(path, content, { encoding: encoding || "utf8" });
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -803,10 +945,14 @@ export default function getMcpTools(z, utils) {
           message: z.string()
         })
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ path, content, encoding }) => {
         const result = utils.writeFileSync(path, content, { encoding: encoding || "utf8" });
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
-      }
+      },
+      isSync: true,
     },
     deleteFile: {
       urlName: "delete-file",
@@ -822,6 +968,9 @@ export default function getMcpTools(z, utils) {
           message: z.string()
         })
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ path }) => {
         const result = await utils.deleteFile(path);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -841,10 +990,14 @@ export default function getMcpTools(z, utils) {
           message: z.string()
         })
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ path }) => {
         const result = utils.deleteFileSync(path);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
-      }
+      },
+      isSync: true,
     },
     getFileSize: {
       urlName: "get-file-size",
@@ -856,6 +1009,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.union([z.number(), z.boolean()]).describe("Size in bytes, or false if file does not exist")
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ path }) => {
         const result = await utils.getFileSize(path);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -872,6 +1028,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.boolean().describe("true if the file is empty, false if it has content")
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ path, encoding }) => {
         const result = await utils.isFileEmpty(path, { encoding: encoding || "utf8" });
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -888,6 +1047,29 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.boolean().describe("true if the file is empty, false if it has content")
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
+      handler: async ({ path, encoding }) => {
+        const result = utils.isFileEmptySync(path, { encoding: encoding || "utf8" });
+        return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
+      },
+      isSync: true,
+    },
+    getFileObject:  {
+      urlName: "get-file-object",
+      title: "Get File Object",
+      description: "Get the properties of a file or directory. the name, fileType, parentDir, path and includedFiles -- if it is a directory.",
+      inputSchema: z.object({
+        path: z.string().describe("The path to the file"),
+        encoding: z.string().optional().default("utf8").describe("File encoding (default: 'utf8')")
+      }),
+      outputSchema: z.object({
+        result: z.boolean().describe("An object with properties like the name, fileType, parentDir, path and includedFiles -- if it is a directory.")
+      }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ path, encoding }) => {
         const result = utils.isFileEmptySync(path, { encoding: encoding || "utf8" });
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -903,6 +1085,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.boolean().describe("true if the directory is empty, false otherwise")
       }),
+      metadata : {
+        group : "fs-directory-utillities",
+      },
       handler: async ({ path }) => {
         const result = await utils.isDirectoryEmpty(path);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -918,10 +1103,14 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.boolean().describe("true if the directory is empty, false otherwise")
       }),
+      metadata : {
+        group : "fsdirectory-utillities",
+      },
       handler: async ({ path }) => {
         const result = utils.isDirectoryEmptySync(path);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
-      }
+      },
+      isSync: true,
     },
     getAllFilesFromDirectory: {
       urlName: "get-all-files-from-directory",
@@ -934,6 +1123,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.array(z.string()).describe("Array of filenames (not full paths)")
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ path, extension }) => {
         const result = await utils.getAllFilesFromDirectory(path, extension);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -950,10 +1142,14 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.array(z.string()).describe("Array of filenames (not full paths)")
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ path, extension }) => {
         const result = utils.getAllFilesFromDirectorySync(path, extension);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
-      }
+      },
+      isSync: true,
     },
     getAllDirsFromDirectory: {
       urlName: "get-all-dirs-from-directory",
@@ -965,6 +1161,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.array(z.string()).describe("Array of subdirectory names")
       }),
+      metadata : {
+        group : "fs-directory-utillities",
+      },
       handler: async ({ path }) => {
         const result = await utils.getAllDirsFromDirectory(path);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -980,10 +1179,14 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.array(z.string()).describe("Array of subdirectory names")
       }),
+      metadata : {
+        group : "fs-directory-utillities",
+      },
       handler: async ({ path }) => {
         const result = utils.getAllDirsFromDirectorySync(path);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
-      }
+      },
+      isSync: true,
     },
     getAllFilesRecursively: {
       urlName: "get-all-files-recursively",
@@ -996,6 +1199,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.array(z.any()).describe("Array of file objects with name, parentDir, fileType, path, and includedFiles (if directory)")
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ path, excludedFolders }) => {
         const result = await utils.getAllFilesRecursively(path, excludedFolders);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1009,13 +1215,17 @@ export default function getMcpTools(z, utils) {
         path: z.string().describe("The root directory"),
         excludedFolders: z.array(z.string()).optional().describe("Names of folders to skip")
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       outputSchema: z.object({
         result: z.array(z.any()).describe("Array of file objects with name, parentDir, fileType, path, and includedFiles (if directory)")
       }),
       handler: async ({ path, excludedFolders }) => {
         const result = utils.getAllFilesRecursivelySync(path, excludedFolders);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
-      }
+      },
+      isSync: true,
     },
     getMimeType: {
       urlName: "get-mime-type",
@@ -1027,6 +1237,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("The MIME type (e.g., 'image/png')")
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ file }) => {
         const result = utils.getMimeType(file);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1042,6 +1255,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.array(z.string()).describe("Array of file extensions")
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ mimeType }) => {
         const result = utils.getFileExtensionsByMimeType(mimeType);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1058,6 +1274,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("The first matching extension found in the URL")
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ url, fileExtensions }) => {
         const result = utils.getSpecifiedExt(url, fileExtensions);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1073,6 +1292,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("The created directory path")
       }),
+      metadata : {
+        group : "fs-directory-utillities",
+      },
       handler: async ({ pathParts }) => {
         const result = await utils.createDirPath(...pathParts);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1093,6 +1315,9 @@ export default function getMcpTools(z, utils) {
           message: z.string()
         })
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ path, recursive }) => {
         const result = await utils.deleteAllFilesInDirPath(path, recursive);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1112,6 +1337,9 @@ export default function getMcpTools(z, utils) {
           message: z.string()
         })
       }),
+      metadata : {
+        group : "fs-directory-utillities",
+      },
       handler: async ({ path }) => {
         const result = await utils.deleteAllDirsInDirPath(path);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1131,6 +1359,9 @@ export default function getMcpTools(z, utils) {
           message: z.string()
         })
       }),
+      metadata : {
+        group : "fs-directory-utillities",
+      },
       handler: async ({ path }) => {
         const result = await utils.deleteAllInDirPath(path);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1151,6 +1382,9 @@ export default function getMcpTools(z, utils) {
           message: z.string()
         })
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async ({ path, recursive }) => {
         const result = await utils.deleteAllEmptyFilesInDirectory(path, recursive);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1171,6 +1405,9 @@ export default function getMcpTools(z, utils) {
           message: z.string()
         })
       }),
+      metadata : {
+        group : "fs-directory-utillities",
+      },
       handler: async ({ path, recursive }) => {
         const result = await utils.deleteAllEmptyDirsInDirectory(path, recursive);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1184,6 +1421,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.record(z.string()).describe("Object mapping file extensions to MIME types")
       }),
+      metadata : {
+        group : "fs-file-utillities",
+      },
       handler: async () => {
         const result = utils.mimeTypes;
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1197,6 +1437,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("The application data directory path")
       }),
+      metadata : {
+        group : "fs-directory-utillities",
+      },
       handler: async () => {
         const result = utils.getAppDataDirPath();
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1214,6 +1457,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("A pseudo-unique identifier string")
       }),
+      metadata : {
+        group : "general-utillities",
+      },
       handler: async ({ radix }) => {
         const result = utils.generateUuid(radix);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1229,6 +1475,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.null().describe("Resolves after the delay")
       }),
+      metadata : {
+        group : "general-utillities",
+      },
       handler: async ({ timeDelay }) => {
         const result = await utils.slowDown(timeDelay);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1245,6 +1494,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("Grammatically formatted list string")
       }),
+      metadata : {
+        group : "general-utillities",
+      },
       handler: async ({ items, useAnd }) => {
         return { content: [{ type: "text", text: utils.enumerate(items, useAnd) }] };
       }
@@ -1260,6 +1512,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.number().describe("Random integer in the range [min, max)")
       }),
+      metadata : {
+        group : "general-utillities",
+      },
       handler: async ({ min, max }) => {
         const result = utils.getRandomNumber(min, max);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1275,6 +1530,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.number().describe("The extracted numeric value, or NaN if not found")
       }),
+      metadata : {
+        group : "general-utillities",
+      },
       handler: async ({ str }) => {
         const result = utils.getNumericValue(str);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1290,6 +1548,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().nullable().describe("String representation of input, or null if input was null/undefined")
       }),
+      metadata : {
+        group : "general-utillities",
+      },
       handler: async ({ input }) => {
         const result = utils.getValidatedStringValue(input);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1305,54 +1566,68 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("String with forward slashes")
       }),
+      metadata : {
+        group : "general-utillities",
+      },
       handler: async ({ str }) => {
         const result = utils.replaceWithForwardSlash(str);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
-    debounce: {
+
+    /* debounce: {
       urlName: "debounce",
       title: "Debounce",
       description: "Creates a debounced function that delays invoking the provided function until after delay milliseconds have elapsed since the last time the debounced function was invoked.",
       inputSchema: z.object({
-        fn: z.function().describe("The function to debounce (function reference)"),
+        fn: z.string().describe("The function converted to string to debounce (function reference)"),
         delay: z.number().optional().default(2500).describe("Delay in milliseconds (default: 2500)")
       }),
       outputSchema: z.object({
         result: z.function().describe("The debounced function")
       }),
+      metadata : {
+        group : "general-utillities",
+      },
       handler: async ({ fn, delay }) => {
-        const result = utils.debounce(fn, delay);
+        const callback = Function(() => fn);
+        const result = utils.debounce(callback, delay);
         return { content: [{ type: "text", text: JSON.stringify({ result: "debounced function created" }) }] };
       }
-    },
-    waitForCondition: {
+    },  */
+    /* waitForCondition: {
       urlName: "wait-for-condition",
       title: "Wait For Condition",
       description: "Polls a condition at a fixed interval (100ms) until it returns true, then executes a callback and resolves the promise.",
       inputSchema: z.object({
-        conditionCallback: z.function().describe("A function that returns a boolean. When true, waiting stops.").optional().describe("Condition function that returns true when condition is met"),
-        onTrueCallback: z.function().optional().describe("Executed once when the condition becomes true"),
-        messageCallback: z.function().optional().describe("Executed periodically (every 100 loops) for progress updates"),
+        conditionCallback: z.string().describe("A function converted to string that returns a boolean. When true, waiting stops.").optional().describe("Condition function that returns true when condition is met"),
+        onTrueCallback: z.string().optional().describe("A function converted to string that is executed once when the condition becomes true"),
+        messageCallback: z.string().optional().describe("A function converted to string that is executed periodically (every 100 loops) for progress updates"),
         timeout: z.number().optional().describe("Maximum time to wait in milliseconds")
       }),
       outputSchema: z.object({
         result: z.null().describe("Resolves when the condition is met")
       }),
+      metadata : {
+        group : "general-utillities",
+      },
       handler: async ({ conditionCallback, onTrueCallback, messageCallback, timeout }) => {
         const result = await utils.waitForCondition({ conditionCallback, onTrueCallback, messageCallback, timeout });
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
-    },
-    moderator: {
+    }, */
+    /* moderator: {
       urlName: "moderator",
       title: "Moderator (Chunked Processing)",
       description: "Processes an array in chunks (batches) to avoid blocking the event loop with large synchronous operations.",
       inputSchema: z.object({
-        arr: z.array(z.any()).describe("The array to process"),
+        arr: z.array(z.string()).describe("The array to process"),
         callback: z.function().describe("An async function called for each chunk. Signature: (chunk, firstIndex, lastIndex, globalIndex)"),
         bulkCount: z.number().optional().default(5).describe("The size of each chunk (default: 5)")
       }),
+      metadata : {
+        group : "general-utillities",
+      },
       outputSchema: z.object({
         result: z.null().describe("Resolves when all chunks have been processed")
       }),
@@ -1360,7 +1635,8 @@ export default function getMcpTools(z, utils) {
         const result = await utils.moderator(arr, callback, bulkCount);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
-    },
+    }, */
+  
 
     // NODE-UTILS
     spawnOnChildProcess: {
@@ -1373,6 +1649,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("Child process spawned successfully")
       }),
+      metadata : {
+        group : "node-utillities",
+      },
       handler: async ({ filePath }) => {
         const result = utils.spawnOnChildProcess(filePath);
         return { content: [{ type: "text", text: JSON.stringify({ result: "Child process spawned" }) }] };
@@ -1395,6 +1674,9 @@ export default function getMcpTools(z, utils) {
           command: z.string().optional().describe("The command executed")
         }).describe("Result object indicating success or failure")
       }),
+      metadata : {
+        group : "node-utillities",
+      },
       handler: async ({ command, cwd }) => {
         const result = await utils.runSystemCommand(command, cwd);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1412,6 +1694,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.any().describe("Parsed JSON object, or the original input if parsing failed")
       }),
+      metadata : {
+        group : "json-utillities",
+      },
       handler: async ({ input }) => {
         const result = utils.parseValidatedJSON(input);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1432,6 +1717,9 @@ export default function getMcpTools(z, utils) {
           clearData: z.function().describe("Async function to clear all data")
         })
       }),
+      metadata : {
+        group : "json-utillities",
+      },
       handler: async ({ path, fileName }) => {
         const result = await utils.createJsonFileObject(path, fileName);
         return { content: [{ type: "text", text: JSON.stringify({ result: "JSON file object created" }) }] };
@@ -1450,6 +1738,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.any().describe("The property values at the specified path")
       }),
+      metadata : {
+        group : "objects-array-utillities",
+      },
       handler: async ({ objStr, propNames }) => {
         const result = utils.getValidatedPropValues(objStr, propNames);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1467,6 +1758,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.boolean().describe("true if object exists in array, false otherwise")
       }),
+      metadata : {
+        group : "objects-array-utillities",
+      },
       handler: async ({ objStr, arrStr, keysToCheck }) => {
         const result = utils.isObjectInArray(objStr, arrStr, keysToCheck);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1482,6 +1776,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.array(z.string()).describe("Array of unique key names")
       }),
+      metadata : {
+        group : "objects-array-utillities",
+      },
       handler: async ({ arrStr }) => {
         const result = utils.getAllObjectKeys(arrStr);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1499,6 +1796,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.array(z.any()).describe("Sorted array of objects")
       }),
+      metadata : {
+        group : "objects-array-utillities",
+      },
       handler: async ({ arrStr, dateProp, ascending }) => {
         const result = utils.sortObjectsByDate(arrStr, dateProp, ascending);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1516,6 +1816,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.array(z.any()).describe("Sorted array of objects")
       }),
+      metadata : {
+        group : "objects-array-utillities",
+      },
       handler: async ({ arrStr, propName, ascending }) => {
         const result = utils.sortObjectsByPropName(arrStr, propName, ascending);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1532,6 +1835,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("Readable string representation of the object")
       }),
+      metadata : {
+        group : "objects-array-utillities",
+      },
       handler: async ({ objStr, delimiter }) => {
         const result = utils.objectToString(objStr, delimiter);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1549,6 +1855,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.boolean().describe("true if object is unique in array")
       }),
+      metadata : {
+        group : "objects-array-utillities",
+      },
       handler: async ({ objStr, arrStr, keys }) => {
         const result = utils.isObjectUnique(objStr, arrStr, keys);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1566,6 +1875,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.array(z.any()).describe("Filtered array of objects not in local list")
       }),
+      metadata : {
+        group : "objects-array-utillities",
+      },
       handler: async ({ localObjectsStr, allObjectsStr, keys }) => {
         const result = utils.filterUnlistedObjects(localObjectsStr, allObjectsStr, keys);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1581,6 +1893,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.array(z.any()).describe("Shuffled array")
       }),
+      metadata : {
+        group : "objects-array-utillities",
+      },
       handler: async ({ arrStr }) => {
         const result = utils.shuffleArr(arrStr);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1597,6 +1912,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.boolean().describe("true if objects are equal")
       }),
+      metadata : {
+        group : "objects-array-utillities",
+      },
       handler: async ({ targetStr, sourceStr }) => {
         const result = utils.objectCompare(targetStr, sourceStr);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1613,6 +1931,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.any().describe("Target object with assigned properties")
       }),
+      metadata : {
+        group : "objects-array-utillities",
+      },
       handler: async ({ targetStr, sourceStr }) => {
         const result = utils.assignProps(targetStr, sourceStr);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1629,6 +1950,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.any().describe("Deep merged object")
       }),
+      metadata : {
+        group : "objects-array-utillities",
+      },
       handler: async ({ targetStr, sourceStr }) => {
         const result = utils.deepMerge(targetStr, sourceStr);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1646,6 +1970,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("URL-friendly slug string")
       }),
+      metadata : {
+        group : "string-utillities",
+      },
       handler: async ({ str }) => {
         const result = utils.toUrl(str);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1661,6 +1988,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("String with first letter capitalized")
       }),
+      metadata : {
+        group : "string-utillities",
+      },
       handler: async ({ str }) => {
         const result = utils.toCapitalize(str);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1676,6 +2006,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("String with each word capitalized")
       }),
+      metadata : {
+        group : "string-utillities",
+      },
       handler: async ({ str }) => {
         const result = utils.toCapitalizeAll(str);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1689,6 +2022,9 @@ export default function getMcpTools(z, utils) {
         str: z.string().describe("The input string"),
         previousFormat: z.enum(["camel-case", "underscored", "kebab-case"]).optional().describe("Previous format: 'camel-case', 'underscored', or 'kebab-case'")
       }),
+      metadata : {
+        group : "string-utillities",
+      },
       outputSchema: z.object({
         result: z.string().describe("Normal string with title case words")
       }),
@@ -1707,6 +2043,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("Initials string (e.g., 'JD')")
       }),
+      metadata : {
+        group : "string-utillities",
+      },
       handler: async ({ str }) => {
         const result = utils.getInitials(str);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1724,6 +2063,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("CamelCase string")
       }),
+      metadata : {
+        group : "string-utillities",
+      },
       handler: async ({ str, url, initialCap }) => {
         const result = utils.toCamelCase(str, url, initialCap);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1741,6 +2083,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("Reconstructed URL string")
       }),
+      metadata : {
+        group : "url-utillities",
+      },
       handler: async ({ urlString }) => {
         const result = utils.urlConstructor(urlString);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1756,6 +2101,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("Query string (e.g., 'a=1&b=2')")
       }),
+      metadata : {
+        group : "url-utillities",
+      },
       handler: async ({ obj }) => {
         const result = utils.objectToQueryString(obj);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1771,6 +2119,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.record(z.any()).describe("JavaScript object parsed from query string")
       }),
+      metadata : {
+        group : "url-utillities",
+      },
       handler: async ({ queryString }) => {
         const result = utils.queryStringToObject(queryString);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1793,6 +2144,9 @@ export default function getMcpTools(z, utils) {
           hostname: z.string().optional()
         }).describe("Object with path, query parameters, and URL components")
       }),
+      metadata : {
+        group : "url-utillities",
+      },
       handler: async ({ urlString, trailingSlash }) => {
         const result = utils.urlToQueryStringObject(urlString, trailingSlash);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1808,6 +2162,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.record(z.any()).describe("Object with dot notation keys")
       }),
+      metadata : {
+        group : "url-utillities",
+      },
       handler: async ({ obj }) => {
         const result = utils.objectToDotNotation(obj);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1823,6 +2180,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.record(z.any()).describe("Nested JavaScript object")
       }),
+      metadata : {
+        group : "url-utillities",
+      },
       handler: async ({ dotNotationStr }) => {
         const result = utils.dotNotationToObject(dotNotationStr);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1838,6 +2198,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.string().describe("Domain string")
       }),
+      metadata : {
+        group : "url-utillities",
+      },
       handler: async ({ url }) => {
         const result = utils.getDomain(url);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
@@ -1854,6 +2217,9 @@ export default function getMcpTools(z, utils) {
       outputSchema: z.object({
         result: z.boolean().describe("true if subUrl is a subdomain of mainUrl")
       }),
+      metadata : {
+        group : "url-utillities",
+      },
       handler: async ({ mainUrl, subUrl }) => {
         const result = utils.checkSubDomain(mainUrl, subUrl);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
