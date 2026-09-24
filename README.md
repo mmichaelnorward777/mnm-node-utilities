@@ -1789,9 +1789,82 @@ npm run test-url-utils
 
 ---
 
+
 ## MCP Server Integration
 
-### I added a getMcpTools method that can be imported from the main index of this library, for easier MCP server tool registration.
+The `mnm-node-utilities` package is designed to be dropped directly into any Model Context Protocol (MCP) server. Every utility function is wrapped with standardized Zod schemas, input/output validation, and built-in permission checks, allowing AI agents to interact with your filesystem, date logic, and data structures safely and predictably.
+
+### How to Integrate
+
+1. **Initialize Utilities**: Import `getUtils` and configure it with your `userAllowedPaths` to enforce security boundaries.
+2. **Generate Base Tools**: Pass `z` (from Zod) and your `utils` instance to `getMcpTools()` to create the full tool dictionary.
+3. **Patch Callback Capabilities**: Call `initializeCallbackRegistry(utils, tools, z)`. This injects 5 management tools (`register-callback`, `list-callbacks`, `get-callback-status`, `remove-callback`, `clear-callback-registry`) and upgrades `moderator`, `debounce`, and `waitForCondition` to use registered callback IDs instead of raw functions.
+4. **Register with MCP Server**: Loop through the tools object and register each one, automatically skipping any tools marked with `isSync: true` to prevent event loop blocking.
+
+### Example Usage
+
+Here’s a complete example of how to set up and run an MCP server using these utilities:
+
+```javascript
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import fs from "fs";
+import path from "path";
+import { z } from "zod";
+import getUtils, { getMcpTools, initializeCallbackRegistry } from "mnm-node-utilities";
+import config from "./config.js";
+
+const utils = getUtils({ userAllowedPaths: config.userAllowedPaths });
+
+const tools = getMcpTools(z, utils);
+
+initializeCallbackRegistry(utils, tools, z);
+
+async function createAndRunMcpServer(tools, key) {
+	// Create MCP server
+	const server = new McpServer({
+		name: key,
+		version: "1.0.0",
+	});
+	
+	for(let key in tools) {
+		let tool = tools[key]
+		
+		if(tool.isSync) {
+			continue;
+		}
+		
+		let { urlName, title, description, inputSchema, handler } = tool;
+
+		server.registerTool(urlName, {
+			title, 
+			description, 
+			inputSchema,
+		}, handler);
+	}
+
+	// Start the server
+	async function main() {
+		const transport = new StdioServerTransport();
+		await server.connect(transport);
+		console.log(`MCP Server (stdio) running with mnm-node-utilities ${key}`);
+	}
+
+	await main().catch((error) => {
+		console.error("Fatal error:", error);
+		process.exit(1);
+	});
+}
+
+createAndRunMcpServer(tools, "mnm-node-utilities");
+```
+
+### Key Integration Features
+- **Zero-Config Validation**: Every tool includes `inputSchema` and `outputSchema` compliant with the MCP spec.
+- **Callback-Ready**: Async-heavy utilities (`moderator`, `debounce`, `waitForCondition`) accept `callbackId`/`fnId` strings, keeping your server stateless and secure.
+- **Auto-Filtered Sync Tools**: The `isSync` flag is respected during registration, preventing synchronous operations from blocking the MCP transport.
+- **Permission Enforcement**: All file and directory tools automatically validate against your `userAllowedPaths` before executing.
+- **Registry Lifecycle Management**: Built-in tools to register, inspect, remove, and clear callbacks without leaving the MCP session.
 
 ---
 
