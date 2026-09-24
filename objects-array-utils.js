@@ -65,7 +65,9 @@ export default function getObjectArrayUtils({toNormalString, objectToDotNotation
                 return date1 > date2 ? -1 : date1 < date2 ? 1 : 0;
             }
 
-        })
+        });
+
+        return arr;
     }
 
     function sortObjectsByPropName(arr, propName, asc = true) {
@@ -76,7 +78,9 @@ export default function getObjectArrayUtils({toNormalString, objectToDotNotation
                 return a[propName] > b[propName] ? -1 : b[propName] < a[propName] ? 1 : 0;
             }
 
-        })
+        });
+
+        return arr;
     }
 
     function objectToString(object, delimiter = ", ") {

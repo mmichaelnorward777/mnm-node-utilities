@@ -1702,7 +1702,7 @@ export default function getMcpTools(z, utils) {
         group : "objects-array-utillities",
       },
       handler: async ({ objStr, arrStr, keysToCheck }) => {
-        const result = utils.isObjectInArray(objStr, arrStr, keysToCheck);
+        const result = utils.isObjectInArray(JSON.parse(objStr), JSON.parse(arrStr), keysToCheck);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -1720,7 +1720,7 @@ export default function getMcpTools(z, utils) {
         group : "objects-array-utillities",
       },
       handler: async ({ arrStr }) => {
-        const result = utils.getAllObjectKeys(arrStr);
+        const result = utils.getAllObjectKeys(JSON.parse(arrStr));
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -1740,7 +1740,7 @@ export default function getMcpTools(z, utils) {
         group : "objects-array-utillities",
       },
       handler: async ({ arrStr, dateProp, ascending }) => {
-        const result = utils.sortObjectsByDate(arrStr, dateProp, ascending);
+        const result = utils.sortObjectsByDate(JSON.parse(arrStr), dateProp, ascending);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -1760,7 +1760,7 @@ export default function getMcpTools(z, utils) {
         group : "objects-array-utillities",
       },
       handler: async ({ arrStr, propName, ascending }) => {
-        const result = utils.sortObjectsByPropName(arrStr, propName, ascending);
+        const result = utils.sortObjectsByPropName(JSON.parse(arrStr), propName, ascending);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -1779,7 +1779,7 @@ export default function getMcpTools(z, utils) {
         group : "objects-array-utillities",
       },
       handler: async ({ objStr, delimiter }) => {
-        const result = utils.objectToString(objStr, delimiter);
+        const result = utils.objectToString(JSON.parse(objStr), delimiter);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -1799,7 +1799,7 @@ export default function getMcpTools(z, utils) {
         group : "objects-array-utillities",
       },
       handler: async ({ objStr, arrStr, keys }) => {
-        const result = utils.isObjectUnique(objStr, arrStr, keys);
+        const result = utils.isObjectUnique(JSON.parse(objStr), JSON.parse(arrStr), keys);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -1819,7 +1819,7 @@ export default function getMcpTools(z, utils) {
         group : "objects-array-utillities",
       },
       handler: async ({ localObjectsStr, allObjectsStr, keys }) => {
-        const result = utils.filterUnlistedObjects(localObjectsStr, allObjectsStr, keys);
+        const result = utils.filterUnlistedObjects(JSON.parse(localObjectsStr), JSON.parse(allObjectsStr), keys);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -1837,7 +1837,7 @@ export default function getMcpTools(z, utils) {
         group : "objects-array-utillities",
       },
       handler: async ({ arrStr }) => {
-        const result = utils.shuffleArr(arrStr);
+        const result = utils.shuffleArr(JSON.parse(arrStr));
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -1856,7 +1856,7 @@ export default function getMcpTools(z, utils) {
         group : "objects-array-utillities",
       },
       handler: async ({ targetStr, sourceStr }) => {
-        const result = utils.objectCompare(targetStr, sourceStr);
+        const result = utils.objectCompare(JSON.parse(targetStr), JSON.parse(sourceStr));
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -1875,7 +1875,7 @@ export default function getMcpTools(z, utils) {
         group : "objects-array-utillities",
       },
       handler: async ({ targetStr, sourceStr }) => {
-        const result = utils.assignProps(targetStr, sourceStr);
+        const result = utils.assignProps(JSON.parse(targetStr), JSON.parse(sourceStr));
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -1894,7 +1894,7 @@ export default function getMcpTools(z, utils) {
         group : "objects-array-utillities",
       },
       handler: async ({ targetStr, sourceStr }) => {
-        const result = utils.deepMerge(targetStr, sourceStr);
+        const result = utils.deepMerge(JSON.parse(targetStr), JSON.parse(sourceStr));
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
