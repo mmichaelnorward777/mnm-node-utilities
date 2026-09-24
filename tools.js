@@ -1575,67 +1575,7 @@ export default function getMcpTools(z, utils) {
       }
     },
 
-    /* debounce: {
-      urlName: "debounce",
-      title: "Debounce",
-      description: "Creates a debounced function that delays invoking the provided function until after delay milliseconds have elapsed since the last time the debounced function was invoked.",
-      inputSchema: z.object({
-        fn: z.string().describe("The function converted to string to debounce (function reference)"),
-        delay: z.number().optional().default(2500).describe("Delay in milliseconds (default: 2500)")
-      }),
-      outputSchema: z.object({
-        result: z.function().describe("The debounced function")
-      }),
-      metadata : {
-        group : "general-utillities",
-      },
-      handler: async ({ fn, delay }) => {
-        const callback = Function(() => fn);
-        const result = utils.debounce(callback, delay);
-        return { content: [{ type: "text", text: JSON.stringify({ result: "debounced function created" }) }] };
-      }
-    },  */
-    /* waitForCondition: {
-      urlName: "wait-for-condition",
-      title: "Wait For Condition",
-      description: "Polls a condition at a fixed interval (100ms) until it returns true, then executes a callback and resolves the promise.",
-      inputSchema: z.object({
-        conditionCallback: z.string().describe("A function converted to string that returns a boolean. When true, waiting stops.").optional().describe("Condition function that returns true when condition is met"),
-        onTrueCallback: z.string().optional().describe("A function converted to string that is executed once when the condition becomes true"),
-        messageCallback: z.string().optional().describe("A function converted to string that is executed periodically (every 100 loops) for progress updates"),
-        timeout: z.number().optional().describe("Maximum time to wait in milliseconds")
-      }),
-      outputSchema: z.object({
-        result: z.null().describe("Resolves when the condition is met")
-      }),
-      metadata : {
-        group : "general-utillities",
-      },
-      handler: async ({ conditionCallback, onTrueCallback, messageCallback, timeout }) => {
-        const result = await utils.waitForCondition({ conditionCallback, onTrueCallback, messageCallback, timeout });
-        return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
-      }
-    }, */
-    /* moderator: {
-      urlName: "moderator",
-      title: "Moderator (Chunked Processing)",
-      description: "Processes an array in chunks (batches) to avoid blocking the event loop with large synchronous operations.",
-      inputSchema: z.object({
-        arr: z.array(z.string()).describe("The array to process"),
-        callback: z.function().describe("An async function called for each chunk. Signature: (chunk, firstIndex, lastIndex, globalIndex)"),
-        bulkCount: z.number().optional().default(5).describe("The size of each chunk (default: 5)")
-      }),
-      metadata : {
-        group : "general-utillities",
-      },
-      outputSchema: z.object({
-        result: z.null().describe("Resolves when all chunks have been processed")
-      }),
-      handler: async ({ arr, callback, bulkCount }) => {
-        const result = await utils.moderator(arr, callback, bulkCount);
-        return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
-      }
-    }, */
+    
   
 
     // NODE-UTILS

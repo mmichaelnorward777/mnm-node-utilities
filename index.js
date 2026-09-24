@@ -10,7 +10,11 @@ import getStringUtils from './string-utils.js';
 import getUrlUtils from './url-utils.js';
 import getMcpToolsFn from './tools.js';
 
+import initializeCallbackRegistryFn from './callbacks-registry.js';
+
 export const getMcpTools = getMcpToolsFn;
+
+export const initializeCallbackRegistry = initializeCallbackRegistryFn;
 
 export default function getUtilities(config)  {
 
@@ -39,6 +43,8 @@ export default function getUtilities(config)  {
     const nodeUtils = getNodeUtils({ checkDirPathPermissions, getUserAllowedPaths });
     const objectArrayUtils = getObjectArrayUtils({ toNormalString, objectToDotNotation });
 
+
+    
 
     return {
         ...fileSystemUtils,
