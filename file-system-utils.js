@@ -148,8 +148,8 @@ export default function getFileSystemUtils({userAllowedPaths})    {
 
     function isPathContained(parentPath, targetPath, permissionType) {
         
-        const resolvedParent = path.resolve(parentPath); // fs.realpathSync(path.resolve(parentPath));
-        const resolvedTarget = path.resolve(targetPath); // fs.realpathSync();
+        const resolvedParent = path.resolve(parentPath).replace(/\\/gi, "/"); // fs.realpathSync(path.resolve(parentPath));
+        const resolvedTarget = path.resolve(targetPath).replace(/\\/gi, "/"); // fs.realpathSync();
 
         // const resolvedParent = fs.realpathSync(path.resolve(parentPath));
         // const resolvedTarget = fs.realpathSync(targetPath);
@@ -160,7 +160,7 @@ export default function getFileSystemUtils({userAllowedPaths})    {
         }
         // Child path match
         return resolvedTarget.startsWith(
-            resolvedParent + path.sep
+            resolvedParent
         );
     }
 
