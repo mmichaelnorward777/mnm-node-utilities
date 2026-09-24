@@ -1642,29 +1642,29 @@ export default function getMcpTools(z, utils) {
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
-    createJsonFileObject: {
-      urlName: "create-json-file-object",
-      title: "Create JSON File Object",
-      description: "Creates a JSON file manager object for storing and retrieving data from a JSON file. Creates the file with an empty array if it doesn't exist.",
-      inputSchema: z.object({
-        path: z.string().describe("The directory path where the JSON file will be stored"),
-        fileName: z.string().describe("The name of the JSON file")
-      }),
-      outputSchema: z.object({
-        result: z.object({
-          getSavedData: z.function().describe("Async function to retrieve stored data"),
-          addData: z.function().describe("Async function to add data to stored array"),
-          clearData: z.function().describe("Async function to clear all data")
-        })
-      }),
-      metadata : {
-        group : "json-utillities",
-      },
-      handler: async ({ path, fileName }) => {
-        const result = await utils.createJsonFileObject(path, fileName);
-        return { content: [{ type: "text", text: JSON.stringify({ result: "JSON file object created" }) }] };
-      }
-    },
+    // createJsonFileObject: {
+    //   urlName: "create-json-file-object",
+    //   title: "Create JSON File Object",
+    //   description: "Creates a JSON file manager object for storing and retrieving data from a JSON file. Creates the file with an empty array if it doesn't exist.",
+    //   inputSchema: z.object({
+    //     path: z.string().describe("The directory path where the JSON file will be stored"),
+    //     fileName: z.string().describe("The name of the JSON file")
+    //   }),
+    //   outputSchema: z.object({
+    //     result: z.object({
+    //       getSavedData: z.function().describe("Async function to retrieve stored data"),
+    //       addData: z.function().describe("Async function to add data to stored array"),
+    //       clearData: z.function().describe("Async function to clear all data")
+    //     })
+    //   }),
+    //   metadata : {
+    //     group : "json-utillities",
+    //   },
+    //   handler: async ({ path, fileName }) => {
+    //     const result = await utils.createJsonFileObject(path, fileName);
+    //     return { content: [{ type: "text", text: JSON.stringify({ result: "JSON file object created" }) }] };
+    //   }
+    // },
 
     // OBJECTS-ARRAY
     getValidatedPropValues: {
