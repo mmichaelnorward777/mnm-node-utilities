@@ -117,11 +117,13 @@ export default function getNodeUtils({ checkDirPathPermissions, getUserAllowedPa
 
                 // 7. Secure Local Execution Routing
                 const platform = os.platform();
-                const binaryPath = platform === 'win32' ? cmd : `/usr/bin/${cmd}`;
+                const isWindows = platform === 'win32';
+                const binaryPath = isWindows ? 'cmd.exe' : `/usr/bin/${cmd}`;
+                const spawnArgs = isWindows ? ['/c', command] : args;
 
                 execFile(
                     binaryPath,
-                    args,
+                    spawnArgs,
                     { 
                         cwd: realCwd, 
                         timeout: 90000,              // 1.5 minute cutoff threshold allocation

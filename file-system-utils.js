@@ -1119,11 +1119,41 @@ export default function getFileSystemUtils({userAllowedPaths})    {
     }
 
 
+    function normalizePathParts(pathParts) {
+        const isWindows = process.platform === 'win32';
+        // Handle both ["C:", "folder"] and "C:", "folder" call styles
+        const parts = Array.isArray(pathParts) ? pathParts : [...pathParts];
+
+        return parts.map((part, index) => {
+            // Windows: Fix missing colon on drive letters (only first part)
+            if (isWindows && index === 0 && /^[a-zA-Z]$/.test(part)) {
+                return `${part}:`;
+            }
+
+            // Windows: Normalize any backslashes to forward slashes
+            if (isWindows && typeof part === 'string') {
+                return part.replace(/\\/g, "/");
+            }
+
+            // Unix: Ensure absolute paths start with "/" if not already
+            if (!isWindows && index === 0 && typeof part === 'string') {
+                if (!part.startsWith('/') && !part.startsWith('~') && part !== '.') {
+                    return `/${part}`;
+                }
+            }
+
+            return part;
+        });
+    }
+
+    // Updated createDirPath function with built-in normalization
     async function createDirPath(...args) {
+        const pathParts = Array.isArray(args[0]) ? args[0] : [...args];
+        const normalizedParts = normalizePathParts(pathParts);
+        
+        let dirPath = path.join(...normalizedParts).replace(/\\/gi, "/");
 
-        let dirPath = path.join(...args);
-
-        if(!checkDirPathPermissions(dirPath, "write")) {
+        if (!checkDirPathPermissions(dirPath, "write")) {
             getDeniedError();
             return;
         }

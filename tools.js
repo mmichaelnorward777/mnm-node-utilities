@@ -469,7 +469,7 @@ export default function getMcpTools(z, utils) {
         group : "date-utillities",
       },
       handler: async ({ startDate, endDate }) => {
-        const result = utils.getForwardDateRangeObjects(startDate, endDate);
+        const result = utils.getForwardDateRangeObjects(new Date(startDate), new Date(endDate));
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -487,8 +487,8 @@ export default function getMcpTools(z, utils) {
       metadata : {
         group : "date-utillities",
       },
-      handler: async ({ startDate, endDate }) => {
-        const result = utils.getBackwardDateRangeObjects(startDate, endDate);
+      handler: ({ startDate, endDate }) => {
+        const result = utils.getBackwardDateRangeObjects(new Date(startDate), new Date(endDate));
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -506,8 +506,8 @@ export default function getMcpTools(z, utils) {
       metadata : {
         group : "date-utillities",
       },
-      handler: async ({ startDate, endDate }) => {
-        const result = utils.getDateRangeObjects(startDate, endDate);
+      handler: ({ startDate, endDate }) => {
+        const result = utils.getDateRangeObjects(new Date(startDate), new Date(endDate));
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -526,8 +526,8 @@ export default function getMcpTools(z, utils) {
       metadata : {
         group : "date-utillities",
       },
-      handler: async ({ startDate, endDate, timeZone }) => {
-        const result = utils.getDateRangeObjectsWithIsoZeroOffset(startDate, endDate, timeZone);
+      handler: ({ startDate, endDate, timeZone }) => {
+        const result = utils.getDateRangeObjectsWithIsoZeroOffset(new Date(startDate), new Date(endDate), timeZone);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -1070,8 +1070,8 @@ export default function getMcpTools(z, utils) {
       metadata : {
         group : "fs-file-utillities",
       },
-      handler: async ({ path, encoding }) => {
-        const result = utils.isFileEmptySync(path, { encoding: encoding || "utf8" });
+      handler: ({ path }) => {
+        const result = utils.getFileObject(path);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -1652,7 +1652,7 @@ export default function getMcpTools(z, utils) {
       metadata : {
         group : "node-utillities",
       },
-      handler: async ({ filePath }) => {
+      handler: ({ filePath }) => {
         const result = utils.spawnOnChildProcess(filePath);
         return { content: [{ type: "text", text: JSON.stringify({ result: "Child process spawned" }) }] };
       }
@@ -1741,8 +1741,8 @@ export default function getMcpTools(z, utils) {
       metadata : {
         group : "objects-array-utillities",
       },
-      handler: async ({ objStr, propNames }) => {
-        const result = utils.getValidatedPropValues(objStr, propNames);
+      handler: ({ objStr, propNames }) => {
+        const result = utils.getValidatedPropValues(JSON.parse(objStr), propNames);
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -2104,8 +2104,8 @@ export default function getMcpTools(z, utils) {
       metadata : {
         group : "url-utillities",
       },
-      handler: async ({ obj }) => {
-        const result = utils.objectToQueryString(obj);
+      handler: ({ obj }) => {
+        const result = utils.objectToQueryString(JSON.parse(obj));
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -2165,8 +2165,8 @@ export default function getMcpTools(z, utils) {
       metadata : {
         group : "url-utillities",
       },
-      handler: async ({ obj }) => {
-        const result = utils.objectToDotNotation(obj);
+      handler: ({ obj }) => {
+        const result = utils.objectToDotNotation(JSON.parse(obj));
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
@@ -2183,8 +2183,8 @@ export default function getMcpTools(z, utils) {
       metadata : {
         group : "url-utillities",
       },
-      handler: async ({ dotNotationStr }) => {
-        const result = utils.dotNotationToObject(dotNotationStr);
+      handler: ({ dotNotationStr }) => {
+        const result = utils.dotNotationToObject(JSON.parse(dotNotationStr));
         return { content: [{ type: "text", text: JSON.stringify({ result }) }] };
       }
     },
